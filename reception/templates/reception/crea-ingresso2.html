@@ -1,0 +1,26 @@
+{% extends 'base/main.html' %}
+
+{% load static %}
+
+{% block content %}
+<title>{% block title%}Modifica Ingresso{% endblock %}</title>
+<link rel="stylesheet" href="{% static 'reception/css/style.css' %}">
+<script src="{% static 'reception/js/script.js' %}"></script>
+
+<div class="container2">
+<div class="header-bar2">
+    <div>
+      <h2>Modifica Ingresso di {{object.nominativo|title}}</h2>
+    </div>
+</div>
+
+<div class="card-body">
+    <form class="" method="POST" action="">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" class="btn btn-success" class="wrap" value="Modifica">
+</form>
+</div>
+</div>
+
+{% endblock %}

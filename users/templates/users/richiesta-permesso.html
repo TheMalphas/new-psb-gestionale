@@ -1,0 +1,24 @@
+{% extends "base/main.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<title>{% block title%}Richiedi un permesso{% endblock %}</title>
+
+<link rel="stylesheet" href="{% static 'users/css/style.css' %}">
+
+
+<section class="one">
+    <div class="container" style="align-elements:center;text-align: center;vertical-align: middle;"><h1>Richiesta Permessi</h1></div>
+    
+    <div class="container-for-mobile"> 
+        <div class="container-for-button-one-mobile"><a href="{% url 'users:richiedi-permesso-giorni' %}"><div class="mobile-icon-entrate"><div class="text-entrate-mobile">Permessi</div></div></a></div>
+        <div class="container-for-button-two-mobile"><a href="{% url 'users:richiedi-permesso-orario' %}"><div class="mobile-icon-uscite"><div class="text-uscite-mobile">Permessi <br> orari</div></div></a></div>
+
+    </div>
+
+</section>
+
+
+{% endblock content %}

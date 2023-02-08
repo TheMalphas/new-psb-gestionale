@@ -1,0 +1,84 @@
+.hover-link:hover {
+    background-color: #1eff00 !important;
+    border-radius: 0.4em;
+    color: #ffffff !important;
+}
+
+.nav-pills > li > a.active {
+    color: #ffffff !important;
+    background-color: #1eff00 !important;
+}
+
+.nav-pills > li > a.active:hover {
+    color: #ffffff !important;
+    background-color: #1eff00 !important;
+}
+
+.nav-pills > li:hover {
+    color: #ffffff !important;
+}
+
+.hover-link:hover {
+    background-color: #1eff00 !important;
+    color: #ffffff !important;
+    border-radius: 0.4em;
+}
+
+a:hover, a:active {
+    color: #ffffff !important;
+}
+
+.hover-link > li > a{
+    color: #ffffff !important;
+}
+
+.cartaBox .carta .numbers {
+    color: #1eff00;
+}
+
+.cartaBox .carta-table .numbers {
+    color: #1eff00;
+}
+
+.cartaBox .carta-table-reception .numbers {
+    color: #1eff00;
+}
+
+.cartaBox .carta:hover:not(#child){
+    background-color: #1eff00;
+    color: #ffffff;
+}
+.cartaBox-table-reception-datatables  .carta .numbers {
+    color: #1eff00;
+}
+
+.cartaBox-table-reception-datatables  .carta-table .numbers {
+    color: #1eff00;
+}
+
+.cartaBox-table-reception-datatables  .carta-table-reception .numbers {
+    color: #1eff00;
+}
+
+.cartaBox-table-reception-datatables  .carta-table-reception-datatables .numbers {
+    color: #1eff00;
+}
+
+.cartaBox-table-reception-datatables  .carta:hover:not(#child){
+    background-color: #1eff00;
+    color: #ffffff;
+}
+
+.table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
+    color: #ffffff;
+    background-color: #1eff00;
+}
+
+.dropdown-item:hover{
+    color: #ffffff;
+    background-color: #1eff00;
+}
+
+strong {
+    color: #1eff00;
+}

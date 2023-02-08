@@ -1,0 +1,202 @@
+{% extends 'base/main.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<title>{% block title%}Presenze Area{% endblock %}</title>
+
+<link rel="stylesheet" href="{% static 'reception/css/style.css' %}">
+<script src="{% static 'reception/js/script.js' %}"></script>
+
+
+<div class="container" >
+<div class="header-bar2 row">
+    <div class="col-md-auto"><h1> Presenze di {{data|date:"D d M Y"}}</h1>
+    <div class="col-md-auto">
+      <form method="GET">
+        {% csrf_token %}
+        <input type="hidden" name="data" value="{{data|date:"Y-m-d"}}">
+        <input type="submit" name="prec" value="Prec">
+      </form>
+    </div>
+    <div class="col-md-auto">
+      <form method="GET">
+        {% csrf_token %}
+        <input style="height:3rem; width:10rem;" type="date" name="data" placeholder="aaaa-mm-gg">
+        <input class="button-reception-search" type="submit" value="Cerca">
+      </form>
+    </div>
+    <div class="col-md-auto">
+        <form method="GET">
+        {% csrf_token %}
+        <input type="hidden" name="data" value="{{data|date:"Y-m-d"}}">
+        <input type="submit" name="succ" value="Succ">
+    </form>
+  </div>
+  </div>
+</div>
+
+</div>
+
+<div class= "container">
+
+<table class="table table-striped table-hover">
+    <thead>
+      <tr>
+        <th scope="col">Area </th>
+        <th scope="col">Presenze</th>
+        <th scope="col">Assenze</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <th scope="row">Amministrazione</th>
+        <td>{{totale_area_presenze_amm}}</td>
+        <td>{{totale_area_assenze_amm}}</td>
+      </tr>
+      <tr>
+        <th scope="row">APL</th>
+        <td>{{totale_area_presenze_APL}}</td>
+        <td>{{totale_area_assenze_APL}}</td>
+      </tr>
+      <tr>
+        <th scope="row">AR/VR</th>
+        <td>{{totale_area_presenze_AR_VR}}</td>
+        <td>{{totale_area_assenze_AR_VR}}</td>
+      </tr>
+      <tr>
+        <th scope="row">Assistenza Direzione</th>
+        <td>{{totale_area_presenze_Assistenza_Direzione}}</td>
+        <td>{{totale_area_assenze_Assistenza_Direzione}}</td>
+      </tr>
+      <tr>
+        <th scope="row">Commerciale</th>
+        <td>{{totale_area_presenze_Commerciale}}</td>
+        <td>{{totale_area_assenze_Commerciale}}</td>
+      </tr>
+      <tr>
+        <th scope="row">Customer Service</th>
+        <td>{{totale_area_presenze_Customer_Service}}</td>
+        <td>{{totale_area_assenze_Customer_Service}}</td>
+      </tr>
+      <tr>
+        <th scope="row">Didattica Autofinanziata</th>
+        <td>{{totale_area_presenze_Didattica_Autofinanziata}}</td>
+        <td>{{totale_area_assenze_Didattica_Autofinanziata}}</td>
+      </tr>
+      <tr>
+        <th scope="row">Didattica Finanziata</th>
+        <td>{{totale_area_presenze_Didattica_Finanziata}}</td>
+        <td>{{totale_area_assenze_Didattica_Finanziata}}</td>
+      </tr>
+      <tr>
+        <th scope="row">Dirigenti</th>
+        <td>{{totale_area_presenze_Dirigenti}}</td>
+        <td>{{totale_area_assenze_Dirigenti}}</td>
+      </tr>
+      <tr>
+        <th scope="row">Edilizia</th>
+        <td>{{totale_area_presenze_Edilizia}}</td>
+        <td>{{totale_area_assenze_Edilizia}}</td>
+      </tr>
+      <tr>
+        <th scope="row">Editoria Web TV</th>
+        <td>{{totale_area_presenze_Editoria_Web_TV}}</td>
+        <td>{{totale_area_assenze_Editoria_Web_TV}}</td>
+      </tr>
+      <tr>
+        <th scope="row">Ente Bilaterale</th>
+        <td>{{totale_area_presenze_Ente_Bilaterale}}</td>
+        <td>{{totale_area_assenze_Ente_Bilaterale}}</td>
+      </tr>
+      <tr>
+        <th scope="row">FAD</th>
+        <td>{{totale_area_presenze_FAD}}</td>
+        <td>{{totale_area_assenze_FAD}}</td>
+      </tr>
+      <tr>
+        <th scope="row">Front Office</th>
+        <td>{{totale_area_presenze_Front_Office}}</td>
+        <td>{{totale_area_assenze_Front_Office}}</td>
+      </tr>
+      <tr>
+        <th scope="row">Generale</th>
+        <td>{{totale_area_presenze_Generale}}</td>
+        <td>{{totale_area_assenze_Generale}}</td>
+      </tr>
+      <tr>
+        <th scope="row">Industria 4.0</th>
+        <td>{{totale_area_presenze_Industria_4}}</td>
+        <td>{{totale_area_assenze_Industria_4}}</td>
+      </tr>
+      <tr>
+        <th scope="row">Marketing</th>
+        <td>{{totale_area_presenze_Marketing}}</td>
+        <td>{{totale_area_assenze_Marketing}}</td>
+      </tr>
+      <tr>
+        <th scope="row">Piattaforme Moodle</th>
+        <td>{{totale_area_presenze_Piattaforme_Moodle}}</td>
+        <td>{{totale_area_assenze_Piattaforme_Moodle}}</td>
+      </tr>
+      <tr>
+        <th scope="row">Processi e Automazioni</th>
+        <td>{{totale_area_presenze_Processi_e_Automazioni}}</td>
+        <td>{{totale_area_assenze_Processi_e_Automazioni}}</td>
+      </tr>
+      <tr>
+        <th scope="row">Pulizie</th>
+        <td>{{totale_area_presenze_Pulizie}}</td>
+        <td>{{totale_area_assenze_Pulizie}}</td>
+      </tr>
+      <tr>
+        <th scope="row">Recruiting</th>
+        <td>{{totale_area_presenze_Recruiting}}</td>
+        <td>{{totale_area_assenze_Recruiting}}</td>
+      </tr>
+      <tr>
+        <th scope="row">Responsabile</th>
+        <td>{{totale_area_presenze_Responsabile}}</td>
+        <td>{{totale_area_assenze_Responsabile}}</td>
+      </tr>
+      <tr>
+        <th scope="row">Responsabile Sede</th>
+        <td>{{totale_area_presenze_Responsabile_Sede}}</td>
+        <td>{{totale_area_assenze_Responsabile_Sede}}</td>
+      </tr>
+      <tr>
+        <th scope="row">Risorse Umane</th>
+        <td>{{totale_area_presenze_Risorse_Umane}}</td>
+        <td>{{totale_area_assenze_Risorse_Umane}}</td>
+      </tr>
+      <tr>
+        <th scope="row">Scuola PSB C</th>
+        <td>{{totale_area_presenze_Scuola_PSB_C}}</td>
+        <td>{{totale_area_assenze_Scuola_PSB_C}}</td>
+      </tr>
+      <tr>
+        <th scope="row">Servizio Civile</th>
+        <td>{{totale_area_presenze_Servizio_Civile}}</td>
+        <td>{{totale_area_assenzee_Servizio_Civile}}</td>
+      </tr>
+      <tr>
+        <th scope="row">Sicurezza Edilizia</th>
+        <td>{{totale_area_presenze_Sicurezza_Edilizia}}</td>
+        <td>{{totale_area_assenze_Sicurezza_Edilizia}}</td>
+      </tr>
+      <tr>
+        <th scope="row">Ufficio Associazioni Sportive</th>
+        <td>{{totale_area_presenze_Ufficio_Associazioni_Sportive}}</td>
+        <td>{{totale_area_assenze_Ufficio_Associazioni_Sportive}}</td>
+      </tr>
+      <tr>
+        <th scope="row">Ufficio Tecnico</th>
+        <td>{{totale_area_presenze_Ufficio_Tecnico}}</td>
+        <td>{{totale_area_assenze_Ufficio_Tecnico}}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends 'base/main.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<title>{% block title%}Presenze{% endblock %}</title>
+
+<link rel="stylesheet" href="{% static 'gestione/css/style.css' %}">
+<script src="{% static 'gestione/js/script.js' %}"></script>
+
+<div class="mini-container">
+  <div class="mini-header-bar">
+      <h1>Totali</h1>
+  </div>
+
+  <table class="table table-striped table-hover">
+  <thead>
+    <tr>
+  </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">Entrate</th>
+      <td>{{totale_entrate}}</td>
+    </tr>
+    <tr>
+      <th scope="row">Uscite</th>
+      <td>{{totale_uscite}}</td>
+    </tr>
+    <tr>
+      <th scope="row">Assenze</th>
+      <td>{{totale_assenze}}</td>
+    </tr>
+    <tr>
+      <th scope="row">Permessi</th>
+      <td>{{totale_permessi}}</td>
+    </tr>
+    <tr>
+      <th scope="row">Scarica Report</th>
+      <td><a href="/presenze/download/{{data|date:'Y-m-d'}}" class='btn btn-outline-primary border-0'><i class='fa-solid fa-download fa-lg'></i></a></td>
+    </tr>
+    <tr>
+    <th scope="row">Area</th>
+    <td><a href="{% url 'gestione:dettagli-presenze-area' %}">Dettagli Aree</a></td>
+    </tr>
+  </tbody>
+    </table>
+</div>
+
+<div class="container" >
+<div class="header-bar2 row">
+    <div class="col-md-auto"><h1> Presenze di {{data|date:"D d M Y"}}</h1></div>
+    <div class="col-md-auto"><form method="GET">
+        {%  csrf_token %%}
+        <input type="submit" name="prec" value="Prec">
+        <input style="height:3rem; width:10rem;" type="date" name="data" placeholder="aaaa-mm-gg">
+        <input class="button-reception-search" type="submit" value="Cerca">
+        <input type="submit" name="succ" value="Succ">
+    </form></div>
+</div>
+
+</div>
+
+<div class= "container">
+
+<table class="table table-striped table-hover">
+    <thead>
+      <tr>
+        <th scope="col">Dipendente</th>
+        <th scope="col">Stato</th>
+        <th scope="col">Entrata</th>
+        <th scope="col">Uscita</th>
+        <th scope="col">Area</th>
+        <th scope="col">Ritardo/Anticipo</th>
+      </tr>
+    </thead>
+    <tbody>
+        {% for dipendente in presenze %}
+      <tr {% if dipendente.tipo == 'Assente' %} style="background-color: red; font-weight: bold;"  {% elif dipendente.in_permesso == 1 %} style="background-color: yellow; font-weight: bold;" {% endif %}>
+        <th scope="row">
+        <button type="button" onclick="open_modal_modifica_ingresso('{% url 'reception:crea-ingresso' dipendente.id_ingresso %}')" class="btn" {% if dipendente.tipo == 'Assente' %} style="font-weight: bold;"  {% elif dipendente.in_permesso == 1 %} style="font-weight: bold;" {% endif %}> {{dipendente.nominativo}}</button>
+        <a href="{% url 'reception:crea-ingresso2' dipendente.id_ingresso %}" target="_blank" rel="noopener noreferrer"><i class="fa-regular fa-pen-to-square"></i></a>
+        <td>{% if dipendente.checked_in %} &#10003; {% elif dipendente.in_permesso == 1 %} &#80; {% elif dipendente.tipo == 'Assente' %} &#65; {% elif dipendente.tipo == 'Esterno' %} &#69; {% else %} &#x2715; {% endif %}</td>
+        <td>{% if dipendente.entrata %} {{dipendente.entrata|time:"H:i"}} {% else %} -- {% endif %}</td>
+        <td>{% if dipendente.seconda_uscita != none %} {{dipendente.seconda_uscita}} {% elif dipendente.uscita %} {{dipendente.uscita|time:"H:i"}}  {% else %} -- {% endif %} </td>
+        <td>{{dipendente.id_dip_ing.area}}</td>
+        <td>{% if dipendente.ritardo %} -{{dipendente.ritardo}} {% elif dipendente.anticipo %} +{{dipendente.anticipo}} {% else %} 0 {% endif %}</td>
+        {% endfor %}
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="modal fade" id="modificaPresenze" role="dialog" tabindex="-1">
+</div>
+
+<script>
+    var $ = jQuery.noConflict();
+function open_modal_modifica_presenze(url){
+    $('#modificaPresenze').load(url,function(){
+    $(this).modal('show'); 
+    });
+};
+</script>
+
+{% endblock %}

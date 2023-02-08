@@ -1,0 +1,116 @@
+{% extends "base/main.html" %}
+
+{% comment %} {% block title %}Accetta richiesta | {% endblock %} {% endcomment %}
+
+{% load static %}
+
+{% block content %}
+
+<title>{% block title%}Richiesta di: {{richiesta.nominativo}}{% endblock %}</title>
+
+<link rel="stylesheet" href="{% static 'capi_area/css/style.css' %}">
+<style>
+.thick {
+    font-weight: 700;
+}
+</style>
+
+    <div class="container text-center shadow" style="position:relative;">
+    
+            <!-- ==== Dipendente ==== -->
+            <div class="header-bar3">
+            <a style="color:white;" href="{% url 'capi_area:richieste' %}">&#8592;Indietro</a>
+            <h1 class="display-4" style="margin-top:20px; text-align:left;">{{richiesta.nominativo}}</h1>
+            </div>
+            
+            <!-- ==== Fine Dipendente ==== -->
+
+            
+            <!-- ==== Dettagli Richiesta==== -->
+            <div class="d-flex justify-content-between align-items-center">
+                
+                <div class="container pt-md-5 pb-md-4 ">
+                    <div class="title"><h5 class="display">Dal:</h5></div>
+                        <small class="text-muted">{{richiesta.da_giorno_richiesta}} <br> {% if richiesta.da_ora_richiesta %} ore: {{richiesta.da_ora_richiesta|time:"H:i"}} {% endif %}</small>
+                </div>
+                <div class="container">
+                    <div class="title"><h5 class="display">fino al:</h4></div>
+                        <small class="text-muted">{% if richiesta.a_giorno_richiesta %} {{richiesta.a_giorno_richiesta}} {% else %} {{richiesta.da_giorno_richiesta}} {% endif %}  <br> {% if richiesta.a_ora_richiesta %} ore: {{richiesta.a_ora_richiesta|time:"H:i"}} {% endif %}</small>
+                </div>
+                <div class="container">
+                    <div class="title"><h5 class="display">Data richiesta:</h5></div>
+                        <small class="text-muted">{{richiesta.timestamp|date}}</small><br>
+                </div>
+            </div>
+            <!-- ==== Fine Dettagli Richiesta==== -->
+
+            <hr>
+
+            <!-- ====  Contatti ==== -->
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="container">
+                    <div class="title"><h5 class="display">Dettagli:</h5></div>
+                        <small class="text-muted"><strong>Sede: </strong>{{richiesta.id_dipendente_richiesta.sede.nome_sede}}</small><br>
+                        <small class="text-muted"><strong>Area: </strong>{{richiesta.id_dipendente_richiesta.area.nome_area}}</small><br>
+                        <small class="text-muted"><strong>Contratto: </strong>{{richiesta.id_dipendente_richiesta.tipocontratto.tipo_contratto}}</small><br>
+                </div>
+                <div class="container">
+                    <div class="title"><h5 class="display">Contatti:</h5></div>
+                        <small class="text-muted"><strong>Email: </strong>{{richiesta.id_dipendente_richiesta.email_lav}}</small><br>
+                        <small class="text-muted"><strong>Cell/Tell: </strong>{{richiesta.id_dipendente_richiesta.cellulare}}</small><br>
+                </div>
+            </div>
+            <!-- ==== Fine Contatti ==== -->
+
+            <hr>
+
+            <!-- ====  Note ==== -->
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="container ">
+                    <h3 class="display">Note</h3>
+                    <h5 class="text">{{richiesta.note_richiesta}}</h5><br>
+                </div>
+            </div>
+            <!-- ==== Fine Note ==== -->
+
+            <hr>
+
+            <!-- ==== Stato ==== -->
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="container">
+                    <h3 class="title">Stato</h3>
+                    <div class="container">
+                    {%  if richiesta.stato == 1 %}
+                    <div class="text"><strong><h4><p class="thick" style="color:#0275d8">Accettata</p></h4></strong></div>
+                    {% elif richiesta.stato == 0 %}
+                    <div class="text"><strong><h4><p class="thick" style="color:#dc3545">Respinta</p></h4></strong></div>
+                    {% else %}
+                    <div class="text"><small class="text-muted">Da controllare</small></div>
+                    {% endif %}
+                    </div>
+                </div>
+            </div>
+            <!-- ==== Fine Stato ==== -->
+
+            <hr>
+
+            <!-- ==== Accetta/Declina ==== -->
+            <div>
+                <div class="container t-3 p-3">
+                    <div class="btn-group" role="group" aria-label="Basic example">
+                        <form action="{% url 'capi_area:gestisci-richiesta' richiesta.id_richiesta %}" name="accept_form" method="GET" value="accept">{% csrf_token %}
+                            <input hidden id="id" name="id" value="{{richiesta.id_richiesta}}">
+                            <button type="submit" class="btn btn-lg btn-primary" id="button accept" name="accept" value="accept">Accetta</button></form>
+                        
+                        <form action="{% url 'capi_area:gestisci-richiesta' richiesta.id_richiesta %}" name="deny_form" method="GET" value="deny">{% csrf_token %}
+                            <input hidden id="id" name="id" value="{{richiesta.id_richiesta}}">
+                            <button type="submit" class="btn btn-lg btn-danger" id="button deny" name="deny" value="deny">Declina</button></form>
+                    </div>
+                </div>
+            </div>
+            <!-- ==== Fine Accetta/Declina ==== -->
+
+    </div>
+
+
+{% endblock content %}

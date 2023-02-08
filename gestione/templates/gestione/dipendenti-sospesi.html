@@ -1,0 +1,73 @@
+{% extends 'base/main.html' %}
+
+{% block content %}
+
+<title>{% block title%}Dipendenti{% endblock %}</title>
+
+
+
+<div class="space">
+</div>
+
+
+<div class="container-mie-richieste">
+   <div class="header-bar2">
+    <div class="row">
+        <div class="col">
+        <h1> Dipendenti </h1>
+        </div>
+        <div class="col" style="margin-top:0.5em;">
+        <form method="GET" action="{% url 'gestione:dipendenti-sospesi' %}" value="{{dipendenti.id_dip}}">{% csrf_token %%}
+            <input id="dip" name="dip" value="{{dipendenti.id_dip}}">
+            <button type="submit" class="btn btn-danger" name="submit" value="Cerca">Cerca</button>
+        </form>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <a class="white-style" href="{%url 'gestione:dipendenti' %}">Attivi</a>
+        </div>
+        <div class="col">
+            <a class="white-style" href="{%url 'gestione:dipendenti-cessati'%}">Cessati</a>
+        </div>
+
+        <div class="col">
+            <a class="white-style" href="{%url 'gestione:dipendenti-sospesi'%}">Sospesi</a>
+        </div>
+    </div>
+    </div>
+    </div>
+   </div>
+
+<div class="container-mie-richieste">
+   <div class="task-items-wrapper">
+        {% for dipendente in dipendenti %}
+        <div class="task-wrapper">  
+        <div class="task-title">
+            <div class="container"><a href="{% url 'gestione:update-anagrafica' dipendente.id_dip %}">{{dipendente}}</a></div>
+        </div>
+    </div>
+        {% endfor %}
+    </div>
+    <div class="header-bar2b">
+        {% if is_paginated %}
+            {% if page_obj.has_previous %}
+            <a class="white-style" href="?page=1">&laquo; Prima pagina</a>
+            <a class="white-style" href="?page={{page_obj.previous_num_pages}}">precedente</a>
+            {% endif %}
+            Pagina {{page_obj.number}} of {{page_obj.paginator.num_pages}}
+            {% if page_obj.has_next %}
+            <a class="white-style" href="?page={{page_obj.next_page_number}}">prossima</a>
+            <a class="white-style" href="?page={{page_obj.paginator.num_pages}}">ultima pagina&raquo;</a>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
+
+
+</div>
+
+
+<div class="space">
+
+{% endblock content %}

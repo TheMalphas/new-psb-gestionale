@@ -1,0 +1,98 @@
+{% extends 'base/main.html' %}
+{% load static %}
+{% block content %}
+
+<title>{% block title%}Sede{% endblock %}</title>
+<link rel="stylesheet" href="{% static 'gestione/css/style.css' %}">
+<script src="{% static 'gestione/js/script.js' %}"></script>
+
+<section style="box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); margin-left:268px;">
+    <header class="p-3 bg-light text-black">
+        <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+    
+        <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+            <li class="nav-link px-2 text-dark"></li>            
+            <li class="nav-link px-2 text-dark">Buon lavoro, {{user.first_name}}</li> 
+        </ul>
+        <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" method="GET" action="{% url 'gestione:sedi' %}" value="{{sede.id_sede}}">
+            {% csrf_token %}
+            <input type="search" id="sede-input" name="sede" class="form-control form-control-dark" value="{{sede.nome_sede}}" placeholder="Search..." aria-label="Search">
+        </form>
+        <div class="text-end">
+            <button type="button" class="btn btn-success">Cerca</button>
+            <a href="/lista-sedi-excel/?sede=" id="sede-anchor"><button type="button" class="btn btn-warning">Scarica</button></a>
+        </div>
+</header>
+</section>
+
+<section style="margin-left:300px; margin-top:25px;">
+    <div class="cartaBox">
+            <div class="carta-table-reception">
+                <div>
+                    <div class="numbers">{{sedi|length}}</div>
+                    <div class="no-hover">
+                    <table class="table table-striped table-hover caption-top text-nowrap">
+                        <caption>Lista Sede</caption>
+                        <thead>
+                        <tr>
+                            <th scope="col"></th>
+                            <td> Sede </td>
+                            <td> Note </td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            {% for sede in sedi %}
+                            <tr>
+                                <th scope="col">
+                                    <div class="dropdown">
+                                        <a href="#" class="d-flex align-items-center link-dark text-decoration-none dropdown-toggle" id="dropdownUser2" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="bi bi-plus-square-fill"></i>
+                                        </a>
+                                            <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser2">
+                                            <li><a class="dropdown-item" onclick="open_modal_create_sede('{% url 'gestione:crea-nuova-sede'%}')">Crea Nuovo</a></li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li><a class="dropdown-item" onclick="open_modal_update_sede('{% url 'gestione:modifica-sede' sede.id_sede %}')">Modifica</a></li>
+                                        </ul>
+                                    </div>
+                                </th>
+                                <td>{{sede.nome_sede|title}}</td>
+                                <td class="ellipsis">{% if sede.note %}{{sede.note}}{% endif %}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                </div>
+                <div class="iconBox">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="55" height="55" fill="currentColor" class="bi bi-house-door-fill" viewBox="0 0 16 16">
+                        <path d="M6.5 14.5v-3.505c0-.245.25-.495.5-.495h2c.25 0 .5.25.5.5v3.5a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.146-.354L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 1.5 7.5v7a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 .5-.5Z"/>
+                    </svg>
+                </div>
+            </div>
+    </div>    
+</section>
+
+<div class="modal fade" id="modificaSedeModal" role="dialog" tabindex="-1">
+</div>
+
+<div class="modal fade" id="creaSedeModal" role="dialog" tabindex="-1">
+</div>
+
+<script>
+    var $ = jQuery.noConflict();
+function open_modal_update_sede(url){
+    $('#modificaSedeModal').load(url,function(){
+    $(this).modal('show'); 
+    });
+};
+
+var $ = jQuery.noConflict();
+function open_modal_create_sede(url){
+    $('#creaSedeModal').load(url,function(){
+    $(this).modal('show'); 
+    });
+};
+</script>
+
+{% endblock content %}
+

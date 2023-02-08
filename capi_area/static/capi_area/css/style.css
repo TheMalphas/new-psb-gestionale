@@ -1,0 +1,59 @@
+.delete-link {
+    text-decoration: none;
+    font-size: 18px;
+    line-height: 0;
+    float:right;
+}
+
+.arrow-link {
+    text-decoration: none;
+    font-size: 18px;
+    line-height: 0;
+}
+
+#search-add-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+}
+
+.small-tag {
+    margin-right: 250px;
+}
+.button-capi_area {
+    border: 1px solid #FAFAFA;
+    background-color: #1f94d9;
+    color: #FAFAFA;
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 50px;
+    cursor: pointer;
+    text-decoration: none;
+    font-size:solid;
+}
+.mini-container{
+    float:right;
+}
+.mini-header-bar {
+    display:inline-flex;
+    color: #FFF;
+    padding: 1em;
+    border-radius: 5px 5px 0 0 ;
+    background: linear-gradient(90deg, #34373e 0%, #5c6580 43%, #020024 100%);
+    min-width: 256px;
+    width: 100%;
+    }
+.maxi-container{
+    overflow:auto;
+}
+.thick {
+    font-weight: 700;
+}
+.header-bar3 {
+    color: #FFF;
+    padding: 1em;
+    border-radius: 5px 5px 0 0 ;
+    margin: 0px;
+    background: linear-gradient(90deg, #34373e 0%, #5c6580 43%, #020024 100%);
+}

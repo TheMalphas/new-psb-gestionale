@@ -1,0 +1,383 @@
+{% extends 'base/main.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<title>{% block title%}Stipendi {{anni}}-{{mese}}{% endblock %}</title>
+<script src="{% static 'cedolini/js/script.js' %}"></script>
+<link rel="stylesheet" href="{% static 'cedolini/css/style.css' %}">
+
+
+
+<div class="header-bar2b">
+    <div class="col-md-auto"><h1>Stipendio di {{mese}}, {{cedolino.anno}}, di {{cedolino.dipendente}} </h1></div>
+</div>
+
+    <div class="btn-group" role="group" aria-label="Basic mixed styles example">
+        <button type"button" class="btn btn-secondary">Setta ore</button>
+        <button type="submit" class="btn btn-danger" class="azzera" id="azzera" name="azzera-{{cedolino.mese}}-{{cedolino.anno}}" value="{{cedolino.id_cedolino}}">Azzera</button>
+        <button type="submit" class="btn btn-warning" class="part" id="part" name="part-{{cedolino.mese}}-{{cedolino.anno}}" value="{{cedolino.id_cedolino}}">Part-time</button>
+        <div class="container" style="width:23%;margin-top:10px;">
+        <select class="form-select" id="percentuale" aria-label="Default select example">
+            <option selected>Perc</option>
+            <option value="25">25%</option>
+            <option value="33.3">33.3%</option>
+            <option value="50">50%</option>
+            <option value="66.6">66.6%</option>
+            <option value="75.3">75.5%</option>
+            <option value="83.3">83.3%</option>
+            <option value="90">90%</option>
+            <option value="95">95%</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-success" class="full" id="full" name="full-{{cedolino.mese}}-{{cedolino.anno}}" value="{{cedolino.id_cedolino}}">Full-time</button>
+        </div>
+<div class="flex-container">
+    <div class="table table-sm">
+        <table class="table table-bordered" id="ceds" style="text-align: center;">
+            <thead class="table-success">
+                <tr>
+                    <th><a href="{% url 'cedolini:cedolino' cedolino.id_cedolino%}">{{cedolino.dipendente}}</a></th>
+                    <th>01</th>
+                    <th>02</th>
+                    <th>03</th>
+                    <th>04</th>
+                    <th>05</th>
+                    <th>06</th>
+                    <th>07</th>
+                    <th>08</th>
+                    <th>09</th>
+                    <th>10</th>
+                    <th>11</th>
+                    <th>12</th>
+                    <th>13</th>
+                    <th>14</th>
+                    <th>15</th>
+                    <th>16</th>
+                    <th>17</th>
+                    <th>18</th>
+                    <th>19</th>
+                    <th>20</th>
+                    <th>21</th>
+                    <th>22</th>
+                    <th>23</th>
+                    <th>24</th>
+                    <th>25</th>
+                    <th>26</th>
+                    <th>27</th>
+                    <th>28</th>
+                    <th>29</th>
+                    <th>30</th>
+                    <th>31</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th>Ordinarie&nbsp;{{cedolino.mese}}</th>
+                    <td class="editable" data-id="{{cedolino.ord_01}}" data-type="ord_01">{% if cedolino.ord_01 %}{{cedolino.ord_01|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.ord_02}}" data-type="ord_02">{% if cedolino.ord_02 %}{{cedolino.ord_02|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.ord_03}}" data-type="ord_03">{% if cedolino.ord_03 %}{{cedolino.ord_03|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.ord_04}}" data-type="ord_04">{% if cedolino.ord_04 %}{{cedolino.ord_04|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.ord_05}}" data-type="ord_05">{% if cedolino.ord_05 %}{{cedolino.ord_05|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.ord_06}}" data-type="ord_06">{% if cedolino.ord_06 %}{{cedolino.ord_06|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.ord_07}}" data-type="ord_07">{% if cedolino.ord_07 %}{{cedolino.ord_07|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.ord_08}}" data-type="ord_08">{% if cedolino.ord_08 %}{{cedolino.ord_08|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.ord_09}}" data-type="ord_09">{% if cedolino.ord_09 %}{{cedolino.ord_09|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.ord_10}}" data-type="ord_10">{% if cedolino.ord_10 %}{{cedolino.ord_10|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.ord_11}}" data-type="ord_11">{% if cedolino.ord_11 %}{{cedolino.ord_11|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.ord_12}}" data-type="ord_12">{% if cedolino.ord_12 %}{{cedolino.ord_12|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.ord_13}}" data-type="ord_13">{% if cedolino.ord_13 %}{{cedolino.ord_13|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.ord_14}}" data-type="ord_14">{% if cedolino.ord_14 %}{{cedolino.ord_14|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.ord_15}}" data-type="ord_15">{% if cedolino.ord_15 %}{{cedolino.ord_15|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.ord_16}}" data-type="ord_16">{% if cedolino.ord_16 %}{{cedolino.ord_16|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.ord_17}}" data-type="ord_17">{% if cedolino.ord_17 %}{{cedolino.ord_17|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.ord_18}}" data-type="ord_18">{% if cedolino.ord_18 %}{{cedolino.ord_18|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.ord_19}}" data-type="ord_19">{% if cedolino.ord_19 %}{{cedolino.ord_19|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.ord_20}}" data-type="ord_20">{% if cedolino.ord_20 %}{{cedolino.ord_20|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.ord_21}}" data-type="ord_21">{% if cedolino.ord_21 %}{{cedolino.ord_21|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.ord_22}}" data-type="ord_22">{% if cedolino.ord_22 %}{{cedolino.ord_22|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.ord_23}}" data-type="ord_23">{% if cedolino.ord_23 %}{{cedolino.ord_23|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.ord_24}}" data-type="ord_24">{% if cedolino.ord_24 %}{{cedolino.ord_24|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.ord_25}}" data-type="ord_25">{% if cedolino.ord_25 %}{{cedolino.ord_25|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.ord_26}}" data-type="ord_26">{% if cedolino.ord_26 %}{{cedolino.ord_26|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.ord_27}}" data-type="ord_27">{% if cedolino.ord_27 %}{{cedolino.ord_27|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.ord_28}}" data-type="ord_28">{% if cedolino.ord_28 %}{{cedolino.ord_28|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.ord_29}}" data-type="ord_29">{% if cedolino.ord_29 %}{{cedolino.ord_29|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.ord_30}}" data-type="ord_30">{% if cedolino.ord_30 %}{{cedolino.ord_30|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.ord_31}}" data-type="ord_31">{% if cedolino.ord_31 %}{{cedolino.ord_31|floatformat}}{% endif %}</td>
+                </tr>
+                <tr>
+                    <th>Ferie &nbsp;<i class='fa-solid fa-umbrella-beach'></i></th>
+                    <td class="editable" data-id="{{cedolino.fer_01}}" data-type="fer_01">{% if cedolino.fer_01 %}{{cedolino.fer_01|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.fer_02}}" data-type="fer_02">{% if cedolino.fer_02 %}{{cedolino.fer_02|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.fer_03}}" data-type="fer_03">{% if cedolino.fer_03 %}{{cedolino.fer_03|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.fer_04}}" data-type="fer_04">{% if cedolino.fer_04 %}{{cedolino.fer_04|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.fer_05}}" data-type="fer_05">{% if cedolino.fer_05 %}{{cedolino.fer_05|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.fer_06}}" data-type="fer_06">{% if cedolino.fer_06 %}{{cedolino.fer_06|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.fer_07}}" data-type="fer_07">{% if cedolino.fer_07 %}{{cedolino.fer_07|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.fer_08}}" data-type="fer_08">{% if cedolino.fer_08 %}{{cedolino.fer_08|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.fer_09}}" data-type="fer_09">{% if cedolino.fer_09 %}{{cedolino.fer_09|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.fer_10}}" data-type="fer_10">{% if cedolino.fer_10 %}{{cedolino.fer_10|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.fer_11}}" data-type="fer_11">{% if cedolino.fer_11 %}{{cedolino.fer_11|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.fer_12}}" data-type="fer_12">{% if cedolino.fer_12 %}{{cedolino.fer_12|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.fer_13}}" data-type="fer_13">{% if cedolino.fer_13 %}{{cedolino.fer_13|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.fer_14}}" data-type="fer_14">{% if cedolino.fer_14 %}{{cedolino.fer_14|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.fer_15}}" data-type="fer_15">{% if cedolino.fer_15 %}{{cedolino.fer_15|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.fer_16}}" data-type="fer_16">{% if cedolino.fer_16 %}{{cedolino.fer_16|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.fer_17}}" data-type="fer_17">{% if cedolino.fer_17 %}{{cedolino.fer_17|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.fer_18}}" data-type="fer_18">{% if cedolino.fer_18 %}{{cedolino.fer_18|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.fer_19}}" data-type="fer_19">{% if cedolino.fer_19 %}{{cedolino.fer_19|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.fer_20}}" data-type="fer_20">{% if cedolino.fer_20 %}{{cedolino.fer_20|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.fer_21}}" data-type="fer_21">{% if cedolino.fer_21 %}{{cedolino.fer_21|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.fer_22}}" data-type="fer_22">{% if cedolino.fer_22 %}{{cedolino.fer_22|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.fer_23}}" data-type="fer_23">{% if cedolino.fer_23 %}{{cedolino.fer_23|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.fer_24}}" data-type="fer_24">{% if cedolino.fer_24 %}{{cedolino.fer_24|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.fer_25}}" data-type="fer_25">{% if cedolino.fer_25 %}{{cedolino.fer_25|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.fer_26}}" data-type="fer_26">{% if cedolino.fer_26 %}{{cedolino.fer_26|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.fer_27}}" data-type="fer_27">{% if cedolino.fer_27 %}{{cedolino.fer_27|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.fer_28}}" data-type="fer_28">{% if cedolino.fer_28 %}{{cedolino.fer_28|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.fer_29}}" data-type="fer_29">{% if cedolino.fer_29 %}{{cedolino.fer_29|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.fer_30}}" data-type="fer_30">{% if cedolino.fer_30 %}{{cedolino.fer_30|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.fer_31}}" data-type="fer_31">{% if cedolino.fer_31 %}{{cedolino.fer_31|floatformat}}{% endif %}</td>
+                    </tr>
+                    <tr>
+                    <th>Malattia &nbsp;<i class="fa-solid fa-house-chimney-medical"></i></th>
+                    <td class="editable" data-id="{{cedolino.mal_01}}" data-type="mal_01">{% if cedolino.mal_01 %}{{cedolino.mal_01|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.mal_02}}" data-type="mal_02">{% if cedolino.mal_02 %}{{cedolino.mal_02|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.mal_03}}" data-type="mal_03">{% if cedolino.mal_03 %}{{cedolino.mal_03|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.mal_04}}" data-type="mal_04">{% if cedolino.mal_04 %}{{cedolino.mal_04|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.mal_05}}" data-type="mal_05">{% if cedolino.mal_05 %}{{cedolino.mal_05|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.mal_06}}" data-type="mal_06">{% if cedolino.mal_06 %}{{cedolino.mal_06|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.mal_07}}" data-type="mal_07">{% if cedolino.mal_07 %}{{cedolino.mal_07|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.mal_08}}" data-type="mal_08">{% if cedolino.mal_08 %}{{cedolino.mal_08|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.mal_09}}" data-type="mal_09">{% if cedolino.mal_09 %}{{cedolino.mal_09|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.mal_10}}" data-type="mal_10">{% if cedolino.mal_10 %}{{cedolino.mal_10|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.mal_11}}" data-type="mal_11">{% if cedolino.mal_11 %}{{cedolino.mal_11|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.mal_12}}" data-type="mal_12">{% if cedolino.mal_12 %}{{cedolino.mal_12|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.mal_13}}" data-type="mal_13">{% if cedolino.mal_13 %}{{cedolino.mal_13|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.mal_14}}" data-type="mal_14">{% if cedolino.mal_14 %}{{cedolino.mal_14|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.mal_15}}" data-type="mal_15">{% if cedolino.mal_15 %}{{cedolino.mal_15|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.mal_16}}" data-type="mal_16">{% if cedolino.mal_16 %}{{cedolino.mal_16|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.mal_17}}" data-type="mal_17">{% if cedolino.mal_17 %}{{cedolino.mal_17|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.mal_18}}" data-type="mal_18">{% if cedolino.mal_18 %}{{cedolino.mal_18|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.mal_19}}" data-type="mal_19">{% if cedolino.mal_19 %}{{cedolino.mal_19|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.mal_20}}" data-type="mal_20">{% if cedolino.mal_20 %}{{cedolino.mal_20|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.mal_21}}" data-type="mal_21">{% if cedolino.mal_21 %}{{cedolino.mal_21|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.mal_22}}" data-type="mal_22">{% if cedolino.mal_22 %}{{cedolino.mal_22|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.mal_23}}" data-type="mal_23">{% if cedolino.mal_23 %}{{cedolino.mal_23|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.mal_24}}" data-type="mal_24">{% if cedolino.mal_24 %}{{cedolino.mal_24|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.mal_25}}" data-type="mal_25">{% if cedolino.mal_25 %}{{cedolino.mal_25|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.mal_26}}" data-type="mal_26">{% if cedolino.mal_26 %}{{cedolino.mal_26|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.mal_27}}" data-type="mal_27">{% if cedolino.mal_27 %}{{cedolino.mal_27|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.mal_28}}" data-type="mal_28">{% if cedolino.mal_28 %}{{cedolino.mal_28|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.mal_29}}" data-type="mal_29">{% if cedolino.mal_29 %}{{cedolino.mal_29|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.mal_30}}" data-type="mal_30">{% if cedolino.mal_30 %}{{cedolino.mal_30|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.mal_31}}" data-type="mal_31">{% if cedolino.mal_31 %}{{cedolino.mal_31|floatformat}}{% endif %}</td>
+                </tr>
+                <tr>
+                    <th>Permessi &nbsp;<i class="fa-solid fa-person-walking-arrow-right"></i></th>
+                    <td class="editable" data-id="{{cedolino.perm_01}}" data-type="perm_01">{% if cedolino.perm_01 %}{{cedolino.perm_01|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.perm_02}}" data-type="perm_02">{% if cedolino.perm_02 %}{{cedolino.perm_02|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.perm_03}}" data-type="perm_03">{% if cedolino.perm_03 %}{{cedolino.perm_03|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.perm_04}}" data-type="perm_04">{% if cedolino.perm_04 %}{{cedolino.perm_04|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.perm_05}}" data-type="perm_05">{% if cedolino.perm_05 %}{{cedolino.perm_05|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.perm_06}}" data-type="perm_06">{% if cedolino.perm_06 %}{{cedolino.perm_06|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.perm_07}}" data-type="perm_07">{% if cedolino.perm_07 %}{{cedolino.perm_07|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.perm_08}}" data-type="perm_08">{% if cedolino.perm_08 %}{{cedolino.perm_08|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.perm_09}}" data-type="perm_09">{% if cedolino.perm_09 %}{{cedolino.perm_09|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.perm_10}}" data-type="perm_10">{% if cedolino.perm_10 %}{{cedolino.perm_10|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.perm_11}}" data-type="perm_11">{% if cedolino.perm_11 %}{{cedolino.perm_11|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.perm_12}}" data-type="perm_12">{% if cedolino.perm_12 %}{{cedolino.perm_12|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.perm_13}}" data-type="perm_13">{% if cedolino.perm_13 %}{{cedolino.perm_13|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.perm_14}}" data-type="perm_14">{% if cedolino.perm_14 %}{{cedolino.perm_14|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.perm_15}}" data-type="perm_15">{% if cedolino.perm_15 %}{{cedolino.perm_15|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.perm_16}}" data-type="perm_16">{% if cedolino.perm_16 %}{{cedolino.perm_16|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.perm_17}}" data-type="perm_17">{% if cedolino.perm_17 %}{{cedolino.perm_17|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.perm_18}}" data-type="perm_18">{% if cedolino.perm_18 %}{{cedolino.perm_18|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.perm_19}}" data-type="perm_19">{% if cedolino.perm_19 %}{{cedolino.perm_19|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.perm_20}}" data-type="perm_20">{% if cedolino.perm_20 %}{{cedolino.perm_20|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.perm_21}}" data-type="perm_21">{% if cedolino.perm_21 %}{{cedolino.perm_21|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.perm_22}}" data-type="perm_22">{% if cedolino.perm_22 %}{{cedolino.perm_22|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.perm_23}}" data-type="perm_23">{% if cedolino.perm_23 %}{{cedolino.perm_23|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.perm_24}}" data-type="perm_24">{% if cedolino.perm_24 %}{{cedolino.perm_24|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.perm_25}}" data-type="perm_25">{% if cedolino.perm_25 %}{{cedolino.perm_25|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.perm_26}}" data-type="perm_26">{% if cedolino.perm_26 %}{{cedolino.perm_26|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.perm_27}}" data-type="perm_27">{% if cedolino.perm_27 %}{{cedolino.perm_27|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.perm_28}}" data-type="perm_28">{% if cedolino.perm_28 %}{{cedolino.perm_28|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.perm_29}}" data-type="perm_29">{% if cedolino.perm_29 %}{{cedolino.perm_29|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.perm_30}}" data-type="perm_30">{% if cedolino.perm_30 %}{{cedolino.perm_30|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.perm_31}}" data-type="perm_31">{% if cedolino.perm_31 %}{{cedolino.perm_31|floatformat}}{% endif %}</td>
+                </tr>
+                <tr>
+                    <th>Straordinari &nbsp;<i class="fa-solid fa-file-invoice-dollar"></i></th>
+                    <td class="editable" data-id="{{cedolino.stra_01}}" data-type="stra_01">{% if cedolino.stra_01 %}{{cedolino.stra_01|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.stra_02}}" data-type="stra_02">{% if cedolino.stra_02 %}{{cedolino.stra_02|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.stra_03}}" data-type="stra_03">{% if cedolino.stra_03 %}{{cedolino.stra_03|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.stra_04}}" data-type="stra_04">{% if cedolino.stra_04 %}{{cedolino.stra_04|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.stra_05}}" data-type="stra_05">{% if cedolino.stra_05 %}{{cedolino.stra_05|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.stra_06}}" data-type="stra_06">{% if cedolino.stra_06 %}{{cedolino.stra_06|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.stra_07}}" data-type="stra_07">{% if cedolino.stra_07 %}{{cedolino.stra_07|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.stra_08}}" data-type="stra_08">{% if cedolino.stra_08 %}{{cedolino.stra_08|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.stra_09}}" data-type="stra_09">{% if cedolino.stra_09 %}{{cedolino.stra_09|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.stra_10}}" data-type="stra_10">{% if cedolino.stra_10 %}{{cedolino.stra_10|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.stra_11}}" data-type="stra_11">{% if cedolino.stra_11 %}{{cedolino.stra_11|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.stra_12}}" data-type="stra_12">{% if cedolino.stra_12 %}{{cedolino.stra_12|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.stra_13}}" data-type="stra_13">{% if cedolino.stra_13 %}{{cedolino.stra_13|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.stra_14}}" data-type="stra_14">{% if cedolino.stra_14 %}{{cedolino.stra_14|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.stra_15}}" data-type="stra_15">{% if cedolino.stra_15 %}{{cedolino.stra_15|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.stra_16}}" data-type="stra_16">{% if cedolino.stra_16 %}{{cedolino.stra_16|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.stra_17}}" data-type="stra_17">{% if cedolino.stra_17 %}{{cedolino.stra_17|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.stra_18}}" data-type="stra_18">{% if cedolino.stra_18 %}{{cedolino.stra_18|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.stra_19}}" data-type="stra_19">{% if cedolino.stra_19 %}{{cedolino.stra_19|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.stra_20}}" data-type="stra_20">{% if cedolino.stra_20 %}{{cedolino.stra_20|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.stra_21}}" data-type="stra_21">{% if cedolino.stra_21 %}{{cedolino.stra_21|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.stra_22}}" data-type="stra_22">{% if cedolino.stra_22 %}{{cedolino.stra_22|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.stra_23}}" data-type="stra_23">{% if cedolino.stra_23 %}{{cedolino.stra_23|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.stra_24}}" data-type="stra_24">{% if cedolino.stra_24 %}{{cedolino.stra_24|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.stra_25}}" data-type="stra_25">{% if cedolino.stra_25 %}{{cedolino.stra_25|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.stra_26}}" data-type="stra_26">{% if cedolino.stra_26 %}{{cedolino.stra_26|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.stra_27}}" data-type="stra_27">{% if cedolino.stra_27 %}{{cedolino.stra_27|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.stra_28}}" data-type="stra_28">{% if cedolino.stra_28 %}{{cedolino.stra_28|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.stra_29}}" data-type="stra_29">{% if cedolino.stra_29 %}{{cedolino.stra_29|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.stra_30}}" data-type="stra_30">{% if cedolino.stra_30 %}{{cedolino.stra_30|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.stra_31}}" data-type="stra_31">{% if cedolino.stra_31 %}{{cedolino.stra_31|floatformat}}{% endif %}</td>
+                </tr>
+                <tr>
+                    <th class="alert alert-danger">Stra. Fes. &nbsp;<span ><i class="fa-solid fa-file-invoice-dollar"></i></th>
+                    <td class="editable" data-id="{{cedolino.strafes_01}}" data-type="strafes_01">{% if cedolino.strafes_01 %}{{cedolino.strafes_01|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.strafes_02}}" data-type="strafes_02">{% if cedolino.strafes_02 %}{{cedolino.strafes_02|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.strafes_03}}" data-type="strafes_03">{% if cedolino.strafes_03 %}{{cedolino.strafes_03|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.strafes_04}}" data-type="strafes_04">{% if cedolino.strafes_04 %}{{cedolino.strafes_04|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.strafes_05}}" data-type="strafes_05">{% if cedolino.strafes_05 %}{{cedolino.strafes_05|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.strafes_06}}" data-type="strafes_06">{% if cedolino.strafes_06 %}{{cedolino.strafes_06|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.strafes_07}}" data-type="strafes_07">{% if cedolino.strafes_07 %}{{cedolino.strafes_07|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.strafes_08}}" data-type="strafes_08">{% if cedolino.strafes_08 %}{{cedolino.strafes_08|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.strafes_09}}" data-type="strafes_09">{% if cedolino.strafes_09 %}{{cedolino.strafes_09|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.strafes_10}}" data-type="strafes_10">{% if cedolino.strafes_10 %}{{cedolino.strafes_10|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.strafes_11}}" data-type="strafes_11">{% if cedolino.strafes_11 %}{{cedolino.strafes_11|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.strafes_12}}" data-type="strafes_12">{% if cedolino.strafes_12 %}{{cedolino.strafes_12|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.strafes_13}}" data-type="strafes_13">{% if cedolino.strafes_13 %}{{cedolino.strafes_13|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.strafes_14}}" data-type="strafes_14">{% if cedolino.strafes_14 %}{{cedolino.strafes_14|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.strafes_15}}" data-type="strafes_15">{% if cedolino.strafes_15 %}{{cedolino.strafes_15|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.strafes_16}}" data-type="strafes_16">{% if cedolino.strafes_16 %}{{cedolino.strafes_16|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.strafes_17}}" data-type="strafes_17">{% if cedolino.strafes_17 %}{{cedolino.strafes_17|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.strafes_18}}" data-type="strafes_18">{% if cedolino.strafes_18 %}{{cedolino.strafes_18|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.strafes_19}}" data-type="strafes_19">{% if cedolino.strafes_19 %}{{cedolino.strafes_19|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.strafes_20}}" data-type="strafes_20">{% if cedolino.strafes_20 %}{{cedolino.strafes_20|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.strafes_21}}" data-type="strafes_21">{% if cedolino.strafes_21 %}{{cedolino.strafes_21|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.strafes_22}}" data-type="strafes_22">{% if cedolino.strafes_22 %}{{cedolino.strafes_22|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.strafes_23}}" data-type="strafes_23">{% if cedolino.strafes_23 %}{{cedolino.strafes_23|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.strafes_24}}" data-type="strafes_24">{% if cedolino.strafes_24 %}{{cedolino.strafes_24|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.strafes_25}}" data-type="strafes_25">{% if cedolino.strafes_25 %}{{cedolino.strafes_25|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.strafes_26}}" data-type="strafes_26">{% if cedolino.strafes_26 %}{{cedolino.strafes_26|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.strafes_27}}" data-type="strafes_27">{% if cedolino.strafes_27 %}{{cedolino.strafes_27|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.strafes_28}}" data-type="strafes_28">{% if cedolino.strafes_28 %}{{cedolino.strafes_28|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.strafes_29}}" data-type="strafes_29">{% if cedolino.strafes_29 %}{{cedolino.strafes_29|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.strafes_30}}" data-type="strafes_30">{% if cedolino.strafes_30 %}{{cedolino.strafes_30|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.strafes_31}}" data-type="strafes_31">{% if cedolino.strafes_31 %}{{cedolino.strafes_31|floatformat}}{% endif %}</td>
+                    </tr>
+                <tr>
+                    <th>Trasferte 	&euro;30 &nbsp;<span ><i class="fa-solid fa-car-side"></i></th>
+                    <td class="editable" data-id="{{cedolino.tras_01}}" data-type="tras_01">{% if cedolino.tras_01 %}{{cedolino.tras_01|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_02}}" data-type="tras_02">{% if cedolino.tras_02 %}{{cedolino.tras_02|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_03}}" data-type="tras_03">{% if cedolino.tras_03 %}{{cedolino.tras_03|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_04}}" data-type="tras_04">{% if cedolino.tras_04 %}{{cedolino.tras_04|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_05}}" data-type="tras_05">{% if cedolino.tras_05 %}{{cedolino.tras_05|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_06}}" data-type="tras_06">{% if cedolino.tras_06 %}{{cedolino.tras_06|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_07}}" data-type="tras_07">{% if cedolino.tras_07 %}{{cedolino.tras_07|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_08}}" data-type="tras_08">{% if cedolino.tras_08 %}{{cedolino.tras_08|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_09}}" data-type="tras_09">{% if cedolino.tras_09 %}{{cedolino.tras_09|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_10}}" data-type="tras_10">{% if cedolino.tras_10 %}{{cedolino.tras_10|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_11}}" data-type="tras_11">{% if cedolino.tras_11 %}{{cedolino.tras_11|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_12}}" data-type="tras_12">{% if cedolino.tras_12 %}{{cedolino.tras_12|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_13}}" data-type="tras_13">{% if cedolino.tras_13 %}{{cedolino.tras_13|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_14}}" data-type="tras_14">{% if cedolino.tras_14 %}{{cedolino.tras_14|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_15}}" data-type="tras_15">{% if cedolino.tras_15 %}{{cedolino.tras_15|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_16}}" data-type="tras_16">{% if cedolino.tras_16 %}{{cedolino.tras_16|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_17}}" data-type="tras_17">{% if cedolino.tras_17 %}{{cedolino.tras_17|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_18}}" data-type="tras_18">{% if cedolino.tras_18 %}{{cedolino.tras_18|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_19}}" data-type="tras_19">{% if cedolino.tras_19 %}{{cedolino.tras_19|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_20}}" data-type="tras_20">{% if cedolino.tras_20 %}{{cedolino.tras_20|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_21}}" data-type="tras_21">{% if cedolino.tras_21 %}{{cedolino.tras_21|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_22}}" data-type="tras_22">{% if cedolino.tras_22 %}{{cedolino.tras_22|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_23}}" data-type="tras_23">{% if cedolino.tras_23 %}{{cedolino.tras_23|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_24}}" data-type="tras_24">{% if cedolino.tras_24 %}{{cedolino.tras_24|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_25}}" data-type="tras_25">{% if cedolino.tras_25 %}{{cedolino.tras_25|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_26}}" data-type="tras_26">{% if cedolino.tras_26 %}{{cedolino.tras_26|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_27}}" data-type="tras_27">{% if cedolino.tras_27 %}{{cedolino.tras_27|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_28}}" data-type="tras_28">{% if cedolino.tras_28 %}{{cedolino.tras_28|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_29}}" data-type="tras_29">{% if cedolino.tras_29 %}{{cedolino.tras_29|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_30}}" data-type="tras_30">{% if cedolino.tras_30 %}{{cedolino.tras_30|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_31}}" data-type="tras_31">{% if cedolino.tras_31 %}{{cedolino.tras_31|floatformat}}{% endif %}</td>
+                    </tr>
+                <tr>
+                <tr>
+                    <th>Trasferte 	&euro;46 &nbsp;<span ><i class="fa-solid fa-car-side"></i></th>
+                    <td class="editable" data-id="{{cedolino.tras_01}}" data-type="tras_01">{% if cedolino.tras_01 %}{{cedolino.tras_01|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_02}}" data-type="tras_02">{% if cedolino.tras_02 %}{{cedolino.tras_02|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_03}}" data-type="tras_03">{% if cedolino.tras_03 %}{{cedolino.tras_03|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_04}}" data-type="tras_04">{% if cedolino.tras_04 %}{{cedolino.tras_04|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_05}}" data-type="tras_05">{% if cedolino.tras_05 %}{{cedolino.tras_05|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_06}}" data-type="tras_06">{% if cedolino.tras_06 %}{{cedolino.tras_06|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_07}}" data-type="tras_07">{% if cedolino.tras_07 %}{{cedolino.tras_07|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_08}}" data-type="tras_08">{% if cedolino.tras_08 %}{{cedolino.tras_08|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_09}}" data-type="tras_09">{% if cedolino.tras_09 %}{{cedolino.tras_09|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_10}}" data-type="tras_10">{% if cedolino.tras_10 %}{{cedolino.tras_10|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_11}}" data-type="tras_11">{% if cedolino.tras_11 %}{{cedolino.tras_11|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_12}}" data-type="tras_12">{% if cedolino.tras_12 %}{{cedolino.tras_12|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_13}}" data-type="tras_13">{% if cedolino.tras_13 %}{{cedolino.tras_13|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_14}}" data-type="tras_14">{% if cedolino.tras_14 %}{{cedolino.tras_14|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_15}}" data-type="tras_15">{% if cedolino.tras_15 %}{{cedolino.tras_15|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_16}}" data-type="tras_16">{% if cedolino.tras_16 %}{{cedolino.tras_16|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_17}}" data-type="tras_17">{% if cedolino.tras_17 %}{{cedolino.tras_17|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_18}}" data-type="tras_18">{% if cedolino.tras_18 %}{{cedolino.tras_18|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_19}}" data-type="tras_19">{% if cedolino.tras_19 %}{{cedolino.tras_19|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_20}}" data-type="tras_20">{% if cedolino.tras_20 %}{{cedolino.tras_20|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_21}}" data-type="tras_21">{% if cedolino.tras_21 %}{{cedolino.tras_21|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_22}}" data-type="tras_22">{% if cedolino.tras_22 %}{{cedolino.tras_22|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_23}}" data-type="tras_23">{% if cedolino.tras_23 %}{{cedolino.tras_23|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_24}}" data-type="tras_24">{% if cedolino.tras_24 %}{{cedolino.tras_24|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_25}}" data-type="tras_25">{% if cedolino.tras_25 %}{{cedolino.tras_25|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_26}}" data-type="tras_26">{% if cedolino.tras_26 %}{{cedolino.tras_26|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_27}}" data-type="tras_27">{% if cedolino.tras_27 %}{{cedolino.tras_27|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_28}}" data-type="tras_28">{% if cedolino.tras_28 %}{{cedolino.tras_28|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_29}}" data-type="tras_29">{% if cedolino.tras_29 %}{{cedolino.tras_29|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_30}}" data-type="tras_30">{% if cedolino.tras_30 %}{{cedolino.tras_30|floatformat}}{% endif %}</td>
+                    <td class="editable" data-id="{{cedolino.tras_31}}" data-type="tras_31">{% if cedolino.tras_31 %}{{cedolino.tras_31|floatformat}}{% endif %}</td>
+                    </tr>
+                <tr>
+                    <th>Rimb. Docu. &nbsp;<i class="fa-solid fa-receipt"></i></th>
+                    <td colspan="100%" class="editable" data-id="{{cedolino.rimborsi}}" data-type="rimborsi">{% if cedolino.rimborsi %}{{cedolino.rimborsi}}{% endif %}</td>
+                </tr>
+                <tr>
+                    <th>Premio Prod &nbsp;<i class="fa-solid fa-coins"></i></th>
+                    <td colspan="100%" class="editable" data-id="{{cedolino.bonuses}}" data-type="bonuses">{% if cedolino.bonuses %}{{cedolino.bonuses}}{% endif %}</td>
+                </tr> 
+                <tr>
+                    <th>Inc. Forf &nbsp;<i class="fa-solid fa-hand-holding-dollar"></i></th>
+                    <td colspan="100%" class="editable" data-id="{{cedolino.inc_forf}}" data-type="inc_forf">{% if cedolino.inc_forf %}{{cedolino.inc_forf}}{% endif %}</td>
+                </tr>
+                <tr>
+                    {% comment %} <th>Inc. Forf. &nbsp;<a href="" onclick="open_modal_aggiungi_inc_forf('{% url 'cedolini:add_inc_forf' cedolino_id %}')"><i class="fa-solid fa-hand-holding-dollar"></i></a></th> {% endcomment %}
+                </tr>
+            </tbody>
+        </table> 
+
+</div>
+<div class="space"></div>
+
+
+<div class="modal fade" id="addIncForfModal" role="dialog" tabindex="-1">
+</div>
+
+<script>
+    var $ = jQuery.noConflict();
+function open_modal_aggiungi_inc_forf(url){
+    $('#addIncForfModal').load(url,function(){
+    $(this).modal('show'); 
+    });
+};
+</script>
+
+{% endblock %}

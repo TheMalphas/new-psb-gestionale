@@ -1,0 +1,89 @@
+html,
+body {
+    height: 100%;
+    margin: 0;
+    max-width: 100%;
+
+} 
+
+.wrapper {
+    min-height: 100%;
+    margin-bottom: -50px;
+}
+
+.push {
+    height: 50px;
+}
+
+
+#tooltip {
+    position: relative;
+    cursor:pointer;
+    font-size: 1em;
+    font-weight:bold;
+  }
+  #tooltipText {
+    position: absolute;
+    left: 50%;
+    top:0;
+    background-color: #000;
+    padding: .5em;
+    border-radius:.5em
+  }
+  #tooltipText::before {
+    content: "";
+    position: absolute;
+    left:50%;
+    top: 100%;
+    transform: translateX(-50%);
+    border: .5em;
+    border-color: #000 #0000 #0000 #0000;
+  }
+  #tooltip:hover #tooltipText{
+    top: -130%;
+    visibility: visible;
+    opacity: 1;
+  }
+/*Ferie Button*/
+  button {
+    margin:10px;
+    pointer-events:none;
+    border:none;
+    background:none;
+    padding:0;
+    position:relative;
+  }
+  button:before,
+  button:after{
+    content:"";
+    position:absolute;
+    bottom:0.12em;
+    left:0.12em;
+    right:0.12em;
+    top:0.2em;
+    pointer-events:auto;
+  }
+  button:after{
+    top:0.1em;
+    height:0.2em;
+    left:0.24em;
+    right:0.24em;
+  }
+  
+  svg path{
+    pointer-events:auto;
+  }
+  
+  button:hover path{
+    fill:red;
+  }
+  .resize {
+    width:10%;
+    height:50%;
+  }
+  td {
+    max-width:3em;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space: nowrap;
+}

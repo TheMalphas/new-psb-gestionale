@@ -1,0 +1,87 @@
+{% extends 'base/main.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<title>{% block title%}Richiedi permesso{% endblock %}</title>
+
+<script src="{% static 'base/js/jquery.js' %}"></script>
+<script src="{% static 'users/js/script.js' %}"></script>
+<link rel="stylesheet" href="{% static 'users/css/style.css' %}">
+
+<section style="box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+    <header class="p-3 bg-light text-black">
+        <div class="container">
+        <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+    
+        <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+            <li class="nav-link px-2 text-dark"></li>            
+            <li class="nav-link px-2 text-dark">Buon lavoro, {{user.first_name}}</li> 
+            <li class="nav-link px-2 text-dark">Il minimo preavviso è di 10 giorni per i permessi non urgenti.</li>
+        </ul>
+    
+        <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3">
+            <input type="search" class="form-control form-control-dark" placeholder="Search..." aria-label="Search">
+        </form>
+    </div>
+    </header>
+</section>
+    
+<section class="right-side-element">
+    
+<div class="card-richiesta-permesso">
+    <form class="" method="POST" action="">
+    {%csrf_token%}
+    {% if form.non_field_errors%}
+    <div class="row mb-4" >
+        <div class="col-auto">
+            {{form.non_field_errors}}
+        </div>
+    </div>
+    {% endif %}
+    <div class="row mb-4" >
+        <div class="col-auto">
+        {{form.da_giorno_richiesta.label}}
+        {{form.da_giorno_richiesta}}
+        <strong style="color:red;">{{form.da_giorno_richiesta.errors}}</strong>
+        </div>
+        <div class="col-md-3">
+        </div>
+        <div class="col-auto">
+            {{form.a_giorno_richiesta.label}}
+            {{form.a_giorno_richiesta}}
+            <strong style="color:red;">{{form.a_giorno_richiesta.errors}}</strong>
+        </div>
+    </div>
+    
+    <div class="row mb-6">
+        <div class="col-auto">{{form.urgente.label}}</div>
+        <div class="col-auto">
+    <div class="form-check form-switch" >{{form.urgente}}</div>        
+    <label class="form-check-label" for="flexSwitchCheckDefault"></label>
+    </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-auto">
+        {{form.id_permessi_richieste.label}}
+        {{form.id_permessi_richieste}}
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-auto">{{form.note_richiesta.label}}</div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-auto">{{form.note_richiesta}}</div>
+    </div>
+
+    <input type="submit" class="btn btn-success" class="warp" value="Richiedi">
+</form>
+</div>
+</div>
+
+</section>
+{% endblock %}

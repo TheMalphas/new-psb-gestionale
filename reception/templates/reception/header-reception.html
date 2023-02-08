@@ -1,0 +1,34 @@
+
+
+<section style="box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); margin-left:268px;">
+    <header class="p-3 bg-light text-black">
+        <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+    
+        <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+            <li class="nav-link px-2 text-dark"></li>
+            <li class="nav-link px-2 text-dark"><strong>{{totale_entrate}}</strong> Badgiati </li>
+            <li class="nav-link px-2 text-dark"><strong>{{totale_uscite}}</strong> Usciti </li>
+            <li class="nav-link px-2 text-dark"><strong>{{totale_assenze}}</strong> Assenti </li>
+            <li class="nav-link px-2 text-dark"><strong>{{totale_permessi}}</strong> In Permesso </li>
+            <!-- <li><a href="#" class="nav-link px-2 text-dark"><strong>{{totale_ferie}}</strong> In Ferie </a></li> -->
+        </ul>
+        <form method="post" action="{% url 'reception:presenze' %}" id="reception-form-cerca" class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3">
+          {% csrf_token %}
+          <input type="search" name="dipendente" class="form-control form-control-dark" placeholder="Dipendente" aria-label="Dipendente">
+        </form>
+        <button type="submit" name="dipendente" id="button-cerca-dipendente" class="btn btn-success" onclick="submitForm()">Cerca</button>
+        <div class="text-end" style="margin-right:15px; margin-left:15px;">Filtra per dipendente</div>
+        <div class="text-end" style="margin-right:15px;">
+          <button type="button" name="precedente" id="reception-button-precedente" class="btn btn-warning" onclick="submitFormPrecedente()">Precedente</button>
+        </div>
+        <form method="post" action="{% url 'reception:presenze' %}" id="reception-form-giorno" class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3">
+          {% csrf_token %}
+          <input type="date" name="giorno" id="giorno" class="form-control form-control-dark" placeholder="Giorno..." aria-label="Giorno" value="{{data|date:'Y-m-d'}}">
+        </form>
+        <div class="text-end">
+          <button type="button" name="cerca-giorno" id="reception-button-giorno" class="btn btn-outline-dark me-2" onclick="submitFormGiorno()">Cerca</button>
+          <button type="button" name="successivo" id="reception-button-successivo" class="btn btn-warning" onclick="submitFormSuccessivo()">Successivo</button>
+        </div>
+    </header>
+  
+  </section>

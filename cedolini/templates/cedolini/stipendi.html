@@ -1,0 +1,34 @@
+{% extends 'base/main.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<title>{% block title%}Altri dati{% endblock %}</title>
+<link rel="stylesheet" href="{% static 'cedolini/css/style.css' %}">
+<script src="{% static 'cedolini/js/script.js' %}"></script>
+
+<div class="container2">
+    <div class="header-bar2">
+    <div class="container">
+        <a class="white-style" href="{% url 'gestione:dashboard-gestione' %}">&#8592;Torna alle opzioni</a>
+        <h3 style="margin-top:20px;" style="color:white;">Altri dati</h3> 
+    </div>
+</div>
+
+
+
+<div class="card-body">
+    <div class="row">
+        <div class="col-md-4" style="margin: 1em;">
+            <strong><a href="{% url 'cedolini:crea-cedolino' %}">Crea Cedolino</a></strong>
+        </div>
+        <div class="col-md-4" style="margin: 1em;">
+            <strong><a href="#">Opzione vuota</a></strong>
+        </div>
+        <div class="col-md-4" style="margin: 1em;">
+            <strong><a href="{% url 'cedolini:cedolini' %}">Vai ai cedolini</a></strong>
+    </div>
+</div>
+</div>
+{% endblock content%}

@@ -1,0 +1,29 @@
+{% extends 'base/main.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<title>{% block title%}Modifica Dirigente{% endblock %}</title>
+<link rel="stylesheet" href="{% static 'gestione/css/style.css' %}">
+<script src="{% static 'gestione/js/script.js' %}"></script>
+
+<div class="container2">
+    <div class="header-bar2">
+    <div>
+        <a class="white-style" href="{% url 'gestione:capi_area' %}">&#8592;Torna alla lista</a>
+        <h3 style="margin-top:20px;">Modifica Dirigente - {{dirigente.nomecompleto|title}}</h3>
+    </div>
+</div>
+
+<div class="card-body">
+<form method="POST" action="">
+    {%csrf_token %}
+    {{form.as_table}}
+    <input type="submit" class="btn btn-primary" value="Conferma">
+</form>
+</div>
+</div>
+
+
+{% endblock content%}

@@ -1,0 +1,63 @@
+{% extends 'base/main.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<title>{% block title%}Entrate - Uscite{% endblock %}</title>
+<link rel="stylesheet" href="{% static 'reception/css/style.css' %}">
+<script src="{% static 'reception/js/script.js' %}"></script>
+
+
+<div class="container" style="justify-content: center;">
+<div class="header-bar2"style="justify-content: center; text-align:center">
+    <form method="POST" id="myform">
+        {% csrf_token %}
+        <h1> REGISTRAZIONE QR </h1>
+       <input style="height:3em; width:10em; align-items: center;"  type="text" name="id_dip_ing" id="id_dip_ing">
+        <input hidden class="button-reception-search" type="submit" value="Cerca">
+    </form>
+</div>
+</div>
+    <div class="container">
+    {% if errore == "Errore" %}
+    <div class="container d-flex justify-content-center alert alert-danger">
+        <h1>QR errato.</h1>
+    </div>
+    {% elif entrato == "entrato" %}
+    <div class="container d-flex justify-content-center alert alert-success">
+        <h1>Buon lavoro, {{dip.nome|title}}</h1>
+    </div>
+    {% elif seconda_entrata == "seconda_entrata" %}
+    <div class="container d-flex justify-content-center alert alert-success">
+        <h1>Bentornato/a, {{dip.nome|title}}</h1>
+    </div>
+    {% elif uscito == "uscito" %}
+    <div class="container d-flex justify-content-center alert alert-success">
+        <h1>Arrivederci, {{dip.nome|title}}</h1>
+    </div>
+    {% elif primaUscita == "primaUscita" %}
+    <div class="container d-flex justify-content-center alert alert-success">
+        <h1>A più tardi, {{dip.nome|title}}</h1>
+    </div>
+    {% elif secondaUscita == "secondaUscita" %}
+    <div class="container d-flex justify-content-center alert alert-success">
+        <h1>Arrivederci, {{dip.nome|title}}</h1>
+    </div>
+    {% elif registratoEntrata == "registrato-entrata" %}
+    <div class="container d-flex justify-content-center alert alert-warning">
+        <h1>Entrata già registrata.</h1>
+    </div>
+    {% elif registratoUscita == "registrato-uscita" %}
+    <div class="container d-flex justify-content-center alert alert-warning">
+        <h1>Uscita già registrata.</h1>
+    </div>
+    {% elif nonEntrato == "non-entrato" %}
+    <div class="container d-flex justify-content-center alert alert-danger">
+        <h1>Stai tentanto di uscire ma la tua entrata non è stata registrata, contatta la reception per segnare la tua entrata ed uscita.</h1>
+    </div>
+    {% endif %}
+    </div>
+</div>
+
+{% endblock %}

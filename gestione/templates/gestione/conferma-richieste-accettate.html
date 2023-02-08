@@ -1,0 +1,41 @@
+<!-- Modal -->
+<div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Modifica il permesso di {{dipendente|title}}</h2>
+        <button type="submit" class="btn btn-danger" data-bs-dismiss="modal" aria-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="container"></div>
+      <form method="POST" action="{% url 'gestione:conferma-richieste-accettate' object.pk %}">
+        <div class="modal-body">
+          {% csrf_token %}
+        <!-- Form -->
+          {{form.as_p}}
+        <!-- End form -->
+        <div class="modal-footer">
+          <button type="button" data-toggle="modal" data-target="#modificaRichiesteAccettateModal" onclick="open_modal_modifica_richieste_accettate('{% url 'gestione:modifica-richieste-accettate' object.pk %}')" class="btn btn-warning">Modifica</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancella</button>
+          <button type="submit" class="btn btn-primary" value="Conferma">Salva</button>
+        </div>
+      </form>
+    </div>
+</div>
+
+<div class="space">
+</div>
+
+<div class="modal fade" id="modificaRichiesteAccettateModal" role="dialog" tabindex="-1">
+</div>
+
+<script>
+
+var $ = jQuery.noConflict();
+function open_modal_modifica_richieste_accettate(url){
+    $('#modificaRichiesteAccettateModal').load(url,function(){
+      $('#firstModal').modal('hide');
+      $(this).modal('show'); 
+    });
+};
+</script>

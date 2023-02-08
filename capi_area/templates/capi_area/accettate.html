@@ -1,0 +1,70 @@
+{% extends 'base/main.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<title>{% block title%}Richieste accettate{% endblock %}</title>
+
+<link rel="stylesheet" href="{% static 'capi_area/css/style.css' %}">
+
+
+<!-- ===== Main Container ===== -->
+<div class="container-mie-richieste">
+    <div class="header-bar2">
+        <h3 style="margin:0">{% if  page_obj.paginator.count  == 1 %}C'&#233; <i>{{ page_obj.paginator.count }}</i> {% else %} Ci sono <i>{{ page_obj.paginator.count }}</i> {% endif %} {% if  page_obj.paginator.count  ==  1 %} richiesta{% else %} richieste{% endif %}</h3>
+        <form method="GET">
+            <a style="color:white;" href="{% url 'capi_area:da_revisionare' %}">Da revisionare | </a>
+            <a style="color:white;" href="{% url 'capi_area:rifiutate' %}">Rifiutate</a>
+            {%  csrf_token %%}
+            <input style="height:20px; width:250px;" type="text" name="search-area">
+            <input class="button-capi_area" type="submit" value="Cerca">
+        </form>
+    </div>
+
+    <div class="task-items-wrapper">
+        {% for richiesta in richieste %}
+        <div class="task-wrapper">  
+
+            {% if richiesta.stato == 1 %}
+            <div class="task-title">
+                <div class="request-accepted-icon"></div>
+                <small class="small"><strong>{{richiesta}}</strong></small>
+            </div>
+            <a class="arrow-link" href="{% url 'capi_area:gestisci-richiesta' richiesta.id_richiesta %}"><i class="fa-solid fa-arrow-right"></i></a>
+
+            {% elif richiesta.stato == 0 %}
+            <div class="task-title">
+                <div class="request-denied-icon"></div>
+                <small class="small"><strong>{{richiesta}}</strong></small>
+            </div>
+                <a class="arrow-link" href="{% url 'capi_area:gestisci-richiesta' richiesta.id_richiesta %}"><i class="fa-solid fa-arrow-right"></i></a>
+
+            {% else %}
+            <div class="task-title">
+                <div class="request-waiting-icon"></div>
+                <small class="small"><strong>{{richiesta}}</strong></small>
+            </div>
+                <a class="arrow-link" href="{% url 'capi_area:gestisci-richiesta' richiesta.id_richiesta %}"><i class="fa-solid fa-arrow-right"></i></a>
+                
+            {% endif %}
+        </div>
+        {% empty %}
+        {% comment %} <h3>Non ci sono richieste. Vuoi fare richiesta?</h3> <a class="modify-link" href="{% url 'permessi:richiedi-permesso' %}"><i class="fa-solid fa-computer-mouse"></i></a> {% endcomment %}
+        {% endfor %}
+</div>
+<div class="header-bar2b">
+    {% if is_paginated %}
+        {% if page_obj.has_previous %}
+        <a class="white-style" href="?page=1">&laquo; Prima pagina</a>
+        <a class="white-style" href="?page={{page_obj.previous_num_pages}}">precedente</a>
+        {% endif %}
+        Pagina {{page_obj.number}} of {{page_obj.paginator.num_pages}}
+        {% if page_obj.has_next %}
+        <a class="white-style" href="?page={{page_obj.next_page_number}}">prossima</a>
+        <a class="white-style" href="?page={{page_obj.paginator.num_pages}}">ultima pagina&raquo;</a>
+        {% endif %}
+    {% endif %}
+</div>
+</div>
+{% endblock content%}

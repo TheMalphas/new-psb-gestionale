@@ -1,0 +1,41 @@
+{% extends 'base/main.html' %}
+{% load static %}
+{% block content %}
+
+<title>{% block title%}Documenti{% endblock %}</title>
+<link rel="stylesheet" href="{% static 'users/css/style.css' %}">
+<script src="{% static 'users/js/script.js' %}"></script>
+
+<div class="container-login">
+<div class="header-bar2">
+<div class="container">
+    <div class="container"><h1 style="margin-top: 20px" >Ciao {{user.first_name|title}} </h1></div>
+</div>
+</div>
+
+<div class="card-body">
+    <td><a href="/presenze/download/excel/{{data|date:'Y-m-d'}}" class='btn btn-outline-primary border-0'></a></td>
+
+    <div class="row">
+        
+        <div class="col-md-4" style="margin: 1em;">
+        <form class="" method="POST" action="/scarica_report_entrate/">
+            {% csrf_token %}
+        <button type="input" class="button"><strong>Report Presenze</strong></button>
+        </div>
+
+        <div class="col-md-4" style="margin:1em;">
+            <select name="mese" id="mese" class="form-select" aria-label="Default select example">
+            {% for el in mesi %}
+            <option name="mese" id="mese" value="{{el}}">{{el}}</option>
+            {% endfor %}
+          </select>
+        </div>
+    </form>
+
+    </div>
+</div>
+</div>
+
+
+{% endblock %}

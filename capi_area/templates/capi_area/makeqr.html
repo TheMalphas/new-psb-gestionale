@@ -1,0 +1,32 @@
+{% extends 'base/main.html' %}
+
+{% block content %}
+
+{% load static %}
+
+<title>{% block title%}MakeQr{% endblock %}</title>
+<link rel="stylesheet" href="{% static 'gestione/css/style.css' %}">
+<script src="{% static 'gestione/js/script.js' %}"></script>
+
+<div class="container2">
+    <div class="header-bar2">
+    <div class="container">
+        <h3 style="margin-top:20px;">Crea il Qr</h3>
+    </div>
+</div>
+
+<div class="card-body">
+<form method="POST" action="">
+    {% csrf_token %} 
+        <select class="form-select" aria-label="Default select example" name="dipendente">
+        {% for dip in dips %}
+        <option value="{{dip.id_dip}}">{{dip}}</option>
+        {% endfor %}
+    </select>
+    <input style="margin-top:1em;" type="submit" value="Conferma">
+</form>
+</div>
+</div>
+
+
+{% endblock %}

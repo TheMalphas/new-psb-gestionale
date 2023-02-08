@@ -1,0 +1,13 @@
+Django==4.1
+docxtpl==0.16.4
+holidays==0.17.2
+openpyxl==3.0.10
+pandas==1.4.2
+pytz==2022.1
+qrcode==7.3.1
+requests==2.27.1
+workalendar==16.4.0
+django_jazzmin
+django_htmx
+pip install django-crispy-forms
+crispy-bootstrap5

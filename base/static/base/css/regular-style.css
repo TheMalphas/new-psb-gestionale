@@ -1,0 +1,84 @@
+.hover-link:hover {
+    background-color: #9d9d9d !important;
+    border-radius: 0.4em;
+    color: #ffffff !important;
+}
+
+.nav-pills > li > a.active {
+    color: #ffffff !important;
+    background-color: #9d9d9d !important;
+}
+
+.nav-pills > li > a.active:hover {
+    color: #ffffff !important;
+    background-color: #9d9d9d !important;
+}
+
+.nav-pills > li:hover {
+    color: #ffffff !important;
+}
+
+.hover-link:hover {
+    background-color: #9d9d9d !important;
+    color: #ffffff !important;
+    border-radius: 0.4em;
+}
+
+a:hover, a:active {
+    color: #ffffff !important;
+}
+
+.hover-link > li > a{
+    color: #ffffff !important;
+}
+
+.cartaBox .carta .numbers {
+    color: #9d9d9d;
+}
+
+.cartaBox .carta-table .numbers {
+    color: #9d9d9d;
+}
+
+.cartaBox .carta-table-reception .numbers {
+    color: #9d9d9d;
+}
+
+.cartaBox .carta:hover:not(#child){
+    background-color: #9d9d9d;
+    color: #ffffff;
+}
+.cartaBox-table-reception-datatables  .carta .numbers {
+    color: #9d9d9d;
+}
+
+.cartaBox-table-reception-datatables  .carta-table .numbers {
+    color: #9d9d9d;
+}
+
+.cartaBox-table-reception-datatables  .carta-table-reception .numbers {
+    color: #9d9d9d;
+}
+
+.cartaBox-table-reception-datatables  .carta-table-reception-datatables .numbers {
+    color: #9d9d9d;
+}
+
+.cartaBox-table-reception-datatables  .carta:hover:not(#child){
+    background-color: #9d9d9d;
+    color: #ffffff;
+}
+
+.table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
+    color: #ffffff;
+    background-color: #9d9d9d;
+}
+
+.dropdown-item:hover{
+    color: #ffffff;
+    background-color: #9d9d9d;
+}
+
+strong {
+    color: #9d9d9d;
+}

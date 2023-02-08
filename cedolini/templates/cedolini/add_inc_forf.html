@@ -1,0 +1,34 @@
+<!-- Modal -->
+<div class="modal-dialog" role="document">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 class="modal-title">Aggiungi Inc Forf</h2>
+      <button type="submit" class="btn btn-danger" data-bs-dismiss="modal" aria-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="container">
+      
+    <form method="POST" action="{% url 'cedolini:add_inc_forf' cedolino.id_cedolino %}" enctype="multipart/form-data" >
+        {% csrf_token %}
+        <!-- Form -->
+        {% for form in formset %}
+            {% for hidden_field in form.hidden_fields %}
+            {{ hidden_field.errors }}    
+            {{ hidden_field }}
+            {% endfor %}
+            {{formset.management_form}}
+            {{formset.non_form_errors}}
+        {% endfor %}
+        {% for form in formset %}
+          {{form.as_p}}
+        {% endfor %}
+    <!-- End form -->
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancella</button>
+      <button type="submit" class="btn btn-primary" value="Conferma">Salva</button>
+    </form> 
+    </div>
+    </div>
+</div>
+</div>

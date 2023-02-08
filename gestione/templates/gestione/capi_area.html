@@ -1,0 +1,127 @@
+{% extends 'base/main.html' %}
+{% load static %}
+{% block content %}
+
+<title>{% block title%}Capi Area{% endblock %}</title>
+<link rel="stylesheet" href="{% static 'gestione/css/style.css' %}">
+<script src="{% static 'gestione/js/script.js' %}"></script>
+
+<div class="space">
+</div>
+
+<div class="container-mie-richieste">
+   <div class="header-bar2">
+    <div class="row">
+        <div class="white-style"><a href="{% url 'gestione:altri-dati' %}">&#8592;Torna alle opzioni</a></div>
+        <div class="col-md-auto"><h1 id="tag-name"> Capi Area </h1></div>
+            <div class="container" id="container-create">
+                <form method="GET" id="capi-form" action="{% url 'gestione:capi_area' %}" value="{{capiarea.id_contratto}}">{% csrf_token %%}
+                    <input class="id-field-onchange" id="capiarea-input" name="capiarea" value="{{capiarea.nomecompleto}}">
+                    <div class="btn-group" role="group" aria-label="Basic example">
+                        <button type="submit" class="btn btn-primary" name="submit" id="capiarea-cerca" value="Cerca">Cerca</button>
+                        <a href="/lista-capiarea-excel/?capiarea=" id="capoarea-anchor"><button type="button" id="button-download" class="btn btn-secondary">Scarica</button></a>
+                    </div>
+                  </form>
+            <div class="col" style="float:right;"><a class="white-style" id="link-crea-capo" style="float:right;" href="/aggiungi_capo_area">Crea nuovo Capo Area &#8594;</a></div>
+            </div>
+        </div>
+    </div>
+
+    <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="pills-capiarea-tab" data-bs-toggle="pill" data-bs-target="#pills-capiarea" type="button" role="tab" aria-controls="pills-capiarea" aria-selected="true">Capi Area</button>
+        </li>
+        <li class="nav-item" role="presentation">
+        <button class="nav-link" id="pills-dirigenti-tab" data-bs-toggle="pill" data-bs-target="#pills-dirigenti" type="button" role="tab" aria-controls="pills-dirigenti" aria-selected="true">Dirigenti</button>
+        </li>
+        <li class="nav-item" role="presentation">
+        <button class="nav-link" id="pills-responsabili-tab" data-bs-toggle="pill" data-bs-target="#pills-responsabili" type="button" role="tab" aria-controls="pills-responsabili" aria-selected="true">Responsabili</button>
+        </li>
+        <li class="nav-item" role="presentation">
+        <button class="nav-link" id="pills-responsabilisede-tab" data-bs-toggle="pill" data-bs-target="#pills-responsabilisede" type="button" role="tab" aria-controls="pills-responsabilisede" aria-selected="true">Responsabili Sede</button>
+        </li>
+        <li class="nav-item" role="presentation">
+        <button class="nav-link" id="pills-referenti-tab" data-bs-toggle="pill" data-bs-target="#pills-referenti" type="button" role="tab" aria-controls="pills-referenti" aria-selected="true">Referenti</button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="pills-tabContent">
+
+        <div class="tab-pane fade show active" id="pills-capiarea" role="tabpanel" aria-labelledby="pills-capiarea-tab" tabindex="0">
+            <div class="container-mie-richieste">
+                <div class="task-items-wrapper">
+                    {% for capo in capiarea %}
+                    <div class="task-wrapper">  
+                        <div class="task-title">
+                            {% if capo.id_capo %}
+                            <div class="container"><a href="{% url 'gestione:update_capo_area' capo.id_capo %}">{{capo.id_dipendente}} Capo Area <strong>{{capo.area}}</strong></a></div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade show" id="pills-dirigenti" role="tabpanel" aria-labelledby="pills-dirigenti-tab" tabindex="0">
+            <div class="container-mie-richieste">
+                <div class="task-items-wrapper">
+                {% for dir in dirigenti %}
+                    <div class="task-wrapper">
+                        <div class="task-title">
+                            <div class="container"><p>{{dir}} - <strong> {{dir.societa}} - {{dir.area}}</strong></p></div>
+                        </div>
+                    </div>
+                {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade show" id="pills-responsabili" role="tabpanel" aria-labelledby="pills-responsabili-tab" tabindex="0">
+            <div class="container-mie-richieste">
+                <div class="task-items-wrapper">
+                {% for resp in respo %}
+                    <div class="task-wrapper">
+                        <div class="task-title">
+                            <div class="container"><p>{{resp}} - <strong> {{resp.societa}} - {{resp.area}}</strong></p></div>
+                        </div>
+                    </div>
+                {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade show" id="pills-responsabilisede" role="tabpanel" aria-labelledby="pills-responsabilisede-tab" tabindex="0">
+            <div class="container-mie-richieste">
+                <div class="task-items-wrapper">
+                {% for respsd in resposede %}
+                    <div class="task-wrapper">
+                        <div class="task-title">
+                            <div class="container"><p>{{respsd}} - <strong> {{respsd.societa}} - {{respsd.area}}</strong></p></div>
+                        </div>
+                    </div>
+                {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-pane fade show" id="pills-referenti" role="tabpanel" aria-labelledby="pills-referenti-tab" tabindex="0">
+            <div class="container-mie-richieste">
+                <div class="task-items-wrapper">
+                {% for ref in refer %}
+                    <div class="task-wrapper">
+                        <div class="task-title">
+                            <div class="container"><p>{{ref}} - <strong> {{ref.societa}} - {{ref.area}}</strong></p></div>
+                        </div>
+                    </div>
+                {% endfor %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="space">
+</div>
+{% endblock content %}

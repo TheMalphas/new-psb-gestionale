@@ -1,0 +1,76 @@
+{% extends 'base/main.html' %}
+{% load static %}
+{% block content %}
+
+<title>{% block title%}Lista Dipendenti Presenze{% endblock %}</title>
+<link rel="stylesheet" href="{% static 'gestione/css/style.css' %}">
+<script src="{% static 'gestione/js/script.js' %}"></script>
+
+<section style="box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); margin-left:268px;">
+    <header class="p-3 bg-light text-black">
+        <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+    
+        <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+            <li class="nav-link px-2 text-dark"></li>            
+            <li class="nav-link px-2 text-dark">Buon lavoro, {{user.first_name}}</li> 
+        </ul>
+        <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" method="GET" action="{% url 'reception:presenze_per_dip' %}" value="{{dipendenti.id_dip}}">
+            {% csrf_token %}
+            <input type="search" id="dip" name="dip" class="form-control form-control-dark" value="{{dipendenti.id_dip}}" placeholder="Dipendente..." aria-label="Cerca">
+        </form>
+        <div class="text-end">
+            <button type="button" class="btn btn-success">Cerca</button>
+            {% comment %} <a href="/lista-aree-excel/?area=" id="area-anchor"><button type="button" class="btn btn-warning">Scarica</button></a> {% endcomment %}
+        </div>
+</header>
+</section>
+
+<section style="margin-left:300px; margin-top:25px;">
+    <div class="cartaBox-table-reception-datatables">
+            <div class="carta-table-reception-datatables">
+                <div>
+                    <div class="numbers"></div>
+                    <div class="no-hover">
+                    <table class="table table-striped table-hover caption-top text-nowrap" id="table-per-dip">
+                        <caption>Lista Presenze Dipendente </caption>
+                        <thead id="head-table-per-dip">
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+                </div>
+                <div class="iconBox">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="55" height="55" fill="currentColor" class="bi bi-calendar4-range" viewBox="0 0 16 16">
+                        <path d="M3.5 0a.5.5 0 0 1 .5.5V1h8V.5a.5.5 0 0 1 1 0V1h1a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3a2 2 0 0 1 2-2h1V.5a.5.5 0 0 1 .5-.5zM2 2a1 1 0 0 0-1 1v1h14V3a1 1 0 0 0-1-1H2zm13 3H1v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V5z"/>
+                        <path d="M9 7.5a.5.5 0 0 1 .5-.5H15v2H9.5a.5.5 0 0 1-.5-.5v-1zm-2 3v1a.5.5 0 0 1-.5.5H1v-2h5.5a.5.5 0 0 1 .5.5z"/>
+                      </svg>
+                </div>
+            </div>
+    </div>    
+</section>
+
+<div class="modal fade" id="modificaAreaModal" role="dialog" tabindex="-1">
+</div>
+
+<div class="modal fade" id="creaAreaModal" role="dialog" tabindex="-1">
+</div>
+
+<script>
+    var $ = jQuery.noConflict();
+function open_modal_update_area(url){
+    $('#modificaAreaModal').load(url,function(){
+    $(this).modal('show'); 
+    });
+};
+
+var $ = jQuery.noConflict();
+function open_modal_create_area(url){
+    $('#creaAreaModal').load(url,function(){
+    $(this).modal('show'); 
+    });
+};
+</script>
+
+{% endblock content %}
+

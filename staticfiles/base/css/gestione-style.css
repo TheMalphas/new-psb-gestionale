@@ -1,0 +1,84 @@
+.hover-link:hover {
+    background-color: #0070dd !important;
+    border-radius: 0.4em;
+    color: #ffffff !important;
+}
+
+.nav-pills > li > a.active {
+    color: #ffffff !important;
+    background-color: #0070dd !important;
+}
+
+.nav-pills > li > a.active:hover {
+    color: #ffffff !important;
+    background-color: #0070dd !important;
+}
+
+.nav-pills > li:hover {
+    color: #ffffff !important;
+}
+
+.hover-link:hover {
+    background-color: #0070dd !important;
+    color: #ffffff !important;
+    border-radius: 0.4em;
+}
+
+a:hover, a:active {
+    color: #ffffff !important;
+}
+
+.hover-link > li > a{
+    color: #ffffff !important;
+}
+
+.cartaBox .carta .numbers {
+    color: #0070dd;
+}
+
+.cartaBox .carta-table .numbers {
+    color: #0070dd;
+}
+
+.cartaBox .carta-table-reception .numbers {
+    color: #0070dd;
+}
+
+.cartaBox .carta:hover:not(#child){
+    background-color: #0070dd;
+    color: #ffffff;
+}
+.cartaBox-table-reception-datatables  .carta .numbers {
+    color: #0070dd;
+}
+
+.cartaBox-table-reception-datatables  .carta-table .numbers {
+    color: #0070dd;
+}
+
+.cartaBox-table-reception-datatables  .carta-table-reception .numbers {
+    color: #0070dd;
+}
+
+.cartaBox-table-reception-datatables  .carta-table-reception-datatables .numbers {
+    color: #0070dd;
+}
+
+.cartaBox-table-reception-datatables  .carta:hover:not(#child){
+    background-color: #0070dd;
+    color: #ffffff;
+}
+
+.table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
+    color: #ffffff;
+    background-color: #0070dd;
+}
+
+.dropdown-item:hover{
+    color: #ffffff;
+    background-color: #0070dd;
+}
+
+strong {
+    color: #0070dd;
+}

@@ -1,0 +1,84 @@
+{% extends 'base/main.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<title>{% block title%}Presenze{% endblock %}</title>
+<script src="{% static 'reception/js/script.js' %}"></script>
+<script src="{% static 'base/js/datatables.js' %}"></script>
+<link rel="stylesheet" href="{% static 'base/css/datatables.css' %}">
+<link rel="stylesheet" href="{% static 'reception/css/style.css' %}">
+
+{% include "reception/header-reception.html" %}
+
+<section style="margin-left:300px; margin-top:25px;">
+    <div class="cartaBox-table-reception-datatables">
+
+            <div class="carta-table-reception-datatables">
+                <div>
+                    <div class="numbers">{{contratti|length}}</div>
+                    <div class="no-hover">
+                      <table class="table table-striped table-hover caption-top">
+                        <caption>Lista Presenze {{data|date:'d-m-Y'}}</caption>
+                        <thead>
+                        <tr>
+                            <th scope="col"></th>
+                            <td> Dipendente </td>
+                            <td> Stato </td>
+                            <td> Sede </td>
+                            <td> Area </td>
+                            <td> Tipo Contratto </td>
+                            <td> Entrata </td>
+                            <td> Uscita </td>
+                            <td> Straordinario/Anticipo </td>
+                            <td> Straordinari </td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            {% for dipendente in presenze %}
+                            <tr>
+                              <th scope="col">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-mouse-fill" viewBox="0 0 16 16">
+                                  <path d="M3 5a5 5 0 0 1 10 0v6a5 5 0 0 1-10 0V5zm5.5-1.5a.5.5 0 0 0-1 0v2a.5.5 0 0 0 1 0v-2z"/>
+                                </svg>
+                              </th>
+                              <td>{{dipendente.nominativo}}</td>
+                              <td></td>
+                              <td>{{dipendente.id_dip_ing.sede.nome_sede|title}}</td>
+                              <td>{{dipendente.id_dip_ing.area.nome_area|title}}</td>
+                              <td>{{dipendente.id_dip_ing.tipo_contratto.nome_contratto|title}}</td>
+                              <td>{% if dipendente.entrata %} {{dipendente.entrata|time:"H:i"}} {% else %} -- {% endif %}</td>
+                              <td>{% if dipendente.seconda_uscita != none %} {{dipendente.seconda_uscita}} {% elif dipendente.uscita %} {{dipendente.uscita|time:"H:i"}}  {% else %} -- {% endif %} </td>
+                              <td>{% if dipendente.ritardo %} -{{dipendente.ritardo}} {% elif dipendente.anticipo %} +{{dipendente.anticipo}} {% else %} 0 {% endif %}</td>
+                              <td>{% if dipendente.straordinario %} {{dipendente.straordinario}} {% endif %}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                </div>
+                <div class="iconBox">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="55" height="55" fill="currentColor" class="bi bi-file-text-fill" viewBox="0 0 16 16">
+                        <path d="M12 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM5 4h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1zm-.5 2.5A.5.5 0 0 1 5 6h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5zM5 8h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1zm0 2h3a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1z"/>
+                    </svg>
+                </div>
+                </a>
+            </div>
+    </div>    
+</section>
+
+<div class="modal fade" id="modificaIngresso" role="dialog" tabindex="-1">
+</div>
+
+<script>
+    var $ = jQuery.noConflict();
+function open_modal_modifica_ingresso(url){
+    $('#modificaIngresso').load(url,function(){
+    $(this).modal('show'); 
+    });
+};
+</script>
+
+
+{% endblock content %}
