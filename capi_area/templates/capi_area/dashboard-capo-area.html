@@ -23,7 +23,6 @@
 </header>
 </section>
 
-
 <section style="margin-left:300px; margin-top:50px;">
 <div class="cartaBox">
     <div class="carta">
@@ -78,6 +77,7 @@
                 <tr>
                     <th scope="col"></th>
                     <td> Nome </td>
+                    <td> Email </td>
                     <td> Et&#224; </td>
                 </tr>
                 </thead>
@@ -86,6 +86,7 @@
                     <tr>
                         <th scope="col"></th>
                         <td>{{teammember.nominativo}}</td>
+                        <td>{% if teammember.email_lav %} {{teammember.email_lav}} {% else %} {{teammember.email_pers}} {% endif %}</td>
                         <td>{% if teammember.eta %}{{teammember.eta}}{% endif %}</td>
                     </tr>
                     {% endfor %}

@@ -52,8 +52,6 @@ class AnaDipendenti(models.Model):
     id_dip = models.AutoField(db_column='ID_Dip', primary_key=True)  # Field name made lowercase.
     user = models.ForeignKey('AuthUser', models.DO_NOTHING, db_column='User_id', blank=True, null=True)  # Field name made lowercase.
     id_stipendio = models.IntegerField(blank=True, null=True)
-    dip_capo_area = models.IntegerField(db_column='Dip_Capo_Area', blank=True, null=True)  # Field name made lowercase.
-    id_capo_area = models.ForeignKey('CapoArea', models.DO_NOTHING, db_column='ID_Capo_Area', blank=True, null=True)  # Field name made lowercase.
     nome = models.CharField(db_column='Nome', max_length=100)  # Field name made lowercase.
     cognome = models.CharField(db_column='Cognome', max_length=100)  # Field name made lowercase.
     sesso = models.ForeignKey('Sesso', models.DO_NOTHING, db_column='Sesso', blank=True, null=True)  # Field name made lowercase.
@@ -69,11 +67,12 @@ class AnaDipendenti(models.Model):
     indirizzo_residenza = models.CharField(db_column='Indirizzo_Residenza', max_length=150, blank=True, null=True)  # Field name made lowercase.
     provincia_residenza = models.CharField(db_column='Provincia_Residenza', max_length=2, blank=True, null=True)  # Field name made lowercase.
     cap_residenza = models.CharField(db_column='Cap_Residenza', max_length=6, blank=True, null=True)  # Field name made lowercase.
+    asl = models.CharField(db_column='ASL', max_length=75, blank=True, null=True)  # Field name made lowercase.
     cellulare = models.CharField(db_column='Cellulare', max_length=30, blank=True, null=True)  # Field name made lowercase.
     cell_alternativo = models.CharField(db_column='Cell_Alternativo', max_length=30, blank=True, null=True)  # Field name made lowercase.
     email_pers = models.CharField(db_column='Email_Pers', max_length=75, blank=True, null=True)  # Field name made lowercase.
     email_lav = models.CharField(db_column='Email_Lav', max_length=75, blank=True, null=True)  # Field name made lowercase.
-    iban = models.CharField(db_column='IBAN', max_length=27, blank=True, null=True)  # Field name made lowercase.
+    iban = models.CharField(db_column='IBAN', max_length=34, blank=True, null=True)  # Field name made lowercase.
     p_iva = models.CharField(db_column='P_Iva', max_length=11, blank=True, null=True)  # Field name made lowercase.
     societa = models.ForeignKey('Societa', models.DO_NOTHING, db_column='Societa', blank=True, null=True)  # Field name made lowercase.
     sede = models.ForeignKey('Sede', models.DO_NOTHING, db_column='Sede', blank=True, null=True)  # Field name made lowercase.
@@ -86,6 +85,7 @@ class AnaDipendenti(models.Model):
     stato = models.CharField(db_column='Stato', max_length=7, blank=True, null=True)  # Field name made lowercase.
     data_creazione = models.DateTimeField(db_column='Data_creazione', blank=True, null=True)  # Field name made lowercase.
     note = models.TextField(db_column='Note', blank=True, null=True)  # Field name made lowercase.
+
     
     class Meta:
         managed = False
@@ -105,6 +105,16 @@ class AnaDipendenti(models.Model):
         if self.data_nascita:
             eta = today.year - self.data_nascita.year - ((today.month, today.day) < (self.data_nascita.month, self.data_nascita.day))
             return eta
+
+
+class AppoggioVerificaQr(models.Model):
+    uuid_qr = models.CharField(primary_key=True, max_length=50)
+    id_dipendente = models.ForeignKey(AnaDipendenti, models.DO_NOTHING, db_column='id_dipendente')
+
+    class Meta:
+        managed = False
+        db_table = 'appoggio_verifica_qr'
+        unique_together = (('uuid_qr', 'id_dipendente'),)
 
 
 class Area(models.Model):
@@ -556,20 +566,9 @@ class Richieste(models.Model):
         verbose_name_plural = 'Richieste'
     
     def __str__(self):
-        strstamp = self.timestamp
-        day = str(strstamp).split(" ")
-        if self.stato == 0:
-            if self.id_permessi_richieste:
-                return f"Richiesta del {str(day[0])} di {self.nominativo} per {Permessi.objects.get(tipopermesso=self.id_permessi_richieste)}"
-            else: return f"Richiesta di permesso orario di {self.nominativo} del {str(day[0])}"
-        elif self.stato == 1:
-            if self.id_permessi_richieste:
-                return f" Richiesta del {str(day[0])} di {self.nominativo} per {Permessi.objects.get(tipopermesso=self.id_permessi_richieste)}"
-            else: return f"Richiesta di permesso orario di {self.nominativo} del {str(day[0])}"
-        else:
-            if self.id_permessi_richieste:
-                return f"Richiesta del {str(day[0])} di {self.nominativo} per {Permessi.objects.get(tipopermesso=self.id_permessi_richieste)}"
-            else: return f"Richiesta di permesso orario di {self.nominativo} del {str(day[0])}"
+        if self.id_permessi_richieste:
+            return self.id_permessi_richieste.codicepermesso
+        else: return f'Permesso Orario'
     
     def get_absolute_url(self):
         return reverse("permessi:mie-richieste", kwargs={"pk": self.pk})
@@ -640,7 +639,8 @@ class Societa(models.Model):
 
 class TipoContratto(models.Model):
     id_contratto = models.AutoField(primary_key=True)
-    tipo_contratto = models.CharField(max_length=23, blank=True, null=True)
+    nome_contratto = models.CharField(unique=True, max_length=100, blank=True, null=True)
+    codice_contratto = models.CharField(max_length=2, blank=True, null=True)
     data_creazione = models.DateTimeField(blank=True, null=True)
     data_modifica = models.DateTimeField(blank=True, null=True)
     note = models.TextField(db_column='Note', blank=True, null=True)  # Field name made lowercase.

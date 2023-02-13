@@ -1,13 +1,17 @@
 {% extends 'base/main.html' %}
 
-{% block content %}
-
 {% load static %}
 
-<title>{% block title%}MakeQr{% endblock %}</title>
-<link rel="stylesheet" href="{% static 'gestione/css/style.css' %}">
-<script src="{% static 'gestione/js/script.js' %}"></script>
+{% block content %}
 
+<title>{% block title%}Tutte le richieste{% endblock %}</title>
+<link rel="stylesheet" href="{% static 'capi_area/css/style.css' %}">
+
+{% include "capi_area/header-capi_area.html" %}
+
+
+<section style="margin-left:300px; margin-top:25px;">
+   
 <div class="container2">
     <div class="header-bar2">
     <div class="container">
@@ -27,6 +31,5 @@
 </form>
 </div>
 </div>
-
 
 {% endblock %}

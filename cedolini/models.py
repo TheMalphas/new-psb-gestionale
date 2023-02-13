@@ -62,8 +62,6 @@ class AnaDipendenti(models.Model):
     id_dip = models.AutoField(db_column='ID_Dip', primary_key=True)  # Field name made lowercase.
     user = models.ForeignKey('AuthUser', models.DO_NOTHING, db_column='User_id', blank=True, null=True)  # Field name made lowercase.
     id_stipendio = models.IntegerField(blank=True, null=True)
-    dip_capo_area = models.IntegerField(db_column='Dip_Capo_Area', blank=True, null=True)  # Field name made lowercase.
-    id_capo_area = models.ForeignKey('CapoArea', models.DO_NOTHING, db_column='ID_Capo_Area', blank=True, null=True)  # Field name made lowercase.
     nome = models.CharField(db_column='Nome', max_length=100)  # Field name made lowercase.
     cognome = models.CharField(db_column='Cognome', max_length=100)  # Field name made lowercase.
     sesso = models.ForeignKey('Sesso', models.DO_NOTHING, db_column='Sesso', blank=True, null=True)  # Field name made lowercase.
@@ -79,11 +77,12 @@ class AnaDipendenti(models.Model):
     indirizzo_residenza = models.CharField(db_column='Indirizzo_Residenza', max_length=150, blank=True, null=True)  # Field name made lowercase.
     provincia_residenza = models.CharField(db_column='Provincia_Residenza', max_length=2, blank=True, null=True)  # Field name made lowercase.
     cap_residenza = models.CharField(db_column='Cap_Residenza', max_length=6, blank=True, null=True)  # Field name made lowercase.
+    asl = models.CharField(db_column='ASL', max_length=75, blank=True, null=True)  # Field name made lowercase.
     cellulare = models.CharField(db_column='Cellulare', max_length=30, blank=True, null=True)  # Field name made lowercase.
     cell_alternativo = models.CharField(db_column='Cell_Alternativo', max_length=30, blank=True, null=True)  # Field name made lowercase.
     email_pers = models.CharField(db_column='Email_Pers', max_length=75, blank=True, null=True)  # Field name made lowercase.
     email_lav = models.CharField(db_column='Email_Lav', max_length=75, blank=True, null=True)  # Field name made lowercase.
-    iban = models.CharField(db_column='IBAN', max_length=27, blank=True, null=True)  # Field name made lowercase.
+    iban = models.CharField(db_column='IBAN', max_length=34, blank=True, null=True)  # Field name made lowercase.
     p_iva = models.CharField(db_column='P_Iva', max_length=11, blank=True, null=True)  # Field name made lowercase.
     societa = models.ForeignKey('Societa', models.DO_NOTHING, db_column='Societa', blank=True, null=True)  # Field name made lowercase.
     sede = models.ForeignKey('Sede', models.DO_NOTHING, db_column='Sede', blank=True, null=True)  # Field name made lowercase.
@@ -96,6 +95,7 @@ class AnaDipendenti(models.Model):
     stato = models.CharField(db_column='Stato', max_length=7, blank=True, null=True)  # Field name made lowercase.
     data_creazione = models.DateTimeField(db_column='Data_creazione', blank=True, null=True)  # Field name made lowercase.
     note = models.TextField(db_column='Note', blank=True, null=True)  # Field name made lowercase.
+
 
     class Meta:
         managed = False
@@ -137,135 +137,6 @@ class AnadipControl(models.Model):
     class Meta:
         managed = False
         db_table = 'anadip_control'
-
-@receiver(post_save, sender=AnaDipendenti)
-def anadipcontrol_post_save_receiver(sender, instance, created, *args, **kwargs):
-    full_row_instance = ""
-
-    if instance.id_dip:
-        full_row_instance += "id_dip:" + str(instance.id_dip) + ","
-    if instance.user:
-        full_row_instance += "user:" + str(instance.user) + ","
-    if instance.dip_capo_area:
-        full_row_instance += "dip_capo_area:" + str(instance.dip_capo_area) + ","
-    if instance.id_capo_area:
-        full_row_instance += "id_capo_area:" + str(instance.id_capo_area) + ","
-    if instance.nome:
-        full_row_instance += "nome:" + str(instance.nome) + ","
-    if instance.cognome:
-        full_row_instance += "cognome:" + str(instance.cognome) + ","
-    if instance.codice_fiscale:
-        full_row_instance += "codice_fiscale:" + str(instance.codice_fiscale) + ","
-    if instance.luogo_nascita:
-        full_row_instance += "luogo_nascita:" + str(instance.luogo_nascita) + ","
-    if instance.provincia_nascita:
-        full_row_instance += "provincia_nascita:" + str(instance.provincia_nascita) + ","
-    if instance.data_nascita:
-        full_row_instance += "data_nascita:" + str(instance.data_nascita) + ","
-    if instance.citta_domicilio:
-        full_row_instance += "citta_domicilio:" + str(instance.citta_domicilio) + ","
-    if instance.indirizzo_domicilio:
-        full_row_instance += "indirizzo_domicilio:" + str(instance.indirizzo_domicilio) + ","
-    if instance.provincia_domicilio:
-        full_row_instance += "provincia_domicilio:" + str(instance.provincia_domicilio) + ","
-    if instance.cap_domicilio:
-        full_row_instance += "cap_domicilio:" + str(instance.cap_domicilio) + ","
-    if instance.citta_residenza:
-        full_row_instance += "citta_residenza:" + str(instance.citta_residenza) + ","
-    if instance.indirizzo_residenza:
-        full_row_instance += "indirizzo_residenza:" + str(instance.indirizzo_residenza) + ","
-    if instance.provincia_residenza:
-        full_row_instance += "provincia_residenza:" + str(instance.provincia_residenza) + ","
-    if instance.cap_residenza:
-        full_row_instance += "cap_residenza:" + str(instance.cap_residenza) + ","
-    if instance.telefono:
-        full_row_instance += "telefono:" + str(instance.telefono) + ","
-    if instance.cellulare:
-        full_row_instance += "cellulare:" + str(instance.cellulare) + ","
-    if instance.email:
-        full_row_instance += "email:" + str(instance.email) + ","
-    if instance.seconda_email:
-        full_row_instance += "seconda_email:" + str(instance.seconda_email) + ","
-    if instance.iban:
-        full_row_instance += "iban:" + str(instance.iban) + ","
-    if instance.societa:
-        full_row_instance += "societa:" + str(instance.societa) + ","
-    if instance.sede:
-        full_row_instance += "sede:" + str(instance.sede) + ","
-    if instance.area:
-        full_row_instance += "area:" + str(instance.area) + ","
-    if instance.istruzione:
-        full_row_instance += "istruzione:" + str(instance.istruzione) + ","
-    if instance.mansione:
-        full_row_instance += "mansione:" + str(instance.mansione) + ","
-    if instance.stato:
-        full_row_instance += "stato:" + str(instance.stato) + ","
-    if instance.data_creazione:
-        full_row_instance += "data_creazione:" + str(instance.data_creazione) + ","
-    if instance.note:
-        full_row_instance += "note:" + str(instance.note)
-
-    if created:
-        new_row = AnadipControl.objects.create(row = instance.pk, table = sender, action =  "created", timestamp = timezone.now(), full_row  = full_row_instance)
-    else: 
-        new_row = AnadipControl.objects.create(row = instance.pk, table = sender, action =  "updated", timestamp = timezone.now(), full_row  = full_row_instance)
-
-@receiver(pre_delete, sender=AnaDipendenti)
-def anadipcontrol_post_save_receiver(sender, instance, *args, **kwargs):
-    full_row_instance = ""
-
-    if instance.id_dip:
-        full_row_instance += "id_dip:" + str(instance.id_dip) + ","
-    if instance.user:
-        full_row_instance += "user:" + str(instance.user) + ","
-    if instance.dip_capo_area:
-        full_row_instance += "dip_capo_area:" + str(instance.dip_capo_area) + ","
-    if instance.id_capo_area:
-        full_row_instance += "id_capo_area:" + str(instance.id_capo_area) + ","
-    if instance.nome:
-        full_row_instance += "nome:" + str(instance.nome) + ","
-    if instance.cognome:
-        full_row_instance += "cognome:" + str(instance.cognome) + ","
-    if instance.codice_fiscale:
-        full_row_instance += "codice_fiscale:" + str(instance.codice_fiscale) + ","
-    if instance.luogo_nascita:
-        full_row_instance += "luogo_nascita:" + str(instance.luogo_nascita) + ","
-    if instance.provincia:
-        full_row_instance += "provincia:" + str(instance.provincia) + ","
-    if instance.cap:
-        full_row_instance += "cap:" + str(instance.cap) + ","
-    if instance.data_nascita:
-        full_row_instance += "data_nascita:" + str(instance.data_nascita) + ","
-    if instance.indirizzo:
-        full_row_instance += "indirizzo:" + str(instance.indirizzo) + ","
-    if instance.telefono:
-        full_row_instance += "telefono:" + str(instance.telefono) + ","
-    if instance.cellulare:
-        full_row_instance += "cellulare:" + str(instance.cellulare) + ","
-    if instance.email:
-        full_row_instance += "email:" + str(instance.email) + ","
-    if instance.seconda_email:
-        full_row_instance += "seconda_email:" + str(instance.seconda_email) + ","
-    if instance.iban:
-        full_row_instance += "iban:" + str(instance.iban) + ","
-    if instance.societa:
-        full_row_instance += "societa:" + str(instance.societa) + ","
-    if instance.sede:
-        full_row_instance += "sede:" + str(instance.sede) + ","
-    if instance.area:
-        full_row_instance += "area:" + str(instance.area) + ","
-    if instance.istruzione:
-        full_row_instance += "istruzione:" + str(instance.istruzione) + ","
-    if instance.mansione:
-        full_row_instance += "mansione:" + str(instance.mansione) + ","
-    if instance.stato:
-        full_row_instance += "stato:" + str(instance.stato) + ","
-    if instance.data_creazione:
-        full_row_instance += "data_creazione:" + str(instance.data_creazione) + ","
-    if instance.note:
-        full_row_instance += "note:" + str(instance.note)
-
-    new_row = AnadipControl.objects.create(row = instance.pk, table = sender, action =  "deleted", timestamp = timezone.now(), full_row  = full_row_instance)
 
 
 class Area(models.Model):
@@ -615,33 +486,6 @@ class Ingressidip(models.Model):
         managed = False
         db_table = 'IngressiDip'
 
-    @property
-    def ritardo(self):
-        orariolav = datetime.strptime("09:00:00", '%H:%M:%S').time()
-        if self.entrata and self.entrata > orariolav:
-            ritardo = datetime.combine(date.today(), self.entrata) - datetime.combine(date.today(), orariolav)
-            return ritardo
-    
-    def sum_ritardo(self):
-        queryset = Ingressidip.objects.all()
-        return sum([self.ritardo for self.ritardo in queryset()])
-    
-    @property
-    def anticipo(self):
-        orariolav = datetime.strptime("09:00:00", '%H:%M:%S').time()
-        if self.entrata and self.entrata < orariolav:
-            anticipo = datetime.combine(date.today(), orariolav) - datetime.combine(date.today(), self.entrata)
-            return anticipo
-    
-    
-    def __str__(self):
-        def newLineNom(nom):
-            
-            for char in nom:
-                nome = nom.replace(" ", "\n")
-            return nome
-        return newLineNom(self.nominativo)
-
 
 class ListaSocieta(models.Model):
     id_societa = models.OneToOneField('Societa', models.DO_NOTHING, db_column='ID_Societa', primary_key=True)  # Field name made lowercase.
@@ -768,22 +612,6 @@ class Richieste(models.Model):
         db_table = 'Richieste'
         verbose_name = 'Richiesta'
         verbose_name_plural = 'Richieste'
-    
-    def __str__(self):
-        strstamp = self.timestamp
-        day = str(strstamp).split(" ")
-        
-        if self.stato == 0:
-            return f"Richiesta di {AnaDipendenti.objects.get(user=self.id_user)} del {str(day[0])}. Respinta."
-        elif self.stato == 1:
-            return f" Richiesta di {AnaDipendenti.objects.get(user=self.id_user)} del {str(day[0])}. Accettata."
-        else:
-            return f" Richiesta di {AnaDipendenti.objects.get(user=self.id_user)} del {str(day[0])}, da revisionare."
-    
-    def get_absolute_url(self):
-        return reverse("permessi:accetta-richieste", kwargs={"pk": self.pk})
-    
-
 
 class RichiesteAccettate(models.Model):
     id_richieste_accettate = models.AutoField(db_column='ID_richieste_accettate', primary_key=True)  # Field name made lowercase.
@@ -925,86 +753,6 @@ class AuthUser(models.Model):
     class Meta:
         managed = False
         db_table = 'auth_user'
-    
-    @receiver(post_save, sender=AnaDipendenti)
-    def create_user(sender, instance, created, *args, **kwargs):
-
-        def modifyUsername(username):  
-            if username[3:4].isdigit():
-                char = username[3:4]
-                newchar = int(char) + 1
-                username = username.replace(f"{str(char)}.", f"{str(newchar)}.")
-                return username
-            else: 
-                username = username.replace(".", "2.")
-            return username
-        
-        if created:
-            usernameCheck=instance.nome[0:3].lower() + "." + instance.cognome.lower()
-            item = AuthUser.objects.filter(username = usernameCheck)
-            if item.exists():
-                usernameCheck = modifyUsername(usernameCheck)
-                try:
-                    new_user = User.objects.create_user(username=usernameCheck,
-                                                    password='Password1$',
-                                                    first_name=instance.nome.title(),
-                                                    last_name=instance.cognome.title(),
-                                                    email=instance.email,
-                                                    is_staff=True)
-                    id_new_user= new_user.id
-                    latest_dip = AnaDipendenti.objects.all().values_list('id_dip', flat=True).order_by('-id_dip').first()
-                    AnaDipendenti.objects.filter(id_dip = latest_dip).update(user=id_new_user)
-                    userAccount = new_user.username
-                    message = f'Di seguito le credenziali per accedere al tuo account aziendale:\n username: {userAccount}\n password: Password1$\n'
-                    recipient = [new_user.email]
-                    send_mail(
-                        'Benvenuto in PSB',
-                        message,
-                        settings.EMAIL_HOST_USER,
-                        recipient
-                    )
-                except: 
-                    randNum = random.randint(0,999)
-                    usernameCheck = instance.nome[0:3].lower() + str(randNum) +  "." + instance.cognome.lower()
-                    modifyUsername(usernameCheck)
-                    new_user = User.objects.create_user(username=usernameCheck,
-                                                    password='Password1$',
-                                                    first_name=instance.nome.title(),
-                                                    last_name=instance.cognome.title(),
-                                                    email=instance.email,
-                                                    is_staff=True)
-                    id_new_user= new_user.id
-                    latest_dip = AnaDipendenti.objects.all().values_list('id_dip', flat=True).order_by('-id_dip').first()
-                    AnaDipendenti.objects.filter(id_dip = latest_dip).update(user=id_new_user)
-                    userAccount = new_user.username
-                    message = f'Di seguito le credenziali per accedere al tuo account aziendale:\n username: {userAccount}\n password: Password1$\n'
-                    recipient = [new_user.email]
-                    send_mail(
-                        'Benvenuto in PSB',
-                        message,
-                        settings.EMAIL_HOST_USER,
-                        [recipient]
-                    )
-            else:
-                new_user = User.objects.create_user(username=usernameCheck,
-                                                    password='Password1$',
-                                                    first_name=instance.nome.title(),
-                                                    last_name=instance.cognome.title(),
-                                                    email=instance.email,
-                                                    is_staff=True)
-                id_new_user= new_user.id
-                latest_dip = AnaDipendenti.objects.all().values_list('id_dip', flat=True).order_by('-id_dip').first()
-                AnaDipendenti.objects.filter(id_dip = latest_dip).update(user=id_new_user)
-                userAccount = new_user.username
-                message = f'Di seguito le credenziali per accedere al tuo account aziendale:\n username: {userAccount}\n password: Password1$\n'
-                recipient = [new_user.email]
-                send_mail(
-                    'Benvenuto in PSB',
-                    message,
-                    settings.EMAIL_HOST_USER,
-                    recipient
-                )
-
         
 class AuthUserGroups(models.Model):
     id = models.BigAutoField(primary_key=True)

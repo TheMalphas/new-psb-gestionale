@@ -7,7 +7,7 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormVi
 from django.views import View
 from django.db.models import Q
 from django.urls import reverse, reverse_lazy
-from .models import Richieste, AuthUser, AnaDipendenti, CapoArea, Permessi, RichiesteAccettate, Ingressidip, Cedolini
+from .models import Richieste, Area, AuthUser, AnaDipendenti, CapoArea, Permessi, RichiesteAccettate, Ingressidip, Cedolini, AppoggioVerificaQr
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import Group
 from django.contrib.auth import login
@@ -34,6 +34,7 @@ def printQR(request):
     
     if request.method == 'POST':
         input_data = request.POST['dipendente']
+        uuid = AppoggioVerificaQr.objects.get(id_dipendente=input_data)
         response = HttpResponse(content_type='image/png')
         dippo = AnaDipendenti.objects.get(id_dip=input_data)
         fl = f'{dippo}'
@@ -43,13 +44,14 @@ def printQR(request):
             box_size=10,
             border=5
         )
-        qr.add_data(input_data)
+        qr.add_data(uuid.uuid_qr)
         qr.make(fit=True)
         img = qr.make_image(fill='black', back_color='white')
         img.save(response)
         return response
     
     return render(request,'capi_area/makeqr.html',context=context)
+
 
 @login_required
 @permission_required('capi_area.change_richiesteaccettate')
@@ -58,12 +60,12 @@ def dashboardCapoarea(request):
     template_name = "capi_area/dashboard-capo-area.html"
     anadipendente = AnaDipendenti.objects.get(user_id=request.user.pk)
     capoccione = CapoArea.objects.get(id_dipendente=anadipendente.id_dip)
-    squadra = AnaDipendenti.objects.filter(id_capo_area=capoccione,stato="Attivo")
+    squadra = AnaDipendenti.objects.filter(area=capoccione.area,stato="Attivo")
     listaIdSquadra = [el.id_dip for el in squadra]
-    numeroSquadra = squadra.count()
+    numeroSquadra = len(listaIdSquadra)
     squadraPresente = Ingressidip.objects.filter(giorno=today,id_dip_ing__in=listaIdSquadra,timestamp_scan_entrata__isnull=False)
-    numeroSquadraIngressi = [ing.id_dip_ing for ing in squadraPresente]
-    squadraPresenteAna = AnaDipendenti.objects.filter(id_capo_area=capoccione,stato="Attivo",id_dip__in=numeroSquadraIngressi)
+    numeroSquadraIngressi = [ing.id_dip_ing.id_dip for ing in squadraPresente]
+    squadraPresenteAna = AnaDipendenti.objects.filter(sede=capoccione.area,stato="Attivo",id_dip__in=numeroSquadraIngressi)
     squadraPresenteNumero = squadraPresente.count()
     richieste = Richieste.objects.filter(id_dipendente_richiesta__in=listaIdSquadra)
     richiesteNumero = richieste.count()
@@ -71,8 +73,8 @@ def dashboardCapoarea(request):
     richiesteFerie = richieste.filter(id_permessi_richieste=6).count()
 
     return render(request,template_name,{"capoArea":capoccione,"squadra":squadra,"numeroSquadra":numeroSquadra,"squadraPresenteAna":squadraPresenteAna,"squadraPresenteNumero":squadraPresenteNumero,"richiesteNumero":richiesteNumero,"richiestePermesso":richiestePermesso,"richiesteFerie":richiesteFerie})
-# GestioneRichiesteList
 
+# GestioneRichiesteList
 class DettagliPresenze(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     model = Ingressidip
     day = datetime.now()
@@ -142,35 +144,42 @@ class DettagliPresenze(LoginRequiredMixin, PermissionRequiredMixin, ListView):
         
         return render(request, self.template_name,context)
 
-class Capi_AreaRichiesteAllList(LoginRequiredMixin,PermissionRequiredMixin,ListView):
-    models = Richieste
-    context_object_name = "richieste"
+@login_required
+@permission_required("capi_area.change_richiesteaccettate")
+def capiAreaRichiesteAllList(request):
     template_name = "capi_area/richieste.html"
     permission_required = 'capi_area.change_richiesteaccettate'
-    paginate_by = 8
-    conta = None
-    queryz = None
+    today = datetime.now().date()
+    tenDays = (today + timedelta(9))
+    monthDays = (today + timedelta(30))
     
-    def get_queryset(self):
-        try:
-            capo_area = CapoArea.objects.get(id_dipendente__user=self.request.user.pk)
-        except CapoArea.DoesNotExist:
-            raise PermissionDenied("Non sei un Capo Area.")
-        if capo_area:
-            queryset = Richieste.objects.filter(id_dipendente_richiesta__id_capo_area=capo_area).order_by("-a_giorno_richiesta").order_by('-timestamp')
-            self.queryz = queryset
-            query = self.request.GET.get("search-area") or ""
-            conta = queryset.count()
-            if query:
-                return queryset.filter(nominativo__icontains=query)
-            return queryset
+    
+    try:
+        capo_area = CapoArea.objects.get(id_dipendente__user=request.user.pk)
+        area = Area.objects.get(id_area=capo_area.area)
+        richieste = Richieste.objects.filter(id_dipendente_richiesta__area=capo_area.area,da_giorno_richiesta__lte=monthDays).order_by("-a_giorno_richiesta")
+        daRevisionare = Richieste.objects.filter(id_dipendente_richiesta__area=capo_area.area,stato=None).order_by("-a_giorno_richiesta").count()
+        accettate = Richieste.objects.filter(id_dipendente_richiesta__area=capo_area.area,stato=1,da_giorno_richiesta__lte=tenDays).order_by("-a_giorno_richiesta").count()
+        rifiutate = Richieste.objects.filter(id_dipendente_richiesta__area=capo_area.area,stato=0,da_giorno_richiesta__lte=tenDays).order_by("-a_giorno_richiesta").count()
+        if request.method == "POST" and request.POST.get("dipendente"):
+            query = request.POST.get("dipendente")
+            queryset = richieste.filter(nominativo__icontains=query).order_by("-a_giorno_richiesta")
+            return render(request,template_name,{'richieste':queryset,'daRevisionare':daRevisionare,'accettate':accettate,'rifiutate':rifiutate,'area':area.nome_area})
+        elif request.method == "POST" and request.POST.get("daRevisionare"):
+            queryset = richieste.filter(stato=None).order_by("-a_giorno_richiesta")
+            return render(request,template_name,{'richieste':queryset,'daRevisionare':daRevisionare,'accettate':accettate,'rifiutate':rifiutate,'area':area.nome_area})
+        elif request.method == "POST" and request.POST.get("accettate"):
+            queryset = richieste.filter(stato=1).order_by("-a_giorno_richiesta")
+            return render(request,template_name,{'richieste':queryset,'daRevisionare':daRevisionare,'accettate':accettate,'rifiutate':rifiutate,'area':area.nome_area})
+        elif request.method == "POST" and request.POST.get("rifiutate"):
+            queryset = richieste.filter(stato=0).order_by("-a_giorno_richiesta")
+            return render(request,template_name,{'richieste':queryset,'daRevisionare':daRevisionare,'accettate':accettate,'rifiutate':rifiutate,'area':area.nome_area})
+        else:
+            return render(request,template_name,{'richieste':richieste,'daRevisionare':daRevisionare,'accettate':accettate,'rifiutate':rifiutate,'area':area.nome_area})
+    except CapoArea.DoesNotExist:
+        raise PermissionDenied("Non sei un Capo Area.")
+    
 
-
-    def get_context_data(self, **kwargs):
-        if self.queryz != None:
-            kwargs["conta"] = self.queryz.count()
-        else: kwargs["conta"] = None
-        return super().get_context_data(**kwargs)
 
 class Capi_AreaRichiesteAccettateList(LoginRequiredMixin,PermissionRequiredMixin,ListView):
     models = Richieste
@@ -245,7 +254,7 @@ class AccettaRichiesta(LoginRequiredMixin,PermissionRequiredMixin,View):
             finePerm = instance.a_giorno_richiesta
             oraInitPerm = instance.da_ora_richiesta
             oraFinePerm = instance.a_ora_richiesta
- 
+
             if instance.id_permessi_richieste != None:
                 codPerm = instance.id_permessi_richieste.id_permesso
                 dipendente = Richieste.objects.filter(pk=id_richiesta).values_list('id_dipendente_richiesta',flat=True)
