@@ -196,3 +196,5 @@ EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'platform@finlise.it'
 EMAIL_HOST_PASSWORD = 'wi0Pb8OM11#%'
+
+TOKEN_EXPIRY = 365 #Login token expiration duration, it's 365 days (basic duration is two weeks)
