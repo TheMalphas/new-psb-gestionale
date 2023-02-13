@@ -11,8 +11,6 @@ class AnaDipendenti(models.Model):
     id_dip = models.AutoField(db_column='ID_Dip', primary_key=True)  # Field name made lowercase.
     user = models.ForeignKey('AuthUser', models.DO_NOTHING, db_column='User_id', blank=True, null=True)  # Field name made lowercase.
     id_stipendio = models.IntegerField(blank=True, null=True)
-    dip_capo_area = models.IntegerField(db_column='Dip_Capo_Area', blank=True, null=True)  # Field name made lowercase.
-    id_capo_area = models.ForeignKey('CapoArea', models.DO_NOTHING, db_column='ID_Capo_Area', blank=True, null=True)  # Field name made lowercase.
     nome = models.CharField(db_column='Nome', max_length=100)  # Field name made lowercase.
     cognome = models.CharField(db_column='Cognome', max_length=100)  # Field name made lowercase.
     sesso = models.ForeignKey('Sesso', models.DO_NOTHING, db_column='Sesso', blank=True, null=True)  # Field name made lowercase.
@@ -28,11 +26,12 @@ class AnaDipendenti(models.Model):
     indirizzo_residenza = models.CharField(db_column='Indirizzo_Residenza', max_length=150, blank=True, null=True)  # Field name made lowercase.
     provincia_residenza = models.CharField(db_column='Provincia_Residenza', max_length=2, blank=True, null=True)  # Field name made lowercase.
     cap_residenza = models.CharField(db_column='Cap_Residenza', max_length=6, blank=True, null=True)  # Field name made lowercase.
+    asl = models.CharField(db_column='ASL', max_length=75, blank=True, null=True)  # Field name made lowercase.
     cellulare = models.CharField(db_column='Cellulare', max_length=30, blank=True, null=True)  # Field name made lowercase.
     cell_alternativo = models.CharField(db_column='Cell_Alternativo', max_length=30, blank=True, null=True)  # Field name made lowercase.
     email_pers = models.CharField(db_column='Email_Pers', max_length=75, blank=True, null=True)  # Field name made lowercase.
     email_lav = models.CharField(db_column='Email_Lav', max_length=75, blank=True, null=True)  # Field name made lowercase.
-    iban = models.CharField(db_column='IBAN', max_length=27, blank=True, null=True)  # Field name made lowercase.
+    iban = models.CharField(db_column='IBAN', max_length=34, blank=True, null=True)  # Field name made lowercase.
     p_iva = models.CharField(db_column='P_Iva', max_length=11, blank=True, null=True)  # Field name made lowercase.
     societa = models.ForeignKey('Societa', models.DO_NOTHING, db_column='Societa', blank=True, null=True)  # Field name made lowercase.
     sede = models.ForeignKey('Sede', models.DO_NOTHING, db_column='Sede', blank=True, null=True)  # Field name made lowercase.
@@ -46,6 +45,7 @@ class AnaDipendenti(models.Model):
     data_creazione = models.DateTimeField(db_column='Data_creazione', blank=True, null=True)  # Field name made lowercase.
     note = models.TextField(db_column='Note', blank=True, null=True)  # Field name made lowercase.
 
+    
     class Meta:
         managed = False
         db_table = 'Ana_Dipendenti'
@@ -305,7 +305,8 @@ class Societa(models.Model):
 
 class TipoContratto(models.Model):
     id_contratto = models.AutoField(primary_key=True)
-    nome_contratto = models.CharField(max_length=23, blank=True, null=True)
+    nome_contratto = models.CharField(unique=True, max_length=100, blank=True, null=True)
+    codice_contratto = models.CharField(max_length=2, blank=True, null=True)
     data_creazione = models.DateTimeField(blank=True, null=True)
     data_modifica = models.DateTimeField(blank=True, null=True)
     note = models.TextField(db_column='Note', blank=True, null=True)  # Field name made lowercase.

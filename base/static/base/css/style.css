@@ -47,6 +47,13 @@ body {
   }
 }
 
+.container-liste  {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+.container-liste::-webkit-scrollbar {
+  display: none;
+}
 
 .bd-placeholder-img {
     font-size: 1.125rem;
@@ -232,7 +239,9 @@ body {
   transform: translate(-50%, -50%);
   overflow: auto;
 }
-
+.container-dipendenti text-nowrap::-webkit-scrollbar {
+  display: none;
+}
 .container-doppio {
   display: flex;
   flex-direction: row;
@@ -387,16 +396,6 @@ body {
   max-height: 83vh;
 
 }
-/* .cartaBox .carta-table-reception .cartaName {
-  color: #000000;
-  font-size: 1.1em;
-  margin-top: 5px;
-  text-decoration: none;
-}
-.cartaBox .carta-table-reception .iconBox{
-  font-size: 3.5em;
-  color: #000000;
-} */
 .cartaBox .carta-table-reception {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
@@ -404,6 +403,67 @@ body {
 .cartaBox .carta-table-reception::-webkit-scrollbar {
   display: none;
 }
+
+
+/*Carta-table-reception-datatables style*/
+.cartaBox-table-reception-datatables {
+  position: relative;
+  justify-content: space-between;
+  width: 100%;
+  padding: 20px;
+  flex:1;
+  display: wrap;
+  grid-template-columns: repeat(3,1fr);
+  grid-gap: 40px;
+}
+
+.cartaBox-table-reception-datatables {
+  position: relative;
+  justify-content: space-between;
+  width: 100%;
+  padding: 20px;
+  display: wrap;
+  grid-template-columns: repeat(3,1fr);
+  grid-gap: 40px;
+}
+.cartaBox-table-reception-datatables  .carta-table-reception-datatables {
+  position:relative;
+  background: var(--white);
+  padding: 30px;
+  border-radius: 20px;
+  display: flex;
+  flex:1;
+  justify-content: space-evenly;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  overflow: auto;
+}
+.cartaBox-table-reception-datatables  .carta-table-reception-datatables .numbers {
+  position: relative;
+  font-weight: 500;
+  font-size: 2.5em;
+  color: #0070dd;
+  text-decoration: none;
+}
+.cartaBox-table-reception-datatables  .carta-table-reception-datatables {
+  position:relative;
+  background: var(--white);
+  padding: 30px;
+  border-radius: 20px;
+  display: flex;
+  justify-content: space-evenly;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  overflow: auto;
+  max-height: 83vh;
+
+}
+.cartaBox-table-reception-datatables  .carta-table-reception-datatables {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+.cartaBox-table-reception-datatables  .carta-table-reception-datatables::-webkit-scrollbar {
+  display: none;
+}
+
 
 /*Carta-table-reception-datatables style*/
 .cartaBox-table-reception-datatables {
@@ -445,21 +505,136 @@ body {
   max-height: 83vh;
 
 }
-/* .cartaBox .carta-table-reception-datatables .cartaName {
-  color: #000000;
-  font-size: 1.1em;
-  margin-top: 5px;
-  text-decoration: none;
-}
-.cartaBox .carta-table-reception-datatables .iconBox{
-  font-size: 3.5em;
-  color: #000000;
-} */
 .cartaBox-table-reception-datatables  .carta-table-reception-datatables {
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
 }
 .cartaBox-table-reception-datatables  .carta-table-reception-datatables::-webkit-scrollbar {
+  display: none;
+}
+.cartaBox-table-reception-datatables  .carta-table-reception-datatables td,th{
+  width: auto !important;
+  height: auto !important;
+  white-space: normal;
+  text-overflow: ellipsis;
+}
+
+
+/*Carta-table-reception-datatables-big style*/
+.cartaBox-table-reception-datatables-big {
+  position: relative;
+  justify-content: space-between;
+  width: 100%;
+  padding: 20px;
+  flex:1;
+  display: wrap;
+  grid-template-columns: repeat(3,1fr);
+  grid-gap: 40px;
+}
+
+.cartaBox-table-reception-datatables-big {
+  position: relative;
+  justify-content: space-between;
+  width: 100%;
+  padding: 20px;
+  display: wrap;
+  grid-template-columns: repeat(3,1fr);
+  grid-gap: 40px;
+}
+.cartaBox-table-reception-datatables-big  .carta-table-reception-datatables-big {
+  position:relative;
+  background: var(--white);
+  padding: 30px;
+  border-radius: 20px;
+  display: flex;
+  flex:1;
+  justify-content: space-evenly;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  overflow: auto;
+  font-size: 0.7em;
+}
+.cartaBox-table-reception-datatables-big  .carta-table-reception-datatables-big .numbers {
+  position: relative;
+  font-weight: 500;
+  font-size: 2.5em;
+  color: #0070dd;
+  text-decoration: none;
+}
+.cartaBox-table-reception-datatables-big  .carta-table-reception-datatables-big {
+  position:relative;
+  background: var(--white);
+  padding: 30px;
+  border-radius: 20px;
+  display: flex;
+  justify-content: space-evenly;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  overflow: auto;
+  max-height: 83vh;
+
+}
+.cartaBox-table-reception-datatables-big  .carta-table-reception-datatables-big {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+.cartaBox-table-reception-datatables-big  .carta-table-reception-datatables-big::-webkit-scrollbar {
+  display: none;
+}
+
+
+/*Carta-table-reception-capi-area style*/
+.cartaBox-table-reception-capi-area {
+  position: relative;
+  justify-content: center;
+  width: 100%;
+  padding: 20px;
+  display: flex;
+  grid-template-columns: repeat(3,1fr);
+  grid-gap: 40px;
+}
+.cartaBox-table-reception-capi-area  .carta-table-reception-capi-area {
+  position:relative;
+  background: var(--white);
+  padding: 30px;
+  border-radius: 20px;
+  display: flex;
+  justify-content: space-evenly;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  overflow: auto;
+}
+.cartaBox-table-reception-capi-area  .carta-table-reception-capi-area .numbers {
+  position: relative;
+  font-weight: 500;
+  font-size: 2.5em;
+  color: #0070dd;
+  text-decoration: none;
+}
+.cartaBox-table-reception-capi-area  .carta-table-reception-capi-area {
+  position:relative;
+  background: var(--white);
+  padding: 30px;
+  border-radius: 20px;
+  display: flex;
+  justify-content: space-evenly;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  overflow: auto;
+  max-height: 83vh;
+
+}
+/* .cartaBox .carta-table-reception-capi-area .cartaName {
+  color: #000000;
+  font-size: 1.1em;
+  margin-top: 5px;
+  text-decoration: none;
+}
+.cartaBox .carta-table-reception-capi-area .iconBox{
+  font-size: 3.5em;
+  color: #000000;
+} */
+.cartaBox-table-reception-capi-area  .carta-table-reception-capi-area {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+.cartaBox-table-reception-capi-area  .carta-table-reception-capi-area::-webkit-scrollbar {
   display: none;
 }
 
@@ -516,34 +691,87 @@ body {
   padding: 2px 4px;
   background: #8de02c;
   color: #ffffff;
-  border-radius: 4px;
+  border-radius: 10px;
   font-size: 14px;
   font-weight: 500;
 }
-.stato.malattia
+
+.stato.ferie
+{
+  padding: 2px 4px;
+  background: #7371fc;
+  color: #ffffff;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.stato.permesso
+{
+  padding: 2px 4px;
+  background: #FF7F50;
+  color: #ffffff;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.stato.piva
+{
+  padding: 2px 4px;
+  background: #0070dd;
+  color: #ffffff;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.stato.medico
 {
   padding: 2px 4px;
   background: #f9ca3f;
   color: #ffffff;
-  border-radius: 4px;
+  border-radius: 10px;
   font-size: 14px;
   font-weight: 500;
 }
+
+.stato.maternita
+{
+  padding: 2px 4px;
+  background: #f400a1;
+  color: #ffffff;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.stato.malattia
+{
+  padding: 2px 4px;
+  background: #22223b;
+  color: #ffffff;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
 .stato.assente
 {
   padding: 2px 4px;
   background: #f00;
   color: #ffffff;
-  border-radius: 4px;
+  border-radius: 10px;
   font-size: 14px;
   font-weight: 500;
 }
+
 .stato.smartworking
 {
   padding: 2px 4px;
   background: #43aa8b;
   color: #ffffff;
-  border-radius: 4px;
+  border-radius: 10px;
   font-size: 14px;
   font-weight: 500;
 }
@@ -552,7 +780,7 @@ body {
   padding: 2px 4px;
   background: #909090;
   color: #ffffff;
-  border-radius: 4px;
+  border-radius: 10px;
   font-size: 14px;
   font-weight: 500;
 }

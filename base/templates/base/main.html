@@ -87,10 +87,10 @@
       <link rel="stylesheet" href="{% static 'base/css/admin-style.css' %}">
       {% elif perms.capi_area.change_anadipendenti %}
       <link rel="stylesheet" href="{% static 'base/css/gestione-style.css' %}">
-      {% elif perms.capi_area.change_richiesteaccettate %}
-      <link rel="stylesheet" href="{% static 'base/css/capi-area-style.css' %}">
       {% elif perms.capi_area.change_ingressidip %}
       <link rel="stylesheet" href="{% static 'base/css/reception-style.css' %}">
+      {% elif perms.capi_area.change_richiesteaccettate %}
+      <link rel="stylesheet" href="{% static 'base/css/capi-area-style.css' %}">
       {% else %}
       <link rel="stylesheet" href="{% static 'base/css/regular-style.css' %}">
       {% endif %}
@@ -182,8 +182,7 @@
       <strong>&ensp;{{user.username}}</strong>
     </a>
     <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser2">
-      <li><a class="dropdown-item" href="#">New project...</a></li>
-      <li><a class="dropdown-item" href="#">Settings</a></li>
+      <li><a class="dropdown-item" href="{% url 'users:get_qr' %}">Scarica il tuo QR</a></li>
       <li><a class="dropdown-item" href="/reset_password/">Resetta Password</a></li>
       <li><hr class="dropdown-divider"></li>
       <li><a class="dropdown-item" href="/logout/">Sign out</a></li>

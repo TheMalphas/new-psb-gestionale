@@ -69,14 +69,40 @@ a:hover, a:active {
     color: #ffffff;
 }
 
-.table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
-    color: #ffffff;
-    background-color: #ff8000;
+.cartaBox-table-reception-capi-area  .carta .numbers {
+    color: #ff8000;
 }
 
+.cartaBox-table-reception-capi-area  .carta-table .numbers {
+    color: #ff8000;
+}
+
+.cartaBox-table-reception-capi-area  .carta-table-reception .numbers {
+    color: #ff8000;
+}
+
+.cartaBox-table-reception-capi-area  .carta-table-reception-capi-area .numbers {
+    color: #ff8000;
+}
+
+.cartaBox-table-reception-capi-area  .carta:hover:not(#child){
+    background-color: #ff8000 !important;
+    color: #ffffff !important;
+}
+
+.table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
+    color: #ffffff !important;
+    background-color: #ff8000 !important;
+}
+
+/* .table-hover tbody tr:hover td, .table-hover tbody tr:hover th:hover, .nav-link:hover .link-dark:hover{
+    color: #ffffff !important;
+    background-color: #ff8000 !important;
+} */
+
 .dropdown-item:hover{
-    color: #ffffff;
-    background-color: #ff8000;
+    color: #ffffff !important;
+    background-color: #ff8000 !important;
 }
 
 strong {

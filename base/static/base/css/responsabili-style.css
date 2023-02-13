@@ -69,6 +69,27 @@ a:hover, a:active {
     color: #ffffff;
 }
 
+.cartaBox-table-reception-capi-area  .carta .numbers {
+    color: #e6cc80;
+}
+
+.cartaBox-table-reception-capi-area  .carta-table .numbers {
+    color: #e6cc80;
+}
+
+.cartaBox-table-reception-capi-area  .carta-table-reception .numbers {
+    color: #e6cc80;
+}
+
+.cartaBox-table-reception-capi-area  .carta-table-reception-capi-area .numbers {
+    color: #e6cc80;
+}
+
+.cartaBox-table-reception-capi-area  .carta:hover:not(#child){
+    background-color: #e6cc80;
+    color: #ffffff;
+}
+
 .table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
     color: #ffffff;
     background-color: #e6cc80;
