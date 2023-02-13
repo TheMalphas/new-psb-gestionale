@@ -1,0 +1,99 @@
+{% extends 'base/main.html' %}
+{% load static %}
+{% block content %}
+
+<title>{% block title%}Percentuali Contratto{% endblock %}</title>
+<link rel="stylesheet" href="{% static 'gestione/css/style.css' %}">
+<script src="{% static 'gestione/js/script.js' %}"></script>
+
+<section style="box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); margin-left:268px;">
+    <header class="p-3 bg-light text-black">
+        <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+    
+        <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+            <li class="nav-link px-2 text-dark"></li>            
+            <li class="nav-link px-2 text-dark">Buon lavoro, {{user.first_name}}</li> 
+        </ul>
+        <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" method="GET" action="{% url 'gestione:lista_percentuali_contratti' %}" value="{{perc.id_ore_contratto}}">
+            {% csrf_token %}
+            <input type="search" id="perc_contratto-input" name="perc_contratto" class="form-control form-control-dark" value="{{perc.nome_perc_contratto}}" placeholder="Search..." aria-label="Search">
+        </form>
+        <div class="text-end">
+            <button type="button" class="btn btn-success">Cerca</button>
+            <a href="/lista-perc_contratto-excel/?perc_contratto=" id="perc_contratto-anchor"><button type="button" class="btn btn-warning">Scarica</button></a>
+        </div>
+</header>
+</section>
+
+<section style="margin-left:300px; margin-top:25px;">
+    <div class="cartaBox">
+
+            <div class="carta-table-reception">
+                <div>
+                    <div class="numbers">{{perc_contratti|length}}</div>
+                    <div class="no-hover">
+                    <table class="table table-striped table-hover caption-top">
+                        <caption>Lista Percentuali Contratto</caption>
+                        <thead>
+                        <tr>
+                            <th scope="col"></th>
+                            <td> Percentuale Contratto </td>
+                            <td> Note</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            {% for perc in perc_contratti %}
+                            <tr>
+                                <th scope="col">
+                                    <div class="dropdown">
+                                        <a href="#" class="d-flex align-items-center link-dark text-decoration-none dropdown-toggle" id="dropdownUser2" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="bi bi-plus-square-fill"></i>
+                                        </a>
+                                            <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser2">
+                                            <li><a class="dropdown-item" onclick="open_modal_create_perc_contratto('{% url 'gestione:aggiungi-perc-contratto'%}')">Crea Nuovo</a></li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li><a class="dropdown-item" onclick="open_modal_update_perc_contratto('{% url 'gestione:modifica-perc-contratto' perc.id_ore_contratto %}')">Modifica</a></li>
+                                        </ul>
+                                    </div>
+                                </th>
+                                <td>{{perc.dicitura_percentuale}}</td>
+                                <td class="ellipsis">{% if perc.note %}{{perc.note}}{% endif %}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                </div>
+                <div class="iconBox">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="55" height="55" fill="currentColor" class="bi bi-pc-display-horizontal" viewBox="0 0 16 16">
+                        <path d="M1.5 0A1.5 1.5 0 0 0 0 1.5v7A1.5 1.5 0 0 0 1.5 10H6v1H1a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1h-5v-1h4.5A1.5 1.5 0 0 0 16 8.5v-7A1.5 1.5 0 0 0 14.5 0h-13Zm0 1h13a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-7a.5.5 0 0 1 .5-.5ZM12 12.5a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0Zm2 0a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0ZM1.5 12h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1ZM1 14.25a.25.25 0 0 1 .25-.25h5.5a.25.25 0 1 1 0 .5h-5.5a.25.25 0 0 1-.25-.25Z"/>
+                    </svg>
+                </div>
+                </a>
+            </div>
+    </div>    
+</section>
+
+<div class="modal fade" id="modificaPercContrattoModal" role="dialog" tabindex="-1">
+</div>
+
+<div class="modal fade" id="creaPercContrattoModal" role="dialog" tabindex="-1">
+</div>
+
+<script>
+    var $ = jQuery.noConflict();
+function open_modal_update_perc_contratto(url){
+    $('#modificaPercContrattoModal').load(url,function(){
+    $(this).modal('show'); 
+    });
+};
+
+var $ = jQuery.noConflict();
+function open_modal_create_perc_contratto(url){
+    $('#creaPercContrattoModal').load(url,function(){
+    $(this).modal('show'); 
+    });
+};
+</script>
+    
+{% endblock content %}

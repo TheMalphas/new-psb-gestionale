@@ -1,0 +1,35 @@
+{% extends 'base/main.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<title>{% block title%}Tutte le richieste{% endblock %}</title>
+<link rel="stylesheet" href="{% static 'capi_area/css/style.css' %}">
+
+{% include "capi_area/header-capi_area.html" %}
+
+
+<section style="margin-left:300px; margin-top:25px;">
+   
+<div class="container2">
+    <div class="header-bar2">
+    <div class="container">
+        <h3 style="margin-top:20px;">Crea il Qr</h3>
+    </div>
+</div>
+
+<div class="card-body">
+<form method="POST" action="">
+    {% csrf_token %} 
+        <select class="form-select" aria-label="Default select example" name="dipendente">
+        {% for dip in dips %}
+        <option value="{{dip.id_dip}}">{{dip}}</option>
+        {% endfor %}
+    </select>
+    <input style="margin-top:1em;" type="submit" value="Conferma">
+</form>
+</div>
+</div>
+
+{% endblock %}

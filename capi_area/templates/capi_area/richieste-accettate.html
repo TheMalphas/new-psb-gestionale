@@ -1,0 +1,89 @@
+{% extends 'base/main.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<title>{% block title%}Presenze{% endblock %}</title>
+
+<link rel="stylesheet" href="{% static 'capi_area/css/style.css' %}">
+{% comment %} <script src="{% static 'capi_area/js/script.js' %}"></script> {% endcomment %}
+
+<div class="mini-container">
+  <div class="mini-header-bar">
+      <h1>Totali</h1>
+  </div>
+
+  <table class="table table-striped table-hover">
+  <thead>
+    <tr>
+  </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">In permesso:</th>
+      <td>{{in_permesso}}</td>
+    </tr>
+    <tr>
+      <th scope="row">Rientranti:</th>
+      <td>{{rientranti}}</td>
+    </tr>
+    <tr>
+      <th scope="row"></th>
+      <td></td>
+    </tr>
+  </tbody>
+    </table>
+</div>
+
+<div class="container" >
+<div class="header-bar2 row">
+    <div class="col-md-auto"><h1>Richieste Accettate</h1></div>
+    <div class="col-md-auto"><form method="GET">
+        {%  csrf_token %%}
+        <input style="height:3rem; width:10rem;" type="date" name="search-area">
+        <input class="button-reception-search" type="submit" value="Cerca">
+    </form></div>
+</div>
+
+</div>
+
+<div class= "container">
+
+<table class="table table-striped table-hover">
+    <thead>
+      <tr>
+        <th scope="col">Dipendente</th>
+        <th scope="col">Area</th>
+        <th scope="col">Responsabile</th>
+        <th scope="col">Permesso</th>
+        <th scope="col">Inizio</th>
+        <th scope="col">Ritorno</th>
+        <th scope="col">Orario</th>
+        <th scope="col">Urgente</th>
+    </tr>
+    </thead>
+    <tbody>
+        {% for richiesta in richieste %}
+      <tr>
+        <th scope="row">{{richiesta.id_richieste.nominativo}}</th>
+        <td>{{richiesta.id_richieste.id_dipendente_richiesta.area}}</td>
+        <td>{{richiesta.id_capoarea_richieste.nomecompleto}}</td>
+        <td>{% if richiesta.id_richieste.id_permessi_richieste %} {{richiesta.id_richieste.id_permessi_richieste}} {% else %} Permesso Orario {% endif %}</td>
+        <td>{{richiesta.data_inizio_permesso}}</td>
+        <td>{% if richiesta.data_fine_permesso %}{{richiesta.data_fine_permesso}} {% else %} -- {% endif %}</td>
+        <td>{% if richiesta.ora_inizio_permesso %}da {{richiesta.ora_inizio_permesso|time:"H:i"}} a {{richiesta.ora_fine_permesso|time:"H:i"}} {% else %} -- {% endif %}</td>
+        <td>{% if richiesta.urgente %} Si {% else %} No {% endif %}</td>
+        {% endfor %}
+      </tr>
+    </tbody>
+  </table>
+    <div class="header-bar2b">
+        {{page_obj.number}}
+        {% if page_obj.has_previous %} < <a href="?page={{page_obj.previous_page_number}}"></a>{% endif %}
+        {% if page_obj.has_next %} > <a href="?page={{page_obj.next_page_number}}"></a>{% endif %}
+    </div>
+  
+</div>
+
+{% endblock %}

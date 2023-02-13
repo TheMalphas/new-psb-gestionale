@@ -1,0 +1,64 @@
+{% extends 'base/main.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<title>{% block title%}Dipendenti{% endblock %}</title>
+<link rel="stylesheet" href="{% static 'gestione/css/style.css' %}">
+<script src="{% static 'gestione/js/script.js' %}"></script>
+
+
+<section style="box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); margin-left:268px;">
+  <header class="p-3 bg-light text-black">
+      <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+      <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+          <li class="nav-link px-2 text-dark"></li>
+          <li class="nav-link px-2 text-dark"><strong>{{dipendentiAttivi}}</strong> Dipendenti Attivi</li>
+          <li class="nav-link px-2 text-dark"><strong>{{dipendentiCessati}}</strong> Dipendenti Cessati</li>
+          <li class="nav-link px-2 text-dark"><strong>{{dipendentiSospesi}}</strong> Dipendenti Sospesi</li>
+      </ul>
+  </header>
+</section>
+
+<section style="margin-top:50px; margin-left:280px; float:right;">
+  <div class="cartaBox-table-reception-datatables-big">
+      <div class="carta-table-reception-datatables-big">
+          <div>
+              <div class="numbers"></div>
+              <table class="table table-striped table-hover caption-top" id="dipendenti-datas">
+                  <caption>Dipendenti</caption>
+                  <thead id="dipendenti-datas-head">
+                  </thead>
+                  <!-- JSON Response -->
+              </table>
+          </div>
+          <div class="iconBox">
+              <svg xmlns="http://www.w3.org/2000/svg" width="55" height="55" fill="currentColor" class="bi bi-file-text-fill" viewBox="0 0 16 16">
+                  <path d="M12 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM5 4h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1zm-.5 2.5A.5.5 0 0 1 5 6h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5zM5 8h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1zm0 2h3a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1z"/>
+              </svg>
+          </div>
+          </a>
+      </div>
+  </div> 
+</section>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/v/bs5/jszip-2.5.0/dt-1.13.2/af-2.5.2/b-2.3.4/b-colvis-2.3.4/b-html5-2.3.4/b-print-2.3.4/cr-1.6.1/date-1.3.0/fc-4.2.1/fh-3.3.1/kt-2.8.0/r-2.4.0/rg-1.3.0/rr-1.3.2/sc-2.0.7/sb-1.4.0/sp-2.1.1/sl-1.6.0/sr-1.2.1/datatables.min.js"></script>
+
+<div class="modal fade" id="openModalStato" role="dialog" tabindex="-1">
+</div>
+
+<script>
+    var $ = jQuery.noConflict();
+function openModalStato(url){
+    $('#openModalStato').load(url,function(){
+    $(this).modal('show'); 
+    });
+};
+
+</script>
+    
+
+{% endblock content %}

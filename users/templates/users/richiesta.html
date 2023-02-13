@@ -1,0 +1,61 @@
+{% extends 'base/main.html' %}
+
+{% block content %}
+
+<title>{% block title%}Richiesta di: {{richiesta.timestamp}}{% endblock %}</title>
+
+<div class="container">
+<section>
+    <div class="header-bar2b">
+    <div>
+        <h1>Ciao {{user.first_name|title}} </h1>
+    </div>
+</div>
+</section>
+
+<div class="card-body">
+    <div class="row mb-4" >
+        <div class="col-auto">
+        <small><strong>Dal </strong></small>
+        {{richiesta.da_giorno_richiesta}}
+        </div>
+        <div class="col-auto">
+        <small><strong>Al </strong></small>
+        {{richiesta.a_giorno_richiesta}}
+        </div>
+    </div>
+    <div class="row mb-4">
+        <div class="col-auto">
+        <small><strong>Dalle </strong></small>
+        {{richiesta.da_ora_richiesta}}
+        </div>
+        <div class="col-auto">
+        <small><strong>alle </strong></small>
+        {{richiesta.a_ora_richiesta}}
+        </div>
+    </div>
+    <div class="row mb-4">
+        {% if richiesta.urgente == 1%}
+            <div><strong><small>Richiesta con urgenza</small></strong></div>
+        {% else%}
+            <div><small>Richiesta non urgenza</small></div>
+        {% endif %}
+    <div class="row mb-4">
+        <div class="col-auto">
+        {{richiesta.id_permessi_richieste|title}}
+        </div>
+    </div>
+    <div class="row mb-4">
+        <div class="col-auto">
+        <small>Note</small>
+        </div>
+    </div>
+    <div class="row mb-4">
+        <div class="col-auto">
+        {{richiesta.note_richiesta}}
+        </div>
+    </div>
+</div>
+</div>
+</div>
+{% endblock content%}

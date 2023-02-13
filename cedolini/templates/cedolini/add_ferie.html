@@ -1,0 +1,51 @@
+{% load static %}
+{% load crispy_forms_tags %}
+
+
+<!-- Modal -->
+<div class="modal-dialog" role="document">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 class="modal-title">Aggiungi Ferie</h2>
+      <button type="submit" class="btn btn-danger" data-bs-dismiss="modal" aria-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="container">
+      
+    <form method="POST" action="{% url 'cedolini:add_ferie' pk %}" enctype="multipart/form-data" >
+        {% csrf_token %}
+        <!-- Form -->
+        {{formset.management_form}}
+        {% for form in formset %}
+            {% for hidden_field in form.hidden_fields %}
+            {{ hidden_field.errors }}    
+            {{ hidden_field }}
+            {% endfor %}
+        {% endfor %}
+        {% for form in formset %}
+          {{form.TOTAL_FORMS}}
+          {{form.rel_giorno|as_crispy_field}}
+          {{form.ore|as_crispy_field}}
+          {{form.DELETE}}
+          {% endfor %}
+    <!-- End form -->
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancella</button>
+      <button type="submit" class="btn btn-primary" value="Conferma">Salva</button>
+    </form> 
+    </div>
+    </div>
+  </form>
+</div>
+</div>
+
+
+<div class="card-group" style="width:50em;">
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title">Ferie</h5>
+        <p><small class="text-muted">{{formset.as_p}}</small></p>
+  </div>
+  </div>
+</div>

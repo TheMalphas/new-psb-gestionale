@@ -1,0 +1,23 @@
+<!-- Modal -->
+<div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Modifica {{object.nome_contratto}}</h2>
+        <button type="submit" class="btn btn-danger" data-bs-dismiss="modal" aria-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form method="POST" action="{% url 'gestione:update_responsabile_sede' object.id_res_sede %}">
+        <div class="modal-body">
+          {% csrf_token %}
+        <!-- Form -->
+          {{form.as_p}}
+        <!-- End form -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancella</button>
+          <button type="submit" class="btn btn-primary" style="background-color: #00ccff !important; border-color: #00ccff !important;" value="Conferma">Salva</button>
+        </div>
+      </form>
+    </div>
+</div>
+

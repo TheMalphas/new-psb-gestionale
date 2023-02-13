@@ -1,0 +1,791 @@
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css");
+*, ::after, ::before {
+    box-sizing: border-box;
+}
+
+link {
+    display: none;
+}
+
+*, ::after, ::before {
+  box-sizing: border-box;
+}
+
+*, ::after, ::before {
+  box-sizing: border-box;
+}
+
+body {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  grid-template-rows: 50px 1fr;
+  grid-template-areas: "navbar navbar" "sidebar main";
+  height: 100vh;
+  margin: 0;
+  /* min-height: 100vh;
+  overflow-x: hidden; */
+  background-color: #fff;
+  text-decoration:none;
+
+}
+
+@media (min-width: 768px) {
+  .right-side-element {
+    margin-right: 300px;
+    text-decoration: none;
+  }
+
+@media (min-width: 768px) {
+  .container-dati .container-liste .container-liste-lunghe .container-dipendenti{
+    margin-right: 300px;
+    text-decoration: none;
+  }
+}
+  #sidebar {
+    width: 300px;
+    position:fixed;
+  }
+}
+
+.container-liste  {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+.container-liste::-webkit-scrollbar {
+  display: none;
+}
+
+.bd-placeholder-img {
+    font-size: 1.125rem;
+    text-anchor: middle;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+}
+
+@media (min-width: 768px) {
+  .bd-placeholder-img-lg {
+    font-size: 3.5rem;
+  }
+}
+
+#sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 9999;
+}
+.b-example-divider {
+  height: 3rem;
+  background-color: rgba(0, 0, 0, 0.1);
+  border: solid rgba(0, 0, 0, .15);
+  border-width: 1px 0;
+  box-shadow: inset 0 0.5em 1.5em rgb(0 0 0 / 10%), inset 0 0.125em 0.5em rgb(0 0 0 / 15%);
+  text-decoration: none;
+}
+
+.nav-pills > li > a.active {
+  color: #ffffff !important;
+  background-color: #0070dd !important;
+}
+
+.hover-link:hover {
+  background-color: #0070dd;
+  border-radius: 0.4em;
+  color: #ffffff !important;
+}
+
+.main
+{
+  position: absolute;
+  width: calc(100% - 300px);
+  left: 300px;
+  min-height: 100vh;
+  background: #ffffff;
+  transition: 0.5s;
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  margin-left: 268px;
+}
+.main.active {
+  width: calc(100% - 80px);
+  left: 80px;
+  margin-left: 268px;
+
+}
+
+.second-item {
+  position: relative;
+  display: grid;
+  flex-wrap: wrap;
+}
+
+.card {
+  margin-top: 2em;
+  padding: 1.5em 0.5em 0.5em;
+  border-radius: 2em;
+  text-align: center;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  text-decoration: none;
+  /* Center vertically and horizontally */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.card-richiesta-permesso {
+  margin-top: 2em;
+  padding: 3.5em 1.5em 1.5em;
+  border-radius: 2em;
+  text-align: center;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  text-decoration: none;
+    /* Center vertically and horizontally */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.container-dati {
+  width: fit-content;
+  height: fit-content;
+  block-size: fit-content;
+  resize: horizontal;
+  direction: ltr;
+  margin-bottom: -20em;
+  margin-left: 19em;
+  padding: 3em 3em 3em;
+  border-radius: 2em;
+  text-align: center;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  text-decoration: none;
+  position: relative;
+  font-stretch: expanded;
+  max-height: 80vh;
+  width: 30em;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  overflow: auto;
+}
+
+.container-liste {
+  margin-left: 268px;
+  float:center;
+  width: fit-content;
+  height: fit-content;
+  block-size: fit-content;
+  resize: horizontal;
+  direction: ltr;
+  margin-top: 4em;
+  padding: 3em 3em 3em;
+  border-radius: 2em;
+  text-align: center;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  text-decoration: none;
+    /* Center vertically and horizontally */
+  font-stretch: expanded;
+  max-height: 80vh;
+  overflow:auto;
+}
+
+.container-liste-lunghe {
+  width:fit-content;
+  height: fit-content;
+  block-size: fit-content;
+  resize: horizontal;
+  direction: ltr;
+  margin-top: 4em;
+  margin-left:100px;
+  padding: 3em 3em 3em;
+  border-radius: 2em;
+  text-align: center;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  text-decoration: none;
+    /* Center vertically and horizontally */
+  position: absolute;
+  font-stretch: expanded;
+  max-height: 90vh;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  overflow: auto;
+}
+
+.container-dipendenti {
+  width: fit-content;
+  height: fit-content;
+  block-size: fit-content;
+  resize: horizontal;
+  direction: ltr;
+  margin-top: 4em;
+  margin-left: 130px;
+  padding: 1em 1em 1em;
+  border-radius: 2em;
+  text-align: center;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  text-decoration: none;
+    /* Center vertically and horizontally */
+  position: fixed;
+  font-stretch: expanded;
+  max-height: 80vh;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  overflow: auto;
+}
+.container-dipendenti text-nowrap::-webkit-scrollbar {
+  display: none;
+}
+.container-doppio {
+  display: flex;
+  flex-direction: row;
+  direction: ltr;
+  text-align: center;
+  text-decoration: none;
+  width: 70%;
+  height: 42vh;
+}
+
+.container-doppio .card {
+  direction: ltr;
+  width: fit-content;
+  height: fit-content;
+  block-size: fit-content;
+  resize: horizontal;
+  position: relative;
+  width: 33.33%;
+  transform: translate(-50%, -50%);
+  top: 50%;
+  left: 50%;
+  height: 42vh;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  border-radius: 2em;
+  padding: 3em 2em 2em;
+  overflow: auto;
+  margin-right: 5em;
+
+}
+
+.table td, .table th {
+  word-wrap: break-word;
+}
+
+.lista-generica{
+  display: flex;
+  box-shadow: 0 7px 25px rgba(0,0,0,0.08);
+}
+/*Carta style*/
+.cartaBox {
+  position: relative;
+  justify-content: space-between;
+  width: 100%;
+  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  grid-gap: 40px;
+}
+.cartaBox .carta {
+  position:relative;
+  background: var(--white);
+  padding: 30px;
+  border-radius: 20px;
+  display: flex;
+  justify-content: space-between;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+}
+.cartaBox .carta .numbers {
+  position: relative;
+  font-weight: 500;
+  font-size: 2.5em;
+  color: #0070dd;
+  text-decoration: none;
+}
+.cartaBox .carta .cartaName {
+  color: #000000;
+  font-size: 1.1em;
+  margin-top: 5px;
+  text-decoration: none;
+}
+.cartaBox .carta .iconBox{
+  font-size: 3.5em;
+  color: #000000;
+  
+}
+
+/*Carta-table style*/
+.cartaBox .carta-table {
+  position:relative;
+  background: var(--white);
+  padding: 30px;
+  border-radius: 20px;
+  display: flex;
+  justify-content: space-between;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  overflow: auto;
+  max-height: 40vh;
+}
+.cartaBox .carta-table .numbers {
+  position: relative;
+  font-weight: 500;
+  font-size: 2.5em;
+  color: #0070dd;
+  text-decoration: none;
+}
+.cartaBox .carta-table {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.cartaBox .carta-table::-webkit-scrollbar {
+  display: none;
+}
+.cartaBox .carta-table .cartaName {
+  color: #000000;
+  font-size: 1.1em;
+  margin-top: 5px;
+  text-decoration: none;
+}
+.cartaBox .carta-table .iconBox{
+  font-size: 3.5em;
+  color: #000000;
+}
+
+/*Carta-table-reception style*/
+.cartaBox-table-reception {
+  position: relative;
+  justify-content: space-between;
+  width: 100%;
+  padding: 20px;
+  flex:1;
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  grid-gap: 40px;
+}
+.cartaBox .carta-table-reception {
+  position:relative;
+  background: var(--white);
+  padding: 30px;
+  border-radius: 20px;
+  display: flex;
+  justify-content: space-evenly;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  overflow: auto;
+}
+.cartaBox .carta-table-reception .numbers {
+  position: relative;
+  font-weight: 500;
+  font-size: 2.5em;
+  color: #0070dd;
+  text-decoration: none;
+}
+.cartaBox .carta-table-reception {
+  position:relative;
+  background: var(--white);
+  padding: 30px;
+  border-radius: 20px;
+  display: flex;
+  justify-content: space-evenly;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  overflow: auto;
+  max-height: 83vh;
+
+}
+.cartaBox .carta-table-reception {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+.cartaBox .carta-table-reception::-webkit-scrollbar {
+  display: none;
+}
+
+
+/*Carta-table-reception-datatables style*/
+.cartaBox-table-reception-datatables {
+  position: relative;
+  justify-content: space-between;
+  width: 100%;
+  padding: 20px;
+  flex:1;
+  display: wrap;
+  grid-template-columns: repeat(3,1fr);
+  grid-gap: 40px;
+}
+
+.cartaBox-table-reception-datatables {
+  position: relative;
+  justify-content: space-between;
+  width: 100%;
+  padding: 20px;
+  display: wrap;
+  grid-template-columns: repeat(3,1fr);
+  grid-gap: 40px;
+}
+.cartaBox-table-reception-datatables  .carta-table-reception-datatables {
+  position:relative;
+  background: var(--white);
+  padding: 30px;
+  border-radius: 20px;
+  display: flex;
+  flex:1;
+  justify-content: space-evenly;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  overflow: auto;
+}
+.cartaBox-table-reception-datatables  .carta-table-reception-datatables .numbers {
+  position: relative;
+  font-weight: 500;
+  font-size: 2.5em;
+  color: #0070dd;
+  text-decoration: none;
+}
+.cartaBox-table-reception-datatables  .carta-table-reception-datatables {
+  position:relative;
+  background: var(--white);
+  padding: 30px;
+  border-radius: 20px;
+  display: flex;
+  justify-content: space-evenly;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  overflow: auto;
+  max-height: 83vh;
+
+}
+.cartaBox-table-reception-datatables  .carta-table-reception-datatables {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+.cartaBox-table-reception-datatables  .carta-table-reception-datatables::-webkit-scrollbar {
+  display: none;
+}
+
+
+/*Carta-table-reception-datatables style*/
+.cartaBox-table-reception-datatables {
+  position: relative;
+  justify-content: space-between;
+  width: 100%;
+  padding: 20px;
+  display: wrap;
+  grid-template-columns: repeat(3,1fr);
+  grid-gap: 40px;
+}
+.cartaBox-table-reception-datatables  .carta-table-reception-datatables {
+  position:relative;
+  background: var(--white);
+  padding: 30px;
+  border-radius: 20px;
+  display: flex;
+  flex:1;
+  justify-content: space-evenly;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  overflow: auto;
+}
+.cartaBox-table-reception-datatables  .carta-table-reception-datatables .numbers {
+  position: relative;
+  font-weight: 500;
+  font-size: 2.5em;
+  color: #0070dd;
+  text-decoration: none;
+}
+.cartaBox-table-reception-datatables  .carta-table-reception-datatables {
+  position:relative;
+  background: var(--white);
+  padding: 30px;
+  border-radius: 20px;
+  display: flex;
+  justify-content: space-evenly;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  overflow: auto;
+  max-height: 83vh;
+
+}
+.cartaBox-table-reception-datatables  .carta-table-reception-datatables {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+.cartaBox-table-reception-datatables  .carta-table-reception-datatables::-webkit-scrollbar {
+  display: none;
+}
+.cartaBox-table-reception-datatables  .carta-table-reception-datatables td,th{
+  width: auto !important;
+  height: auto !important;
+  white-space: normal;
+  text-overflow: ellipsis;
+}
+
+
+/*Carta-table-reception-datatables-big style*/
+.cartaBox-table-reception-datatables-big {
+  position: relative;
+  justify-content: space-between;
+  width: 100%;
+  padding: 20px;
+  flex:1;
+  display: wrap;
+  grid-template-columns: repeat(3,1fr);
+  grid-gap: 40px;
+}
+
+.cartaBox-table-reception-datatables-big {
+  position: relative;
+  justify-content: space-between;
+  width: 100%;
+  padding: 20px;
+  display: wrap;
+  grid-template-columns: repeat(3,1fr);
+  grid-gap: 40px;
+}
+.cartaBox-table-reception-datatables-big  .carta-table-reception-datatables-big {
+  position:relative;
+  background: var(--white);
+  padding: 30px;
+  border-radius: 20px;
+  display: flex;
+  flex:1;
+  justify-content: space-evenly;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  overflow: auto;
+  font-size: 0.7em;
+}
+.cartaBox-table-reception-datatables-big  .carta-table-reception-datatables-big .numbers {
+  position: relative;
+  font-weight: 500;
+  font-size: 2.5em;
+  color: #0070dd;
+  text-decoration: none;
+}
+.cartaBox-table-reception-datatables-big  .carta-table-reception-datatables-big {
+  position:relative;
+  background: var(--white);
+  padding: 30px;
+  border-radius: 20px;
+  display: flex;
+  justify-content: space-evenly;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  overflow: auto;
+  max-height: 83vh;
+
+}
+.cartaBox-table-reception-datatables-big  .carta-table-reception-datatables-big {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+.cartaBox-table-reception-datatables-big  .carta-table-reception-datatables-big::-webkit-scrollbar {
+  display: none;
+}
+
+
+/*Carta-table-reception-capi-area style*/
+.cartaBox-table-reception-capi-area {
+  position: relative;
+  justify-content: center;
+  width: 100%;
+  padding: 20px;
+  display: flex;
+  grid-template-columns: repeat(3,1fr);
+  grid-gap: 40px;
+}
+.cartaBox-table-reception-capi-area  .carta-table-reception-capi-area {
+  position:relative;
+  background: var(--white);
+  padding: 30px;
+  border-radius: 20px;
+  display: flex;
+  justify-content: space-evenly;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  overflow: auto;
+}
+.cartaBox-table-reception-capi-area  .carta-table-reception-capi-area .numbers {
+  position: relative;
+  font-weight: 500;
+  font-size: 2.5em;
+  color: #0070dd;
+  text-decoration: none;
+}
+.cartaBox-table-reception-capi-area  .carta-table-reception-capi-area {
+  position:relative;
+  background: var(--white);
+  padding: 30px;
+  border-radius: 20px;
+  display: flex;
+  justify-content: space-evenly;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  overflow: auto;
+  max-height: 83vh;
+
+}
+/* .cartaBox .carta-table-reception-capi-area .cartaName {
+  color: #000000;
+  font-size: 1.1em;
+  margin-top: 5px;
+  text-decoration: none;
+}
+.cartaBox .carta-table-reception-capi-area .iconBox{
+  font-size: 3.5em;
+  color: #000000;
+} */
+.cartaBox-table-reception-capi-area  .carta-table-reception-capi-area {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+.cartaBox-table-reception-capi-area  .carta-table-reception-capi-area::-webkit-scrollbar {
+  display: none;
+}
+
+
+.card {
+    margin-top: 2em;
+    padding: 1.5em 0.5em 0.5em;
+    border-radius: 2em;
+    text-align: center;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    text-decoration: none;
+}
+
+.ellipsis {
+  max-width: 100px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* .cartaBox .carta:hover:not(.no-hover){
+  background-color: #0070dd;
+  color: #ffffff;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+}
+
+.cartaBox .carta .no-hover{
+  background-color: inherit;
+  color: inherit;
+} */
+
+.cartaBox .carta:hover .numbers ,
+.cartaBox .carta:hover .cartaName ,
+.cartaBox .carta:hover .iconBox
+{
+  color: #ffffff;
+
+}
+
+.cartaHeader
+{
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.cartaHeader h2
+{
+  font-weight: 600;
+  color: var(--blue);
+}
+
+.stato.attivo
+{
+  padding: 2px 4px;
+  background: #8de02c;
+  color: #ffffff;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.stato.ferie
+{
+  padding: 2px 4px;
+  background: #7371fc;
+  color: #ffffff;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.stato.permesso
+{
+  padding: 2px 4px;
+  background: #FF7F50;
+  color: #ffffff;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.stato.piva
+{
+  padding: 2px 4px;
+  background: #0070dd;
+  color: #ffffff;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.stato.medico
+{
+  padding: 2px 4px;
+  background: #f9ca3f;
+  color: #ffffff;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.stato.maternita
+{
+  padding: 2px 4px;
+  background: #f400a1;
+  color: #ffffff;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.stato.malattia
+{
+  padding: 2px 4px;
+  background: #22223b;
+  color: #ffffff;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.stato.assente
+{
+  padding: 2px 4px;
+  background: #f00;
+  color: #ffffff;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.stato.smartworking
+{
+  padding: 2px 4px;
+  background: #43aa8b;
+  color: #ffffff;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.stato.attesa{
+  padding: 2px 4px;
+  background: #909090;
+  color: #ffffff;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+a, a:hover, a:visited, a:active {
+  color: inherit;
+  text-decoration: none;
+}

@@ -1,0 +1,117 @@
+{% extends 'base/main.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<title>{% block title%}Resp. Sede{% endblock %}</title>
+<link rel="stylesheet" href="{% static 'gestione/css/style.css' %}">
+<script src="{% static 'gestione/js/script.js' %}"></script>
+
+
+<section style="box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); margin-left:268px;">
+  <header class="p-3 bg-light text-black">
+      <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+      <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+        <li><a class="nav-link px-2 text-dark" href="{% url 'gestione:dashboard-responsabili' %}">Torna alla Dashboard Responsabili</a></li>
+      </ul>
+      <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" method="GET" action="{% url 'gestione:responsabili_sede' %}" value="{{dipendente.nomecompleto}}">
+        {% csrf_token %}
+        <input type="search" id="perc_contratto-input" name="perc_contratto" class="form-control form-control-dark" value="{{dipendente.nome_completo}}" placeholder="Search..." aria-label="Search">
+    </form>
+</header>
+  </header>
+</section>
+
+<section style="margin-top:50px; margin-left:280px; float:right;">
+  <div class="cartaBox-table-reception-datatables">
+      <div class="carta-table-reception-datatables">
+          <div>
+              <div class="numbers">{{ressede|length}}</div>
+              <table class="table table-striped table-hover caption-top" id="reception-datas">
+                <caption>Responsabili Sede</caption>
+                  <thead>
+                      <tr>
+                        <th scope="col"></th>
+                        <th scope="col">Nominativo </th>
+                        <th scope="col">Area</th>
+                        <th scope="col">Sede</th>
+                        <th scope="col">Societ&#224;</th>
+                        <th scope="col">Tipo Contratto</th>
+                        <th scope="col">Scadenza Contratto</th>
+                      </tr>
+                  </thead>
+                  {% for dipendente in ressede %}
+                  <tr>
+                  <th scope="col">
+                      <div class="dropdown">
+                        <a href="#" class="d-flex align-items-center link-dark text-decoration-none dropdown-toggle" id="dropdownUser2" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-plus-square-fill"></i>
+                        </a>
+                            <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser2">
+                              <li><a class="dropdown-item" onclick="openModalStato('{% url 'gestione:update-stato' dipendente.id_dipendente.id_dip %}')">Cambia Stato</a></li>
+                              <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" onclick="openModalResSede('{% url 'gestione:update_responsabile_sede' dipendente.pk %}')">Modifica Resp. Sede</a></li>
+                            <li><a class="dropdown-item" onclick="openModalDelete('{% url 'gestione:delete_responsabile_sede' dipendente.pk %}')">Rimuovi Resp. Sede</a></li>
+                        </ul>
+                      </div>
+                  </th>
+                  <td>{{dipendente.nomecompleto}}</td>    
+                  <td>{% if dipendente.area %} {{dipendente.area.nome_area|title}} {% endif %}</td>
+                  <td>{% if dipendente.sede %} {{dipendente.sede.nome_sede|title}} {% endif %}</td>
+                  <td>{% if dipendente.id_dipendente.societa %} {{dipendente.id_dipendente.societa.nome_societa|title}} {% endif %}</td>
+                  <td>{% if dipendente.id_dipendente.tipo_contratto %} {{dipendente.id_dipendente.tipo_contratto|title}} {% endif %}</td>
+                  <td>{% if dipendente.id_dipendente.data_fine_rap %} {{dipendente.id_dipendente.data_fine_rap|date:'d-m-Y'}} {% endif %}</td>
+                </tr>
+                  {% endfor %}
+              </table>
+          </div>
+          <div class="iconBox">
+              <svg xmlns="http://www.w3.org/2000/svg" width="55" height="55" fill="#00ccff" class="bi bi-people-fill" viewBox="0 0 16 16">
+                  <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7Zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm-5.784 6A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1h4.216ZM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"/>
+              </svg>
+          </div>
+          </a>
+            <a onclick="openModalResSede('{% url 'gestione:aggiungi_capo_area'%}')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="55" height="55" fill="#00ccff" class="bi bi-person-fill-add" viewBox="0 0 16 16">
+                    <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0Zm-2-6a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+                    <path d="M2 13c0 1 1 1 1 1h5.256A4.493 4.493 0 0 1 8 12.5a4.49 4.49 0 0 1 1.544-3.393C9.077 9.038 8.564 9 8 9c-5 0-6 3-6 4Z"/>
+                </svg>
+            </a>
+      </div>
+  </div> 
+</section>
+
+<div class="modal fade" id="openModalStato" role="dialog" tabindex="-1">
+</div>
+<div class="modal fade" id="openModalResSede" role="dialog" tabindex="-1">
+</div>
+<div class="modal fade" id="openModalDelete" role="dialog" tabindex="-1">
+</div>
+
+<script>
+    var $ = jQuery.noConflict();
+function openModalStato(url){
+    $('#openModalStato').load(url,function(){
+    $(this).modal('show'); 
+    });
+};
+
+    var $ = jQuery.noConflict();
+function openModalResSede(url){
+    $('#openModalResSede').load(url,function(){
+    $(this).modal('show'); 
+    });
+};
+
+    var $ = jQuery.noConflict();
+function openModalDelete(url){
+    $('#openModalDelete').load(url,function(){
+    $(this).modal('show'); 
+    });
+};
+
+</script>
+    
+
+{% endblock content %}
