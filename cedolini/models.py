@@ -24,6 +24,7 @@ import random
 class AddIncForf(models.Model):
     id_inc_forf = models.BigAutoField(primary_key=True)
     id_ced = models.ForeignKey('Cedolini', models.DO_NOTHING, db_column='id_ced', blank=True, null=True)
+    id_dip = models.ForeignKey('AnaDipendenti', models.DO_NOTHING, db_column='id_dip', blank=True, null=True)
     inc_forf = models.FloatField(db_column='Inc_Forf', blank=True, null=True)  # Field name made lowercase.
     timestamp_creazione = models.DateTimeField(blank=True, null=True)
 
@@ -35,23 +36,46 @@ class AddIncForf(models.Model):
 class AddRimborsi(models.Model):
     id_rimborsi = models.BigAutoField(primary_key=True)
     id_ced = models.ForeignKey('Cedolini', models.DO_NOTHING, db_column='id_ced', blank=True, null=True)
-    rel_giorno = models.IntegerField(blank=True, null=True)
+    id_dip = models.ForeignKey('AnaDipendenti', models.DO_NOTHING, db_column='id_dip', blank=True, null=True)
+    rel_giorno = models.DateField(blank=True, null=True)
+    stato = models.IntegerField(default=0,blank=True, null=True)
     ore = models.FloatField(blank=True, null=True)
     valore = models.FloatField(blank=True, null=True)
-    timestamp_creazione = models.DateTimeField(blank=True, null=True)
+    timestamp_creazione = models.DateTimeField(auto_now_add=True,blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'Add_Rimborsi'
 
 
-class AddTrasferte(models.Model):
-    id_trasferte = models.BigAutoField(primary_key=True)
+class AddStraordinari(models.Model):
+    id_straordinari = models.BigAutoField(primary_key=True)
+    id_dip = models.ForeignKey('AnaDipendenti', models.DO_NOTHING, db_column='id_dip', blank=True, null=True)
     id_ced = models.ForeignKey('Cedolini', models.DO_NOTHING, db_column='id_ced', blank=True, null=True)
-    rel_giorno = models.IntegerField(blank=True, null=True)
+    rel_giorno = models.DateField(blank=True, null=True)
+    rel_time_start = models.TimeField(blank=True, null=True)
+    rel_time_end = models.TimeField(blank=True, null=True)
+    stato = models.IntegerField(default=0,blank=True, null=True)
     ore = models.FloatField(blank=True, null=True)
     valore = models.FloatField(blank=True, null=True)
-    timestamp_creazione = models.DateTimeField(blank=True, null=True)
+    note = models.TextField(blank=True, null=True)
+    timestamp_creazione = models.DateTimeField(auto_now_add=True,blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'Add_Straordinari'
+
+
+class AddTrasferte(models.Model):
+    id_trasferte = models.BigAutoField(primary_key=True)
+    id_dip = models.ForeignKey('AnaDipendenti', models.DO_NOTHING, db_column='id_dip', blank=True, null=True)
+    id_ced = models.ForeignKey('Cedolini', models.DO_NOTHING, db_column='id_ced', blank=True, null=True)
+    rel_giorno = models.DateField(blank=True, null=True)
+    stato = models.IntegerField(default=0,blank=True, null=True)
+    ore = models.FloatField(blank=True, null=True)
+    valore = models.FloatField(blank=True, null=True)
+    note = models.TextField(blank=True, null=True)
+    timestamp_creazione = models.DateTimeField(auto_now_add=True,blank=True, null=True)
 
     class Meta:
         managed = False
@@ -430,8 +454,11 @@ class Contratti(models.Model):
     id_dip = models.ForeignKey(AnaDipendenti, models.DO_NOTHING, db_column='ID_Dip', blank=True, null=True)  # Field name made lowercase.
     id_societa = models.ForeignKey('ListaSocieta', models.DO_NOTHING, db_column='ID_Societa', blank=True, null=True)  # Field name made lowercase.
     tipologia = models.ForeignKey('TipoContratto', models.DO_NOTHING, db_column='Tipologia', blank=True, null=True)  # Field name made lowercase.
+    ccnl = models.ForeignKey('TabellaCcnl', models.DO_NOTHING, db_column='ccnl', blank=True, null=True)
     codicecontratto = models.CharField(db_column='CodiceContratto', max_length=50, blank=True, null=True)  # Field name made lowercase.
     percentuale = models.ForeignKey('PercentualiContratto', models.DO_NOTHING, db_column='Percentuale', blank=True, null=True)  # Field name made lowercase.
+    trasferte_fisse = models.IntegerField(blank=True, null=True)
+    trasferte_fisse_tipo = models.CharField(max_length=2, blank=True, null=True)
     datainizio = models.DateField(db_column='DataInizio', blank=True, null=True)  # Field name made lowercase.
     datafine = models.DateField(db_column='DataFine', blank=True, null=True)  # Field name made lowercase.
     note = models.TextField(db_column='Note', blank=True, null=True)  # Field name made lowercase.
@@ -439,6 +466,7 @@ class Contratti(models.Model):
     class Meta:
         managed = False
         db_table = 'Contratti'
+        ordering = ["codicecontratto"]
 
     def __str__(self):
         return f'{self.id_dip.cognome} {self.id_dip.nome}'
@@ -688,10 +716,21 @@ class Societa(models.Model):
         super(Societa, self).save(*args, **kwargs)
 
 
+class TabellaCcnl(models.Model):
+    id_ccnl = models.AutoField(primary_key=True)
+    tipo_contratto = models.CharField(max_length=250, blank=True, null=True)
+    codice_ccnl = models.CharField(max_length=10, blank=True, null=True)
+    note = models.CharField(max_length=50, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'tabella_ccnl'
+
+
 class TipoContratto(models.Model):
     id_contratto = models.AutoField(primary_key=True)
     nome_contratto = models.CharField(unique=True, max_length=100, blank=True, null=True)
-    codice_contratto = models.CharField(max_length=2, blank=True, null=True)
+    codice_contratto = models.CharField(max_length=10, blank=True, null=True)
     data_creazione = models.DateTimeField(blank=True, null=True)
     data_modifica = models.DateTimeField(blank=True, null=True)
     note = models.TextField(db_column='Note', blank=True, null=True)  # Field name made lowercase.
@@ -699,6 +738,7 @@ class TipoContratto(models.Model):
     class Meta:
         managed = False
         db_table = 'Tipo_Contratto'
+        ordering = ["nome_contratto"]
         
     def __str__(self):
         return self.nome_contratto

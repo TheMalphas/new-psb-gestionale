@@ -84,7 +84,9 @@ a:hover, a:active {
 .cartaBox-table-reception-capi-area  .carta-table-reception-capi-area .numbers {
     color: #0070dd;
 }
-
+.cartaBox-table-reception-datatables-big .carta-table-reception-datatables-big .numbers  {
+    color: #0070dd;
+}
 .cartaBox-table-reception-capi-area  .carta:hover:not(#child){
     background-color: #0070dd;
     color: #ffffff;
@@ -102,4 +104,13 @@ a:hover, a:active {
 
 strong {
     color: #0070dd;
+}
+
+.tab-filter-container {
+    padding: 2rem;
+    text-align: center;
+    --bs-bg-opacity: 1;
+    background-color: rgba(var(--bs-light-rgb),var(--bs-bg-opacity))!important;
+    border-radius: 20px 20px 0px 0px;
+    box-shadow: 10px 5px 5px  #4da6ff;
 }

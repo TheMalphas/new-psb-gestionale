@@ -24,11 +24,13 @@ from django.conf import settings
 import re
 import random
 from capi_area import updateCedolini
+from uuid import uuid4
 
 
 class AddIncForf(models.Model):
     id_inc_forf = models.BigAutoField(primary_key=True)
     id_ced = models.ForeignKey('Cedolini', models.DO_NOTHING, db_column='id_ced', blank=True, null=True)
+    id_dip = models.ForeignKey('AnaDipendenti', models.DO_NOTHING, db_column='id_dip', blank=True, null=True)
     inc_forf = models.FloatField(db_column='Inc_Forf', blank=True, null=True)  # Field name made lowercase.
     timestamp_creazione = models.DateTimeField(blank=True, null=True)
 
@@ -40,27 +42,51 @@ class AddIncForf(models.Model):
 class AddRimborsi(models.Model):
     id_rimborsi = models.BigAutoField(primary_key=True)
     id_ced = models.ForeignKey('Cedolini', models.DO_NOTHING, db_column='id_ced', blank=True, null=True)
-    rel_giorno = models.IntegerField(blank=True, null=True)
+    id_dip = models.ForeignKey('AnaDipendenti', models.DO_NOTHING, db_column='id_dip', blank=True, null=True)
+    rel_giorno = models.DateField(blank=True, null=True)
+    stato = models.IntegerField(default=0,blank=True, null=True)
     ore = models.FloatField(blank=True, null=True)
     valore = models.FloatField(blank=True, null=True)
-    timestamp_creazione = models.DateTimeField(blank=True, null=True)
+    timestamp_creazione = models.DateTimeField(auto_now_add=True,blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'Add_Rimborsi'
 
 
-class AddTrasferte(models.Model):
-    id_trasferte = models.BigAutoField(primary_key=True)
+class AddStraordinari(models.Model):
+    id_straordinari = models.BigAutoField(primary_key=True)
+    id_dip = models.ForeignKey('AnaDipendenti', models.DO_NOTHING, db_column='id_dip', blank=True, null=True)
     id_ced = models.ForeignKey('Cedolini', models.DO_NOTHING, db_column='id_ced', blank=True, null=True)
-    rel_giorno = models.IntegerField(blank=True, null=True)
+    rel_giorno = models.DateField(blank=True, null=True)
+    rel_time_start = models.TimeField(blank=True, null=True)
+    rel_time_end = models.TimeField(blank=True, null=True)
+    stato = models.IntegerField(default=0,blank=True, null=True)
     ore = models.FloatField(blank=True, null=True)
     valore = models.FloatField(blank=True, null=True)
-    timestamp_creazione = models.DateTimeField(blank=True, null=True)
+    note = models.TextField(blank=True, null=True)
+    timestamp_creazione = models.DateTimeField(auto_now_add=True,blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'Add_Straordinari'
+
+
+class AddTrasferte(models.Model):
+    id_trasferte = models.BigAutoField(primary_key=True)
+    id_dip = models.ForeignKey('AnaDipendenti', models.DO_NOTHING, db_column='id_dip', blank=True, null=True)
+    id_ced = models.ForeignKey('Cedolini', models.DO_NOTHING, db_column='id_ced', blank=True, null=True)
+    rel_giorno = models.DateField(blank=True, null=True)
+    stato = models.IntegerField(default=0,blank=True, null=True)
+    ore = models.FloatField(blank=True, null=True)
+    valore = models.FloatField(blank=True, null=True)
+    note = models.TextField(blank=True, null=True)
+    timestamp_creazione = models.DateTimeField(auto_now_add=True,blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'Add_Trasferte'
+
 
 class AnaDipendenti(models.Model):
     id_dip = models.AutoField(db_column='ID_Dip', primary_key=True)  # Field name made lowercase.
@@ -144,24 +170,30 @@ class AnaDipendenti(models.Model):
     def getarea(self):
         if self.area:
             areas = f'{self.area.nome_area}'
-            ar = areas.split(" ")
-            return f'{(self.area.nome_area).title()}'
+            return areas
+            # ar = areas.split(" ")
+            # return ar[0].title()
         else: "No Area"
         
     @property
     def getsocieta(self):
         if self.societa:
             societas = f'{self.societa.nome_societa}'
-            soc = societas.split(" ")
-            return soc[0].title()
+            return societas
+            # soc = societas.split(" ")
+            # try:
+            #     if soc[1] != "-":
+            #         return f'{(soc[0].title())} {(soc[1].title())}'
+            # except: return soc[0].title()
         else: "No Società"
     
     @property
     def getsede(self):
         if self.sede:
-            sex = f'{self.sede.nome_sede}'
-            sesso = sex.split(" ")
-            return sesso[0].title()
+            sed = f'{self.sede.nome_sede}'
+            return sed
+            # sedez = sed.split(" ")
+            # return sedez[0].title()
         else: "No Sede"
 
     @property
@@ -202,18 +234,11 @@ class AnaDipendenti(models.Model):
             contratti = ""
             for i, item in enumerate(contrattilist):
                 if i:  # print a separator if this isn't the first element
-                    contratti += f'{item.codicecontratto},'
-                contratti += f'{item.codicecontratto}'
+                    contratti += f'{item.tipologia.codice_contratto},'
+                contratti += f'{item.tipologia.codice_contratto}'
             return contratti
         else: return 'No contratto'
-    
-    @property
-    def capoareadi(self):
-        if self.dip_capo_area == True:
-            if self.area:
-                return f'Capo Area: {self.area.nome_area}'
-        else:
-            return "No"
+
 
 @receiver(pre_save, sender=AnaDipendenti)
 def upper_fields(sender, instance, *args, **kwargs):
@@ -392,19 +417,21 @@ def anadipcontrol_post_save_receiver(sender, instance, *args, **kwargs):
         
     new_row = AnadipControl.objects.create(row = instance.pk, table = sender, action =  "deleted", timestamp = timezone.now(), full_row  = full_row_instance)
 
+
+class AppoggioVerificaQr(models.Model):
+    uuid_qr = models.CharField(max_length=50,default=uuid4)
+    id_dipendente = models.OneToOneField(AnaDipendenti, models.DO_NOTHING, db_column='id_dipendente')
+
+    class Meta:
+        managed = False
+        db_table = 'appoggio_verifica_qr'
+
+
 @receiver(post_save, sender=AnaDipendenti)
 def qr_create(sender, instance, created, *args, **kwargs):
     if created:
         AppoggioVerificaQr.objects.create(id_dipendente = AnaDipendenti.objects.get(id_dip=instance.id_dip))
 
-class AppoggioVerificaQr(models.Model):
-    uuid_qr = models.CharField(primary_key=True, max_length=50)
-    id_dipendente = models.ForeignKey(AnaDipendenti, models.DO_NOTHING, db_column='id_dipendente')
-
-    class Meta:
-        managed = False
-        db_table = 'appoggio_verifica_qr'
-        unique_together = (('uuid_qr', 'id_dipendente'),)
 
 class Area(models.Model):
     id_area = models.AutoField(primary_key=True)
@@ -423,7 +450,7 @@ class Area(models.Model):
     
 @receiver(pre_save, sender=Area)
 def area_post_save_receiver(sender, instance, *args, **kwargs):
-    instance.nome_area = (instance.nome_area.upper())
+    instance.nome_area = (instance.nome_area.title())
     
 class BancaOrari(models.Model):
     id_banca_dati = models.BigAutoField(db_column='Id_banca_dati', primary_key=True)  # Field name made lowercase.
@@ -696,7 +723,61 @@ class Cedolini(models.Model):
         return f'LUL di {self.dipendente} mese {self.mese}, anno {self.anno}'
 
 
-@receiver(post_save, sender=AnaDipendenti)
+class Contratti(models.Model):
+    id_contratto = models.AutoField(db_column='ID_Contratto', primary_key=True)  # Field name made lowercase.
+    id_dip = models.ForeignKey(AnaDipendenti, models.DO_NOTHING, db_column='ID_Dip', blank=True, null=True)  # Field name made lowercase.
+    id_societa = models.ForeignKey('ListaSocieta', models.DO_NOTHING, db_column='ID_Societa', blank=True, null=True)  # Field name made lowercase.
+    tipologia = models.ForeignKey('TipoContratto', models.DO_NOTHING, db_column='Tipologia', blank=True, null=True)  # Field name made lowercase.
+    ccnl = models.ForeignKey('TabellaCcnl', models.DO_NOTHING, db_column='ccnl', blank=True, null=True)
+    codicecontratto = models.CharField(db_column='CodiceContratto', max_length=50, blank=True, null=True)  # Field name made lowercase.
+    percentuale = models.ForeignKey('PercentualiContratto', models.DO_NOTHING, db_column='Percentuale', blank=True, null=True)  # Field name made lowercase.
+    trasferte_fisse = models.IntegerField(blank=True, null=True)
+    trasferte_fisse_tipo = models.CharField(max_length=2, blank=True, null=True)
+    datainizio = models.DateField(db_column='DataInizio', blank=True, null=True)  # Field name made lowercase.
+    datafine = models.DateField(db_column='DataFine', blank=True, null=True)  # Field name made lowercase.
+    note = models.TextField(db_column='Note', blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'Contratti'
+    
+    @property
+    def getdipendente(self):
+        if self.id_dip:
+            return self.id_dip.nominativo
+        else:
+            return "N/A"
+    
+    @property
+    def getsocieta(self):
+        if self.id_societa:
+            return str(self.id_societa.nomesocieta).title()
+        else:
+            return "N/A"
+        
+    @property
+    def gettipologia(self):
+        if self.tipologia:
+            return self.tipologia.nome_contratto
+        else:
+            return "N/A"
+    
+    @property
+    def getccnl(self):
+        if self.ccnl:
+            return self.ccnl.tipo_contratto
+        else:
+            return "N/A"
+    
+    @property
+    def getpercentuale(self):
+        if self.percentuale:
+            return self.percentuale.dicitura_percentuale
+        else:
+            return "N/A"
+
+
+@receiver(post_save, sender=Contratti)
 def cedolini_post_save_receiver(sender, instance, created, *args, **kwargs):
     if created:
         yeary = datetime.now().date().year
@@ -712,24 +793,6 @@ def cedolini_post_save_receiver(sender, instance, created, *args, **kwargs):
                     pass
             except Exception as err:
                 print(err)
-
-
-class Contratti(models.Model):
-    id_contratto = models.AutoField(db_column='ID_Contratto', primary_key=True)  # Field name made lowercase.
-    id_dip = models.ForeignKey(AnaDipendenti, models.DO_NOTHING, db_column='ID_Dip', blank=True, null=True)  # Field name made lowercase.
-    id_societa = models.ForeignKey('ListaSocieta', models.DO_NOTHING, db_column='ID_Societa', blank=True, null=True)  # Field name made lowercase.
-    tipologia = models.ForeignKey('TipoContratto', models.DO_NOTHING, db_column='Tipologia', blank=True, null=True)  # Field name made lowercase.
-    codicecontratto = models.CharField(db_column='CodiceContratto', max_length=50, blank=True, null=True)  # Field name made lowercase.
-    percentuale = models.ForeignKey('PercentualiContratto', models.DO_NOTHING, db_column='Percentuale', blank=True, null=True)  # Field name made lowercase.
-    datainizio = models.DateField(db_column='DataInizio', blank=True, null=True)  # Field name made lowercase.
-    datafine = models.DateField(db_column='DataFine', blank=True, null=True)  # Field name made lowercase.
-    note = models.TextField(db_column='Note', blank=True, null=True)  # Field name made lowercase.
-    
-    class Meta:
-        managed = False
-        db_table = 'Contratti'
-        ordering = ["codicecontratto"]
-
 
 class Dirigenti(models.Model):
     id_dir = models.AutoField(primary_key=True)
@@ -762,7 +825,7 @@ class Istruzione(models.Model):
     
 @receiver(pre_save, sender=Istruzione)
 def tipo_istruzione_pre_save_receiver(sender, instance, *args, **kwargs):
-    instance.tipo_istruzione = (instance.tipo_istruzione.upper())
+    instance.tipo_istruzione = (instance.tipo_istruzione.title())
 
 class Ingressidip(models.Model):
     id_ingresso = models.AutoField(primary_key=True)
@@ -931,7 +994,7 @@ class Mansione(models.Model):
     
 @receiver(pre_save, sender=Mansione)
 def mansione_pre_save_receiver(sender, instance, *args, **kwargs):
-    instance.tipo_mansione = (instance.tipo_mansione.upper())
+    instance.tipo_mansione = (instance.tipo_mansione.title())
 
         
 class Mese(models.Model):
@@ -1096,7 +1159,7 @@ class Sede(models.Model):
     
 @receiver(pre_save, sender=Sede)
 def sede_pre_save_receiver(sender, instance, *args, **kwargs):
-    instance.nome_sede = (instance.nome_sede.upper())
+    instance.nome_sede = (instance.nome_sede.title())
 
 
 class Sesso(models.Model):
@@ -1128,13 +1191,27 @@ class Societa(models.Model):
 
 @receiver(pre_save, sender=Societa)
 def societa_pre_save_receiver(sender, instance, *args, **kwargs):
-    instance.nome_societa = (instance.nome_societa.upper())
+    instance.nome_societa = (instance.nome_societa.title())
+
+
+class TabellaCcnl(models.Model):
+    id_ccnl = models.AutoField(primary_key=True)
+    tipo_contratto = models.CharField(max_length=250, blank=True, null=True)
+    codice_ccnl = models.CharField(max_length=10, blank=True, null=True)
+    note = models.CharField(max_length=50, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'tabella_ccnl'
+    
+    def __str__(self):
+        return str(self.tipo_contratto).title()
 
 
 class TipoContratto(models.Model):
     id_contratto = models.AutoField(primary_key=True)
     nome_contratto = models.CharField(unique=True, max_length=100, blank=True, null=True)
-    codice_contratto = models.CharField(max_length=2, blank=True, null=True)
+    codice_contratto = models.CharField(max_length=10, blank=True, null=True)
     data_creazione = models.DateTimeField(blank=True, null=True)
     data_modifica = models.DateTimeField(blank=True, null=True)
     note = models.TextField(db_column='Note', blank=True, null=True)  # Field name made lowercase.
@@ -1150,7 +1227,7 @@ class TipoContratto(models.Model):
 
 @receiver(pre_save, sender=TipoContratto)
 def sede_pre_save_receiver(sender, instance, *args, **kwargs):
-    instance.nome_contratto = (instance.nome_contratto.upper())
+    instance.nome_contratto = (instance.nome_contratto.title())
 
 class AuthGroup(models.Model):
     name = models.CharField(unique=True, max_length=150)

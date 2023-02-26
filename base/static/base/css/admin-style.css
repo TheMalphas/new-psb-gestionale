@@ -85,6 +85,10 @@ a:hover, a:active {
     color: #ff8000;
 }
 
+.cartaBox-table-reception-datatables-big .carta-table-reception-datatables-big .numbers  {
+    color: #ff8000;
+}
+
 .cartaBox-table-reception-capi-area  .carta:hover:not(#child){
     background-color: #ff8000 !important;
     color: #ffffff !important;

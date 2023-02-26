@@ -1,6 +1,31 @@
 from django import forms
-from .models import AnaDipendenti, Richieste, Ingressidip, AuthUser
+from .models import AnaDipendenti, Richieste, Ingressidip, AuthUser,TodoList
 from django.utils.translation import gettext_lazy as _
+
+
+class TodoListCapoAreaUpdateForm(forms.ModelForm):
+    # dipendente
+    class Meta:
+        model = TodoList
+        exclude = ["id_lista","user","fatta","setter","gruppo","data"]
+        
+        CHOICES = (
+            (0,'Bassa'),
+            (1,'Media'),
+            (2,'Alta'),
+            (3,'Urgente'),
+        )
+        
+        labels = {
+            'todo':_("Oggetto"),
+            'priority':_('Cambia la priorit&#224;')
+        }
+        
+        widgets= {
+            'todo': forms.TextInput(attrs={"class":"form-control","id":"todo","name":"todo"}),
+            'priority': forms.Select(choices=CHOICES,attrs={"class":"form-control",'id':'priority','name':'priority'}),
+        } 
+
 
 
 class DipendentiForm(forms.ModelForm):

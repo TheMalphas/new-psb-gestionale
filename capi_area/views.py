@@ -7,14 +7,14 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormVi
 from django.views import View
 from django.db.models import Q
 from django.urls import reverse, reverse_lazy
-from .models import Richieste, Area, AuthUser, AnaDipendenti, CapoArea, Permessi, RichiesteAccettate, Ingressidip, Cedolini, AppoggioVerificaQr
+from .models import Richieste, Area, AddStraordinari, AddTrasferte, AddRimborsi, AuthUser, AnaDipendenti, CapoArea, Permessi, RichiesteAccettate, Ingressidip, Cedolini, AppoggioVerificaQr, TodoList
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import Group
 from django.contrib.auth import login
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django import forms
 from django.contrib import messages
-from .forms import DipendentiForm, UpdateRichiestaForm, UpdateEntrata
+from .forms import DipendentiForm, UpdateRichiestaForm, UpdateEntrata, TodoListCapoAreaUpdateForm
 from datetime import time, datetime, timedelta,date
 from django.contrib.auth.views import redirect_to_login
 from django.db.models import Count
@@ -26,31 +26,74 @@ from django.core.exceptions import PermissionDenied
 from io import BytesIO
 from . import updateCedolini
 
-#QR
+#HTMX VIEWS
+@login_required #DELETE
+def delete_todo_capo_area(request,pk):
+    template_name = 'partials/todolist_capo_area.html'
+    oggetto = TodoList.objects.filter(id_lista=pk).update(fatta=1)
+    capoArea = AnaDipendenti.objects.get(user_id = request.user.pk)
+    listaDipendenti = AnaDipendenti.objects.filter(area=capoArea.area.id_area,stato="Attivo").values_list('user_id', flat=True)
+    dipendentiUser = AuthUser.objects.filter(id__in=listaDipendenti)
+    dipendentiUserInput = AuthUser.objects.filter(id__in=listaDipendenti).values_list('id','last_name','first_name').exclude(id=request.user.pk)
+
+    todos = TodoList.objects.filter(user__in=dipendentiUser,fatta=False).order_by("data").order_by("-priority")
+    user = request.user.pk
+
+    return render(request,template_name,{'todos':todos,'dipendenti':dipendentiUserInput,'user_id':user})
+
+#UPDATE
+class UpdateTodoCapoArea(LoginRequiredMixin,UpdateView):
+    model= TodoList
+    form_class = TodoListCapoAreaUpdateForm
+    template_name = "capi_area/update_todo_capo_area.html"
+    context_object_name = "todo"
+    success_url= reverse_lazy('capi_area:capi_area_todo')
+
+
+@login_required #CREATE AND LIST
+@permission_required('capi_area.change_richiesteaccettate')
+def assegnaTodo(request):
+    template_name = 'partials/todolist_capo_area.html'
+    capoArea = AnaDipendenti.objects.get(user_id = request.user.pk)
+    listaDipendenti = AnaDipendenti.objects.filter(area=capoArea.area.id_area,stato="Attivo").values_list('user_id', flat=True)
+    dipendentiUser = AuthUser.objects.filter(id__in=listaDipendenti)
+    dipendentiUserInput = AuthUser.objects.filter(id__in=listaDipendenti).values_list('id','last_name','first_name').exclude(id=request.user.pk)
+
+
+    if request.POST.get('aggiungi') and request.POST.get('dipendente') and request.POST.get('dipendente') != 'Me':
+        appunto = request.POST.get('aggiungi')
+
+        if appunto != "" or appunto != None:
+            dipendente = request.POST.get('dipendente')
+            dip = AuthUser.objects.get(id=dipendente)
+            capodip = AnaDipendenti.objects.get(user_id=request.user.pk)
+            capocchia = CapoArea.objects.get(id_dipendente=capodip.id_dip)
+            oggetto = TodoList.objects.get_or_create(todo=appunto,user=AuthUser.objects.get(id=dipendente),setter=CapoArea.objects.get(id_capo=capocchia.pk))
+    
+    elif request.POST.get('aggiungi'):
+        appunto = request.POST.get('aggiungi')
+        utente = AuthUser.objects.get(id=request.user.pk)
+        oggetto = TodoList.objects.get_or_create(todo=appunto.title(),user=utente)
+    
+    todos = TodoList.objects.filter(user__in=dipendentiUser,fatta=False).order_by("data").order_by("-priority")
+    user = request.user.pk
+    return render(request,template_name,{'todos':todos,'dipendenti':dipendentiUserInput,'user_id':user})
+
+
 @login_required
-def printQR(request):
-    dips=AnaDipendenti.objects.filter(stato="attivo").order_by("cognome")
-    context={'dips':dips}
-    
-    if request.method == 'POST':
-        input_data = request.POST['dipendente']
-        uuid = AppoggioVerificaQr.objects.get(id_dipendente=input_data)
-        response = HttpResponse(content_type='image/png')
-        dippo = AnaDipendenti.objects.get(id_dip=input_data)
-        fl = f'{dippo}'
-        response['Content-Disposition'] = f'attachment; filename= "QR - {fl}".png'
-        qr = qrcode.QRCode(
-            version=1,
-            box_size=10,
-            border=5
-        )
-        qr.add_data(uuid.uuid_qr)
-        qr.make(fit=True)
-        img = qr.make_image(fill='black', back_color='white')
-        img.save(response)
-        return response
-    
-    return render(request,'capi_area/makeqr.html',context=context)
+@permission_required('capi_area.change_richiesteaccettate')
+def listaTodoCapoArea(request):
+    capoArea = AnaDipendenti.objects.get(user_id = request.user.pk)
+    listaDipendenti = AnaDipendenti.objects.filter(area=capoArea.area.id_area,stato="Attivo").values_list('user_id', flat=True)
+    dipendentiUser = AuthUser.objects.filter(id__in=listaDipendenti).values_list('id',flat=True)
+    dipendentiUserInput = AuthUser.objects.filter(id__in=listaDipendenti).values_list('id','last_name','first_name').exclude(id=request.user.pk)
+
+    template_name='capi_area/capi_area_todo.html'
+    todos = TodoList.objects.filter(user__in=dipendentiUser,fatta=False).order_by("data").order_by("-priority")
+    context = {'todos':todos}
+    context["dipendenti"] = dipendentiUserInput
+    context["user_id"] = request.user.pk
+    return render(request,template_name,context)
 
 
 @login_required
@@ -70,9 +113,9 @@ def dashboardCapoarea(request):
     richieste = Richieste.objects.filter(id_dipendente_richiesta__in=listaIdSquadra)
     richiesteNumero = richieste.count()
     richiestePermesso = richieste.filter().exclude(id_permessi_richieste=6).count()
-    richiesteFerie = richieste.filter(id_permessi_richieste=6).count()
+    richiesteStraordinari = AddStraordinari.objects.filter(id_dip__in=listaIdSquadra,stato=False).count()
 
-    return render(request,template_name,{"capoArea":capoccione,"squadra":squadra,"numeroSquadra":numeroSquadra,"squadraPresenteAna":squadraPresenteAna,"squadraPresenteNumero":squadraPresenteNumero,"richiesteNumero":richiesteNumero,"richiestePermesso":richiestePermesso,"richiesteFerie":richiesteFerie})
+    return render(request,template_name,{"capoArea":capoccione,"squadra":squadra,"numeroSquadra":numeroSquadra,"squadraPresenteAna":squadraPresenteAna,"squadraPresenteNumero":squadraPresenteNumero,"richiesteNumero":richiesteNumero,"richiestePermesso":richiestePermesso,"richiesteStraordinari":richiesteStraordinari})
 
 # GestioneRichiesteList
 class DettagliPresenze(LoginRequiredMixin, PermissionRequiredMixin, ListView):
@@ -90,7 +133,6 @@ class DettagliPresenze(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     def getDipDay(self, id_dip_ing):
         richiesteDip = Richieste.objects.filter(id_dipendente_richiesta=id_dip_ing)
         richiesteAccettateDip = RichiesteAccettate.objects.raw("SELECT ID_Richiesta, nominativo, da_giorno_richiesta, da_ora_richiesta, a_giorno_richiesta a_ora_richiesta FROM Richieste JOIN Richieste_Accettate ON ID_richiesta = ID_richieste WHERE ID_dipendente_richiesta = %s", [id_dip_ing])
-
         return richiesteAccettateDip
     
     def get(self, request, *args, **kwargs):
@@ -148,7 +190,6 @@ class DettagliPresenze(LoginRequiredMixin, PermissionRequiredMixin, ListView):
 @permission_required("capi_area.change_richiesteaccettate")
 def capiAreaRichiesteAllList(request):
     template_name = "capi_area/richieste.html"
-    permission_required = 'capi_area.change_richiesteaccettate'
     today = datetime.now().date()
     tenDays = (today + timedelta(9))
     monthDays = (today + timedelta(30))
@@ -180,6 +221,58 @@ def capiAreaRichiesteAllList(request):
         raise PermissionDenied("Non sei un Capo Area.")
     
 
+@login_required
+@permission_required("capi_area.change_richiesteaccettate")
+def capiAreaRichiesteStaordinariList(request):
+    template_name = "capi_area/richieste-straordinari.html"
+    today = datetime.now().date()
+    tenDays = (today + timedelta(9))
+    monthDays = (today + timedelta(30))
+    
+    try:
+        anadipendente = AnaDipendenti.objects.get(user_id=request.user.pk)
+        capoccione = CapoArea.objects.get(id_dipendente=anadipendente.id_dip)
+        squadra = AnaDipendenti.objects.filter(area=capoccione.area,stato="Attivo")
+        listaIdSquadra = [el.id_dip for el in squadra]
+        richieste = AddStraordinari.objects.filter(id_dip__in=listaIdSquadra,rel_giorno__lte=monthDays)
+        daRevisionare = richieste.filter(stato=False)
+        accettate = richieste.filter(stato=True)
+        rifiutate = richieste.filter(stato=2)
+        
+        if request.method == "POST" and request.POST.get("dipendente"):
+            query = request.POST.get("dipendente")
+            queryset = richieste.filter(Q(id_dip__nome__icontains=query) | Q(id_dip__cognome__icontains=query)).order_by("-rel_giorno")
+            daRevisionare = richieste.filter(stato=False).count()
+            accettate = richieste.filter(stato=True).count()
+            rifiutate = richieste.filter(stato=2).count()
+            return render(request,template_name,{'richieste':queryset,'daRevisionare':daRevisionare,'accettate':accettate,'rifiutate':rifiutate})
+        
+        elif request.method == "POST" and request.POST.get("daRevisionare"):
+            queryset = daRevisionare.order_by("-rel_giorno")
+            daRevisionare = daRevisionare.count()
+            accettate = accettate.count()
+            rifiutate = rifiutate.count()
+            return render(request,template_name,{'richieste':queryset,'daRevisionare':daRevisionare,'accettate':accettate,'rifiutate':rifiutate})
+        
+        elif request.method == "POST" and request.POST.get("accettate"):
+            queryset = accettate.order_by("-rel_giorno")
+            daRevisionare = daRevisionare.count()
+            accettate = accettate.count()
+            rifiutate = rifiutate.count()
+            return render(request,template_name,{'richieste':queryset,'daRevisionare':daRevisionare,'accettate':accettate,'rifiutate':rifiutate})
+        
+        elif request.method == "POST" and request.POST.get("rifiutate"):
+            queryset = rifiutate.order_by("-rel_giorno")
+            daRevisionare = daRevisionare.count()
+            accettate = accettate.count()
+            rifiutate = rifiutate.count()
+            return render(request,template_name,{'richieste':queryset,'daRevisionare':daRevisionare,'accettate':accettate,'rifiutate':rifiutate})
+        
+        else:
+            return render(request,template_name,{'richieste':daRevisionare,'daRevisionare':daRevisionare.count(),'accettate':accettate.count(),'rifiutate':rifiutate.count()})
+    except CapoArea.DoesNotExist:
+        raise PermissionDenied("Non sei un Capo Area.")
+    
 
 class Capi_AreaRichiesteAccettateList(LoginRequiredMixin,PermissionRequiredMixin,ListView):
     models = Richieste
@@ -204,7 +297,7 @@ class Capi_AreaRichiesteRifiutateList(LoginRequiredMixin,PermissionRequiredMixin
     models = Richieste
     context_object_name = "richieste"
     template_name = "capi_area/rifiutate.html"
-    permission_required = 'capi_area.change_ingressidip'
+    permission_required = 'capi_area.change_richiesteaccettate'
     paginate_by = 8
 
     
@@ -220,7 +313,7 @@ class Capi_AreaRichiesteDaRevisionareList(LoginRequiredMixin,PermissionRequiredM
     models = Richieste
     context_object_name = "richieste"
     template_name = "capi_area/da_revisionare.html"
-    permission_required = 'capi_area.change_ingressidip'
+    permission_required = 'capi_area.change_richiesteaccettate'
     paginate_by = 8
 
     
@@ -236,7 +329,7 @@ class Capi_AreaRichiesteDaRevisionareList(LoginRequiredMixin,PermissionRequiredM
 class AccettaRichiesta(LoginRequiredMixin,PermissionRequiredMixin,View):
     template_name = "capi_area/gestisci-richiesta.html"
     context_object_name = 'richiesta'
-    permission_required = 'capi_area.change_anadipendenti'
+    permission_required = 'capi_area.change_richiesteaccettate'
     fields = ['note','stato']
     
         
@@ -439,8 +532,93 @@ class AccettaRichiesta(LoginRequiredMixin,PermissionRequiredMixin,View):
         
         return render(request, self.template_name, context)
 
+
+class AccettaStraordinari(LoginRequiredMixin,PermissionRequiredMixin,View):
+    template_name = "capi_area/gestisci-richiesta-straordinari.html"
+    context_object_name = 'richiesta'
+    permission_required = 'capi_area.change_richiesteaccettate'
+    fields = ['note','stato']
+
+    def runAcceptQuery(self, user, id_straordinari, *args, **kwargs):
+        try:
+            instance = AddStraordinari.objects.get(pk=id_straordinari)
+            dipendente = instance.id_dip
+            giorno = instance.rel_giorno
+            oraInit = instance.rel_time_start
+            oraFine = instance.rel_time_end
+
+            giornoC = instance.rel_giorno.day
+            meseC = instance.rel_giorno.month
+            annoC = instance.rel_giorno.year
+            dippo = instance.id_dip
+            ore = instance.ore
+            
+            if instance.stato == False or instance.stato == 2:
+                try:
+                    updateCedolini.cedStraordinari(giornoC,meseC,annoC,dippo,ore)
+                except Exception as error:
+                    print(error)
+                    
+                sameInstance = AddStraordinari.objects.filter(pk=id_straordinari).update(stato=1)
+                
+        except Exception as error:
+            print(error)
+            
+    def runDenyQuery(self, user, id_straordinari, *args, **kwargs):
+        try:
+            instance = AddStraordinari.objects.get(pk=id_straordinari)
+            dipendente = instance.id_dip
+            giorno = instance.rel_giorno
+            oraInit = instance.rel_time_start
+            oraFine = instance.rel_time_end
+
+            giornoC = instance.rel_giorno.day
+            meseC = instance.rel_giorno.month
+            annoC = instance.rel_giorno.year
+            dippo = instance.id_dip
+            
+            if instance.stato == False or instance.stato == True:
+                try:
+                    updateCedolini.delCedStraordinari(giornoC,meseC,annoC,dippo)
+                except Exception as error:
+                    print(error)
+                    
+                sameInstance = AddStraordinari.objects.filter(pk=id_straordinari).update(stato=2)
+                    
+        except Exception as error:
+            print(error)
+    
+
+    def get(self, request, id_straordinari=None, *args, **kwargs):
+        try:
+            richiesta = AddStraordinari.objects.get(pk=id_straordinari)
+        except Exception as error:
+            print(error)
+        
+        if id_straordinari is not None:
+            richiesta = get_object_or_404(AddStraordinari, id_straordinari=id_straordinari)
+            context = {'richiesta':richiesta}
+        try:
+            if request.method == "GET" and request.GET.get("accept"):
+                current_user = request.user
+                user = current_user.id
+                id_straordinari = request.GET["id"]
+                self.runAcceptQuery(user,id_straordinari)
+                return redirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
+            elif request.method == "GET" and request.GET.get("deny"):
+                current_user = request.user
+                user = current_user.id
+                id_straordinari = request.GET["id"]
+                self.runDenyQuery(user,id_straordinari)
+                return redirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
+        except Exception as error: 
+            print(error)
+            return HttpResponse("Torna indietro, qualcosa &#232; andato storto.")
+        
+        return render(request, self.template_name, context)
+
 class RichiestaRespinta(LoginRequiredMixin,PermissionRequiredMixin, UpdateView):
     model= Richieste
     template_name = "reception/richiesta-respinta.html"
     context_object_name = 'respinta'
-    permission_required = 'capi_area.change_ingressidip'
+    permission_required = 'capi_area.change_richiesteaccettate'

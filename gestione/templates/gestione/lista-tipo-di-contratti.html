@@ -6,13 +6,11 @@
 <link rel="stylesheet" href="{% static 'gestione/css/style.css' %}">
 <script src="{% static 'gestione/js/script.js' %}"></script>
 
-<section style="box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); margin-left:268px;">
+<section id="styler-navbar" style="box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); margin-left:210px;">
     <header class="p-3 bg-light text-black">
         <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-    
         <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-            <li class="nav-link px-2 text-dark"></li>            
-            <li class="nav-link px-2 text-dark">Buon lavoro, {{user.first_name}}</li> 
+            <li><a class="nav-link px-2 text-dark" href="{% url 'gestione:altri-dati' %}">Torna alla Dati</a></li>
         </ul>
         <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" method="GET" action="{% url 'gestione:lista-tipo-di-contratti' %}" value="{{contratto.id_contratto}}">
             {% csrf_token %}
@@ -53,6 +51,7 @@
                                             <li><a class="dropdown-item" onclick="open_modal_create_contratto('{% url 'gestione:aggiungi-tipo-di-contratto'%}')">Crea Nuovo</a></li>
                                             <li><hr class="dropdown-divider"></li>
                                             <li><a class="dropdown-item" onclick="open_modal_update_contratto('{% url 'gestione:modifica-tipo-di-contratto' contratto.id_contratto %}')">Modifica</a></li>
+                                            <li><a class="dropdown-item" onclick="open_modal_delete_contratto('{% url 'gestione:delete-tipo-di-contratto' contratto.id_contratto %}')">Elimina</a></li>
                                         </ul>
                                     </div>
                                 </th>
@@ -65,11 +64,15 @@
                 </div>
                 </div>
                 <div class="iconBox">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="55" height="55" fill="currentColor" class="bi bi-file-text-fill" viewBox="0 0 16 16">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="55" height="55" fill="currentColor" class="bi bi-file-text-fill" viewBox="0 0 16 16" style="margin-bottom:20px;">
                         <path d="M12 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM5 4h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1zm-.5 2.5A.5.5 0 0 1 5 6h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1-.5-.5zM5 8h6a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1zm0 2h3a.5.5 0 0 1 0 1H5a.5.5 0 0 1 0-1z"/>
                     </svg>
+                    <a class="dropdown-item" onclick="open_modal_create_contratto('{% url 'gestione:aggiungi-tipo-di-contratto'%}')">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="55" height="55s" fill="currentColor" class="bi bi-file-earmark-plus-fill" viewBox="0 0 16 16">
+                        <path d="M9.293 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.707A1 1 0 0 0 13.707 4L10 .293A1 1 0 0 0 9.293 0zM9.5 3.5v-2l3 3h-2a1 1 0 0 1-1-1zM8.5 7v1.5H10a.5.5 0 0 1 0 1H8.5V11a.5.5 0 0 1-1 0V9.5H6a.5.5 0 0 1 0-1h1.5V7a.5.5 0 0 1 1 0z"/>
+                    </svg>
+                    </a>
                 </div>
-                </a>
             </div>
     </div>    
 </section>
@@ -79,6 +82,9 @@
 </div>
 
 <div class="modal fade" id="creaTipodiContrattoModal" role="dialog" tabindex="-1">
+</div>
+
+<div class="modal fade" id="deleteTipodiContrattoModal" role="dialog" tabindex="-1">
 </div>
 
 <script>
@@ -92,6 +98,13 @@ function open_modal_create_contratto(url){
 var $ = jQuery.noConflict();
 function open_modal_update_contratto(url){
     $('#creaTipodiContrattoModal').load(url,function(){
+    $(this).modal('show'); 
+    });
+};
+
+var $ = jQuery.noConflict();
+function open_modal_delete_contratto(url){
+    $('#deleteTipodiContrattoModal').load(url,function(){
     $(this).modal('show'); 
     });
 };

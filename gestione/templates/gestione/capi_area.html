@@ -1,25 +1,25 @@
 {% extends 'base/main.html' %}
-
 {% load static %}
-
 {% block content %}
 
 <title>{% block title%}Capi Area{% endblock %}</title>
 <link rel="stylesheet" href="{% static 'gestione/css/style.css' %}">
 <script src="{% static 'gestione/js/script.js' %}"></script>
 
-
-<section style="box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); margin-left:268px;">
-  <header class="p-3 bg-light text-black">
+<section id="styler-navbar" style="box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); margin-left:210px;">
+    <header class="p-3 bg-light text-black">
       <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-      <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-            <li><a class="nav-link px-2 text-dark" href="{% url 'gestione:dashboard-responsabili' %}">Torna alla Dashboard Responsabili</a></li>
-      </ul>
-      <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" method="GET" action="{% url 'gestione:capi_area' %}" value="{{dipendente.nomecompleto}}">
-        {% csrf_token %}
-        <input type="search" id="perc_contratto-input" name="perc_contratto" class="form-control form-control-dark" value="{{dipendente.nome_completo}}" placeholder="Search..." aria-label="Search">
-    </form>
-</header>
+        <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+                <li><a class="nav-link px-2 text-dark" href="{% url 'gestione:dashboard-responsabili' %}">Torna alla Dashboard Responsabili</a></li>
+        </ul>
+        <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" method="GET" action="{% url 'gestione:capi_area' %}" value="{{dipendente.nomecompleto}}">
+            {% csrf_token %}
+            <input type="search" id="capiarea-input" name="capiarea" class="form-control form-control-dark" value="{{dipendente.nome_completo}}" placeholder="Search..." aria-label="Search">
+        </form>
+        <div class="text-end">
+            <button type="button" class="btn btn-success">Cerca</button>
+            <a href="/lista-capiarea-excel/?capoarea=" id="capoarea-anchor"><button type="button" class="btn btn-warning">Scarica</button></a>
+        </div>    
   </header>
 </section>
 

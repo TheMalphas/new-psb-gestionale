@@ -7,7 +7,7 @@
 
 <title>{% block title%}Dashboard Utente{% endblock %}</title>
 
-<section style="box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); margin-left:268px;">
+<section id="styler-navbar" style="box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); margin-left:210px;">
     <header class="p-3 bg-light text-black">
         <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
     
@@ -15,65 +15,47 @@
             <li class="nav-link px-2 text-dark"></li>            
             <li class="nav-link px-2 text-dark">Buon lavoro, {{user.first_name}}</li> 
         </ul>
-</header>
-
+    </header>
 </section>
 
 
 <section style="margin-left:300px; margin-top:50px;">
-<div class="cartaBox">
-    <div class="carta">
-        <div>
-            <a href="{% url 'users:richiedi-permesso-giorni' %}">
-            <div class="numbers">{{numeroPermessiAttiviGiorno}} </div>
-                <div class="cartaName">Richiedi Permesso Giorni</div>
-        </div>
-            <div class="iconBox">
-                <i class="bi bi-person-dash"></i>
-            </div>
-        </a>
-        </div>
-        
+    <div class="cartaBox">
         <div class="carta">
             <div>
-                <a href="{% url 'users:richiedi-permesso-orario' %}">
-                <div class="numbers">{{numeroPermessiAttiviOre}}</div>
-                <div class="cartaName">Richiedi Permesso Orario</div>
-            </div>
-            <div class="iconBox">
-                <i class="bi bi-person-up"></i>
-            </div>
-        </a>
+                <a href="{% url 'users:todo_utente' %}">
+                <div class="numbers">{{todos}} </div>
+                <div class="cartaName">Vai alla tua lista di todos</div>
+                </div>
+                <div class="iconBox">
+                    <a href="{% url 'users:todo_utente' %}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="55" height="55" fill="currentColor" class="bi bi-list-check" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zM3.854 2.146a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 3.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708L2 7.293l1.146-1.147a.5.5 0 0 1 .708 0zm0 4a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0z"/>
+                        </svg>
+                    </a>        
+                </div>
+                </a>
         </div>
 
         <div class="carta">
             <div>
                 <a href="{% url 'users:mie-richieste' %}">
-                <div class="numbers">{{permessiInAttesa}}</div>
-                <div class="cartaName">Vai alle tue richieste</div>
-            </div>
-            <div class="iconBox">
-                <i class="bi bi-person-lines-fill"></i>
-            </div>
-        </a>
+                <div class="numbers">{{permessiInAttesa}} </div>
+                <div class="cartaName">Vai alle tue richieste di permesso</div>
+                </div>
+                <div class="iconBox">
+                    <a href="{% url 'users:mie-richieste' %}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="55" height="55" fill="currentColor" class="bi bi-list-ul" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M5 11.5a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h9a.5.5 0 0 1 0 1h-9a.5.5 0 0 1-.5-.5zm-3 1a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm0 4a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+                        </svg>  
+                    </a>        
+                </div>
+                </a>
         </div>
-
-        <div class="carta">
-            <div>
-            <a href="{% url 'users:scarica_report_entrate' %}">
-                <div class="numbers"></div>
-                <div class="cartaName">Scarica report presenze del mese corrente</div>
-            </div>
-            <div class="iconBox">
-                <i class="bi bi-calendar3"></i>
-            </div>
-        </a>
-        </div>
-</div>    
+    </div>    
 </section>
 
 <script>
-
 window.onload = function() {
     var elements = document.getElementsByTagName("*");
     for (var i = 0; i < elements.length; i++) {
@@ -93,7 +75,6 @@ $.ajax({
     }
 });
 });
-
 </script>
 
 {% endblock content %}

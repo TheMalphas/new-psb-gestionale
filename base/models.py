@@ -1,11 +1,68 @@
-# This is an auto-generated Django model module.
-# You'll have to do the following manually to clean this up:
-#   * Rearrange models' order
-#   * Make sure each model has one field with primary_key=True
-#   * Make sure each ForeignKey and OneToOneField has `on_delete` set to the desired behavior
-#   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
-# Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
+from decimal import *
+import math
+from django.utils import timezone
+
+
+class AddIncForf(models.Model):
+    id_inc_forf = models.BigAutoField(primary_key=True)
+    id_ced = models.ForeignKey('Cedolini', models.DO_NOTHING, db_column='id_ced', blank=True, null=True)
+    id_dip = models.ForeignKey('AnaDipendenti', models.DO_NOTHING, db_column='id_dip', blank=True, null=True)
+    inc_forf = models.FloatField(db_column='Inc_Forf', blank=True, null=True)  # Field name made lowercase.
+    timestamp_creazione = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'Add_Inc_Forf'
+
+
+class AddRimborsi(models.Model):
+    id_rimborsi = models.BigAutoField(primary_key=True)
+    id_ced = models.ForeignKey('Cedolini', models.DO_NOTHING, db_column='id_ced', blank=True, null=True)
+    id_dip = models.ForeignKey('AnaDipendenti', models.DO_NOTHING, db_column='id_dip', blank=True, null=True)
+    rel_giorno = models.DateField(blank=True, null=True)
+    stato = models.IntegerField(default=0,blank=True, null=True)
+    ore = models.FloatField(blank=True, null=True)
+    valore = models.FloatField(blank=True, null=True)
+    timestamp_creazione = models.DateTimeField(auto_now_add=True,blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'Add_Rimborsi'
+
+
+class AddStraordinari(models.Model):
+    id_straordinari = models.BigAutoField(primary_key=True)
+    id_dip = models.ForeignKey('AnaDipendenti', models.DO_NOTHING, db_column='id_dip', blank=True, null=True)
+    id_ced = models.ForeignKey('Cedolini', models.DO_NOTHING, db_column='id_ced', blank=True, null=True)
+    rel_giorno = models.DateField(blank=True, null=True)
+    rel_time_start = models.TimeField(blank=True, null=True)
+    rel_time_end = models.TimeField(blank=True, null=True)
+    stato = models.IntegerField(default=0,blank=True, null=True)
+    ore = models.FloatField(blank=True, null=True)
+    valore = models.FloatField(blank=True, null=True)
+    note = models.TextField(blank=True, null=True)
+    timestamp_creazione = models.DateTimeField(auto_now_add=True,blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'Add_Straordinari'
+
+
+class AddTrasferte(models.Model):
+    id_trasferte = models.BigAutoField(primary_key=True)
+    id_dip = models.ForeignKey('AnaDipendenti', models.DO_NOTHING, db_column='id_dip', blank=True, null=True)
+    id_ced = models.ForeignKey('Cedolini', models.DO_NOTHING, db_column='id_ced', blank=True, null=True)
+    rel_giorno = models.DateField(blank=True, null=True)
+    stato = models.IntegerField(default=0,blank=True, null=True)
+    ore = models.FloatField(blank=True, null=True)
+    valore = models.FloatField(blank=True, null=True)
+    note = models.TextField(blank=True, null=True)
+    timestamp_creazione = models.DateTimeField(auto_now_add=True,blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'Add_Trasferte'
 
 class AnaDipendenti(models.Model):
     id_dip = models.AutoField(db_column='ID_Dip', primary_key=True)  # Field name made lowercase.
@@ -50,6 +107,21 @@ class AnaDipendenti(models.Model):
         managed = False
         db_table = 'Ana_Dipendenti'
 
+    @property
+    def nominativo(self):
+        return f'{(self.cognome).title()} {(self.nome).title()}'
+    
+
+class AppoggioVerificaQr(models.Model):
+    uuid_qr = models.CharField(primary_key=True, max_length=50)
+    id_dipendente = models.ForeignKey(AnaDipendenti, models.DO_NOTHING, db_column='id_dipendente')
+
+    class Meta:
+        managed = False
+        db_table = 'appoggio_verifica_qr'
+        unique_together = (('uuid_qr', 'id_dipendente'),)
+
+
 class Area(models.Model):
     id_area = models.AutoField(primary_key=True)
     nome_area = models.CharField(unique=True, max_length=100, blank=True, null=True)
@@ -76,22 +148,270 @@ class CapoArea(models.Model):
         db_table = 'Capo_Area'
 
 
+
+
+class Cedolini(models.Model):
+    id_cedolino = models.BigAutoField(primary_key=True)
+    dipendente = models.ForeignKey(AnaDipendenti, models.DO_NOTHING, db_column='dipendente', blank=True, null=True)
+    add_rimborsi = models.ForeignKey(AddRimborsi, models.DO_NOTHING, db_column='add_rimborsi', blank=True, null=True)
+    add_trasferte = models.ForeignKey(AddTrasferte, models.DO_NOTHING, db_column='add_trasferte', blank=True, null=True)
+    add_inc_forf = models.ForeignKey(AddIncForf, models.DO_NOTHING, db_column='add_inc_forf', blank=True, null=True)
+    mese = models.IntegerField(blank=True, null=True)
+    anno = models.IntegerField(blank=True, null=True)
+    ord_01 = models.FloatField(blank=True, null=True)
+    ord_02 = models.FloatField(blank=True, null=True)
+    ord_03 = models.FloatField(blank=True, null=True)
+    ord_04 = models.FloatField(blank=True, null=True)
+    ord_05 = models.FloatField(blank=True, null=True)
+    ord_06 = models.FloatField(blank=True, null=True)
+    ord_07 = models.FloatField(blank=True, null=True)
+    ord_08 = models.FloatField(blank=True, null=True)
+    ord_09 = models.FloatField(blank=True, null=True)
+    ord_10 = models.FloatField(blank=True, null=True)
+    ord_11 = models.FloatField(blank=True, null=True)
+    ord_12 = models.FloatField(blank=True, null=True)
+    ord_13 = models.FloatField(blank=True, null=True)
+    ord_14 = models.FloatField(blank=True, null=True)
+    ord_15 = models.FloatField(blank=True, null=True)
+    ord_16 = models.FloatField(blank=True, null=True)
+    ord_17 = models.FloatField(blank=True, null=True)
+    ord_18 = models.FloatField(blank=True, null=True)
+    ord_19 = models.FloatField(blank=True, null=True)
+    ord_20 = models.FloatField(blank=True, null=True)
+    ord_21 = models.FloatField(blank=True, null=True)
+    ord_22 = models.FloatField(blank=True, null=True)
+    ord_23 = models.FloatField(blank=True, null=True)
+    ord_24 = models.FloatField(blank=True, null=True)
+    ord_25 = models.FloatField(blank=True, null=True)
+    ord_26 = models.FloatField(blank=True, null=True)
+    ord_27 = models.FloatField(blank=True, null=True)
+    ord_28 = models.FloatField(blank=True, null=True)
+    ord_29 = models.FloatField(blank=True, null=True)
+    ord_30 = models.FloatField(blank=True, null=True)
+    ord_31 = models.FloatField(blank=True, null=True)
+    fer_01 = models.FloatField(blank=True, null=True)
+    fer_02 = models.FloatField(blank=True, null=True)
+    fer_03 = models.FloatField(blank=True, null=True)
+    fer_04 = models.FloatField(blank=True, null=True)
+    fer_05 = models.FloatField(blank=True, null=True)
+    fer_06 = models.FloatField(blank=True, null=True)
+    fer_07 = models.FloatField(blank=True, null=True)
+    fer_08 = models.FloatField(blank=True, null=True)
+    fer_09 = models.FloatField(blank=True, null=True)
+    fer_10 = models.FloatField(blank=True, null=True)
+    fer_11 = models.FloatField(blank=True, null=True)
+    fer_12 = models.FloatField(blank=True, null=True)
+    fer_13 = models.FloatField(blank=True, null=True)
+    fer_14 = models.FloatField(blank=True, null=True)
+    fer_15 = models.FloatField(blank=True, null=True)
+    fer_16 = models.FloatField(blank=True, null=True)
+    fer_17 = models.FloatField(blank=True, null=True)
+    fer_18 = models.FloatField(blank=True, null=True)
+    fer_19 = models.FloatField(blank=True, null=True)
+    fer_20 = models.FloatField(blank=True, null=True)
+    fer_21 = models.FloatField(blank=True, null=True)
+    fer_22 = models.FloatField(blank=True, null=True)
+    fer_23 = models.FloatField(blank=True, null=True)
+    fer_24 = models.FloatField(blank=True, null=True)
+    fer_25 = models.FloatField(blank=True, null=True)
+    fer_26 = models.FloatField(blank=True, null=True)
+    fer_27 = models.FloatField(blank=True, null=True)
+    fer_28 = models.FloatField(blank=True, null=True)
+    fer_29 = models.FloatField(blank=True, null=True)
+    fer_30 = models.FloatField(blank=True, null=True)
+    fer_31 = models.FloatField(blank=True, null=True)
+    mal_01 = models.FloatField(blank=True, null=True)
+    mal_02 = models.FloatField(blank=True, null=True)
+    mal_03 = models.FloatField(blank=True, null=True)
+    mal_04 = models.FloatField(blank=True, null=True)
+    mal_05 = models.FloatField(blank=True, null=True)
+    mal_06 = models.FloatField(blank=True, null=True)
+    mal_07 = models.FloatField(blank=True, null=True)
+    mal_08 = models.FloatField(blank=True, null=True)
+    mal_09 = models.FloatField(blank=True, null=True)
+    mal_10 = models.FloatField(blank=True, null=True)
+    mal_11 = models.FloatField(blank=True, null=True)
+    mal_12 = models.FloatField(blank=True, null=True)
+    mal_13 = models.FloatField(blank=True, null=True)
+    mal_14 = models.FloatField(blank=True, null=True)
+    mal_15 = models.FloatField(blank=True, null=True)
+    mal_16 = models.FloatField(blank=True, null=True)
+    mal_17 = models.FloatField(blank=True, null=True)
+    mal_18 = models.FloatField(blank=True, null=True)
+    mal_19 = models.FloatField(blank=True, null=True)
+    mal_20 = models.FloatField(blank=True, null=True)
+    mal_21 = models.FloatField(blank=True, null=True)
+    mal_22 = models.FloatField(blank=True, null=True)
+    mal_23 = models.FloatField(blank=True, null=True)
+    mal_24 = models.FloatField(blank=True, null=True)
+    mal_25 = models.FloatField(blank=True, null=True)
+    mal_26 = models.FloatField(blank=True, null=True)
+    mal_27 = models.FloatField(blank=True, null=True)
+    mal_28 = models.FloatField(blank=True, null=True)
+    mal_29 = models.FloatField(blank=True, null=True)
+    mal_30 = models.FloatField(blank=True, null=True)
+    mal_31 = models.FloatField(blank=True, null=True)
+    perm_01 = models.FloatField(blank=True, null=True)
+    perm_02 = models.FloatField(blank=True, null=True)
+    perm_03 = models.FloatField(blank=True, null=True)
+    perm_04 = models.FloatField(blank=True, null=True)
+    perm_05 = models.FloatField(blank=True, null=True)
+    perm_06 = models.FloatField(blank=True, null=True)
+    perm_07 = models.FloatField(blank=True, null=True)
+    perm_08 = models.FloatField(blank=True, null=True)
+    perm_09 = models.FloatField(blank=True, null=True)
+    perm_10 = models.FloatField(blank=True, null=True)
+    perm_11 = models.FloatField(blank=True, null=True)
+    perm_12 = models.FloatField(blank=True, null=True)
+    perm_13 = models.FloatField(blank=True, null=True)
+    perm_14 = models.FloatField(blank=True, null=True)
+    perm_15 = models.FloatField(blank=True, null=True)
+    perm_16 = models.FloatField(blank=True, null=True)
+    perm_17 = models.FloatField(blank=True, null=True)
+    perm_18 = models.FloatField(blank=True, null=True)
+    perm_19 = models.FloatField(blank=True, null=True)
+    perm_20 = models.FloatField(blank=True, null=True)
+    perm_21 = models.FloatField(blank=True, null=True)
+    perm_22 = models.FloatField(blank=True, null=True)
+    perm_23 = models.FloatField(blank=True, null=True)
+    perm_24 = models.FloatField(blank=True, null=True)
+    perm_25 = models.FloatField(blank=True, null=True)
+    perm_26 = models.FloatField(blank=True, null=True)
+    perm_27 = models.FloatField(blank=True, null=True)
+    perm_28 = models.FloatField(blank=True, null=True)
+    perm_29 = models.FloatField(blank=True, null=True)
+    perm_30 = models.FloatField(blank=True, null=True)
+    perm_31 = models.FloatField(blank=True, null=True)
+    stra_01 = models.FloatField(blank=True, null=True)
+    stra_02 = models.FloatField(blank=True, null=True)
+    stra_03 = models.FloatField(blank=True, null=True)
+    stra_04 = models.FloatField(blank=True, null=True)
+    stra_05 = models.FloatField(blank=True, null=True)
+    stra_06 = models.FloatField(blank=True, null=True)
+    stra_07 = models.FloatField(blank=True, null=True)
+    stra_08 = models.FloatField(blank=True, null=True)
+    stra_09 = models.FloatField(blank=True, null=True)
+    stra_10 = models.FloatField(blank=True, null=True)
+    stra_11 = models.FloatField(blank=True, null=True)
+    stra_12 = models.FloatField(blank=True, null=True)
+    stra_13 = models.FloatField(blank=True, null=True)
+    stra_14 = models.FloatField(blank=True, null=True)
+    stra_15 = models.FloatField(blank=True, null=True)
+    stra_16 = models.FloatField(blank=True, null=True)
+    stra_17 = models.FloatField(blank=True, null=True)
+    stra_30 = models.FloatField(blank=True, null=True)
+    stra_29 = models.FloatField(blank=True, null=True)
+    stra_18 = models.FloatField(blank=True, null=True)
+    stra_19 = models.FloatField(blank=True, null=True)
+    stra_20 = models.FloatField(blank=True, null=True)
+    stra_21 = models.FloatField(blank=True, null=True)
+    stra_22 = models.FloatField(blank=True, null=True)
+    stra_23 = models.FloatField(blank=True, null=True)
+    stra_24 = models.FloatField(blank=True, null=True)
+    stra_25 = models.FloatField(blank=True, null=True)
+    stra_26 = models.FloatField(blank=True, null=True)
+    stra_27 = models.FloatField(blank=True, null=True)
+    stra_28 = models.FloatField(blank=True, null=True)
+    stra_31 = models.FloatField(blank=True, null=True)
+    strafes_01 = models.FloatField(blank=True, null=True)
+    strafes_02 = models.FloatField(blank=True, null=True)
+    strafes_03 = models.FloatField(blank=True, null=True)
+    strafes_04 = models.FloatField(blank=True, null=True)
+    strafes_05 = models.FloatField(blank=True, null=True)
+    strafes_06 = models.FloatField(blank=True, null=True)
+    strafes_07 = models.FloatField(blank=True, null=True)
+    strafes_08 = models.FloatField(blank=True, null=True)
+    strafes_09 = models.FloatField(blank=True, null=True)
+    strafes_10 = models.FloatField(blank=True, null=True)
+    strafes_11 = models.FloatField(blank=True, null=True)
+    strafes_12 = models.FloatField(blank=True, null=True)
+    strafes_13 = models.FloatField(blank=True, null=True)
+    strafes_14 = models.FloatField(blank=True, null=True)
+    strafes_15 = models.FloatField(blank=True, null=True)
+    strafes_16 = models.FloatField(blank=True, null=True)
+    strafes_17 = models.FloatField(blank=True, null=True)
+    strafes_18 = models.FloatField(blank=True, null=True)
+    strafes_19 = models.FloatField(blank=True, null=True)
+    strafes_20 = models.FloatField(blank=True, null=True)
+    strafes_21 = models.FloatField(blank=True, null=True)
+    strafes_22 = models.FloatField(blank=True, null=True)
+    strafes_23 = models.FloatField(blank=True, null=True)
+    strafes_24 = models.FloatField(blank=True, null=True)
+    strafes_25 = models.FloatField(blank=True, null=True)
+    strafes_26 = models.FloatField(blank=True, null=True)
+    strafes_27 = models.FloatField(blank=True, null=True)
+    strafes_28 = models.FloatField(blank=True, null=True)
+    strafes_29 = models.FloatField(blank=True, null=True)
+    strafes_30 = models.FloatField(blank=True, null=True)
+    strafes_31 = models.FloatField(blank=True, null=True)
+    tras_01 = models.CharField(max_length=3, blank=True, null=True)
+    tras_02 = models.CharField(max_length=3, blank=True, null=True)
+    tras_03 = models.CharField(max_length=3, blank=True, null=True)
+    tras_04 = models.CharField(max_length=3, blank=True, null=True)
+    tras_05 = models.CharField(max_length=3, blank=True, null=True)
+    tras_06 = models.CharField(max_length=3, blank=True, null=True)
+    tras_07 = models.CharField(max_length=3, blank=True, null=True)
+    tras_08 = models.CharField(max_length=3, blank=True, null=True)
+    tras_09 = models.CharField(max_length=3, blank=True, null=True)
+    tras_10 = models.CharField(max_length=3, blank=True, null=True)
+    tras_11 = models.CharField(max_length=3, blank=True, null=True)
+    tras_12 = models.CharField(max_length=3, blank=True, null=True)
+    tras_13 = models.CharField(max_length=3, blank=True, null=True)
+    tras_14 = models.CharField(max_length=3, blank=True, null=True)
+    tras_15 = models.CharField(max_length=3, blank=True, null=True)
+    tras_16 = models.CharField(max_length=3, blank=True, null=True)
+    tras_17 = models.CharField(max_length=3, blank=True, null=True)
+    tras_18 = models.CharField(max_length=3, blank=True, null=True)
+    tras_19 = models.CharField(max_length=3, blank=True, null=True)
+    tras_20 = models.CharField(max_length=3, blank=True, null=True)
+    tras_21 = models.CharField(max_length=3, blank=True, null=True)
+    tras_22 = models.CharField(max_length=3, blank=True, null=True)
+    tras_23 = models.CharField(max_length=3, blank=True, null=True)
+    tras_24 = models.CharField(max_length=3, blank=True, null=True)
+    tras_25 = models.CharField(max_length=3, blank=True, null=True)
+    tras_26 = models.CharField(max_length=3, blank=True, null=True)
+    tras_27 = models.CharField(max_length=3, blank=True, null=True)
+    tras_28 = models.CharField(max_length=3, blank=True, null=True)
+    tras_29 = models.CharField(max_length=3, blank=True, null=True)
+    tras_30 = models.CharField(max_length=3, blank=True, null=True)
+    tras_31 = models.CharField(max_length=3, blank=True, null=True)
+    rimborsi = models.CharField(max_length=255, blank=True, null=True)
+    inc_forf = models.CharField(max_length=255, blank=True, null=True)
+    bonuses = models.CharField(max_length=255, blank=True, null=True)
+    documenti = models.TextField(blank=True, null=True)
+    id_ultima_modifica = models.IntegerField(blank=True, null=True)
+    timestamp_modifica = models.DateTimeField(blank=True, null=True)
+    id_creazione = models.IntegerField(blank=True, null=True)
+    timestamp_creazione = models.DateTimeField(auto_now_add=True,blank=True, null=True)
+    notes = models.CharField(max_length=1000, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'Cedolini'
+    
+    def save(self, *args, **kwargs):
+        timestamp = timezone.now()
+        self.timestamp_modifica = timestamp
+        super(Cedolini, self).save(*args, **kwargs)
+
 class Contratti(models.Model):
     id_contratto = models.AutoField(db_column='ID_Contratto', primary_key=True)  # Field name made lowercase.
     id_dip = models.ForeignKey(AnaDipendenti, models.DO_NOTHING, db_column='ID_Dip', blank=True, null=True)  # Field name made lowercase.
-    id_societa = models.IntegerField(db_column='ID_Societa', blank=True, null=True)  # Field name made lowercase.
-    codicecontratto = models.CharField(db_column='CodiceContratto', max_length=2, blank=True, null=True)  # Field name made lowercase.
-    tipologia = models.CharField(db_column='Tipologia', max_length=23, blank=True, null=True)  # Field name made lowercase.
-    parziale = models.CharField(db_column='Parziale', max_length=5, blank=True, null=True)  # Field name made lowercase.
-    orecontrattuali = models.CharField(db_column='OreContrattuali', max_length=3, blank=True, null=True)  # Field name made lowercase.
+    id_societa = models.ForeignKey('ListaSocieta', models.DO_NOTHING, db_column='ID_Societa', blank=True, null=True)  # Field name made lowercase.
+    tipologia = models.ForeignKey('TipoContratto', models.DO_NOTHING, db_column='Tipologia', blank=True, null=True)  # Field name made lowercase.
+    ccnl = models.ForeignKey('TabellaCcnl', models.DO_NOTHING, db_column='ccnl', blank=True, null=True)
+    codicecontratto = models.CharField(db_column='CodiceContratto', max_length=50, blank=True, null=True)  # Field name made lowercase.
+    percentuale = models.ForeignKey('PercentualiContratto', models.DO_NOTHING, db_column='Percentuale', blank=True, null=True)  # Field name made lowercase.
+    trasferte_fisse = models.IntegerField(blank=True, null=True)
+    trasferte_fisse_tipo = models.CharField(max_length=2, blank=True, null=True)
     datainizio = models.DateField(db_column='DataInizio', blank=True, null=True)  # Field name made lowercase.
     datafine = models.DateField(db_column='DataFine', blank=True, null=True)  # Field name made lowercase.
     note = models.TextField(db_column='Note', blank=True, null=True)  # Field name made lowercase.
-    id_permesso = models.IntegerField(db_column='ID_Permesso', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         managed = False
         db_table = 'Contratti'
+        ordering = ["codicecontratto"]
 
 
 class Dirigenti(models.Model):
@@ -184,9 +504,10 @@ class Permessi(models.Model):
         managed = False
         db_table = 'Permessi'
 
+
 class PercentualiContratto(models.Model):
     id_ore_contratto = models.AutoField(primary_key=True)
-    dicitura_percentuale = models.CharField(max_length=50, blank=True, null=True)
+    dicitura_percentuale = models.CharField(max_length=50)
     perc_contratto = models.DecimalField(max_digits=20, decimal_places=2)
     ore_contratto = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
     note = models.TextField(db_column='Note', blank=True, null=True)  # Field name made lowercase.
@@ -194,6 +515,21 @@ class PercentualiContratto(models.Model):
     class Meta:
         managed = False
         db_table = 'Percentuali_contratto'
+        ordering = ["perc_contratto"]
+
+    def __str__(self):
+        perc = f'{self.perc_contratto}%'
+        if '.00' in perc:
+            entuale = perc.split(".")
+            return f'{entuale[0]}%'
+        else: return perc
+
+    def save(self, *args, **kwargs):
+        if self.perc_contratto:
+            perce = round(self.perc_contratto,2)
+            ore = math.trunc((perce * 160)/100)
+            self.ore_contratto = Decimal(ore)
+        super(PercentualiContratto, self).save(*args, **kwargs)
 
 class Responsabili(models.Model):
     id_res = models.AutoField(primary_key=True)
@@ -303,10 +639,21 @@ class Societa(models.Model):
         return self.nome_societa
 
 
+class TabellaCcnl(models.Model):
+    id_ccnl = models.AutoField(primary_key=True)
+    tipo_contratto = models.CharField(max_length=250, blank=True, null=True)
+    codice_ccnl = models.CharField(max_length=10, blank=True, null=True)
+    note = models.CharField(max_length=50, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'tabella_ccnl'
+
+
 class TipoContratto(models.Model):
     id_contratto = models.AutoField(primary_key=True)
     nome_contratto = models.CharField(unique=True, max_length=100, blank=True, null=True)
-    codice_contratto = models.CharField(max_length=2, blank=True, null=True)
+    codice_contratto = models.CharField(max_length=10, blank=True, null=True)
     data_creazione = models.DateTimeField(blank=True, null=True)
     data_modifica = models.DateTimeField(blank=True, null=True)
     note = models.TextField(db_column='Note', blank=True, null=True)  # Field name made lowercase.
@@ -314,6 +661,7 @@ class TipoContratto(models.Model):
     class Meta:
         managed = False
         db_table = 'Tipo_Contratto'
+        ordering = ["nome_contratto"]
         
     def __str__(self):
         return self.nome_contratto

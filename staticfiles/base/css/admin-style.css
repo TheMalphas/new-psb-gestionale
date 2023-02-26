@@ -85,6 +85,10 @@ a:hover, a:active {
     color: #ff8000;
 }
 
+.cartaBox-table-reception-datatables-big .carta-table-reception-datatables-big .numbers  {
+    color: #ff8000;
+}
+
 .cartaBox-table-reception-capi-area  .carta:hover:not(#child){
     background-color: #ff8000 !important;
     color: #ffffff !important;
@@ -95,10 +99,10 @@ a:hover, a:active {
     background-color: #ff8000 !important;
 }
 
-.table-hover tbody tr:hover td, .table-hover tbody tr:hover th:hover, .nav-link:hover .link-dark:hover{
+/* .table-hover tbody tr:hover td, .table-hover tbody tr:hover th:hover, .nav-link:hover .link-dark:hover{
     color: #ffffff !important;
     background-color: #ff8000 !important;
-}
+} */
 
 .dropdown-item:hover{
     color: #ffffff !important;

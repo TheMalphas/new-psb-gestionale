@@ -7,10 +7,11 @@
 <title>{% block title%}Dipendenti{% endblock %}</title>
 <link rel="stylesheet" href="{% static 'gestione/css/style.css' %}">
 <script src="{% static 'gestione/js/script.js' %}"></script>
+<script src="{% static 'gestione/js/datatables_dipendenti.js' %}"></script>
 
 
-<section style="box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); margin-left:268px;">
-  <header class="p-3 bg-light text-black">
+<section id="styler-navbar" style="box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); margin-left:210px;">
+    <header class="p-3 bg-light text-black">
       <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
       <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
           <li class="nav-link px-2 text-dark"></li>
@@ -26,7 +27,7 @@
       <div class="carta-table-reception-datatables-big">
           <div>
               <div class="numbers"></div>
-              <table class="table table-striped table-hover caption-top" id="dipendenti-datas">
+              <table class="table table-striped table-hover caption-top table-bordered display" style="width:100%; table-layout: fixed; word-wrap:break-word;"  id="dipendenti-datas">
                   <caption>Dipendenti</caption>
                   <thead id="dipendenti-datas-head">
                   </thead>

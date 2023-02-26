@@ -41,10 +41,10 @@ body {
     text-decoration: none;
   }
 }
-  #sidebar {
+  /* #sidebar {
     width: 300px;
     position:fixed;
-  }
+  } */
 }
 
 .container-liste  {
@@ -70,13 +70,12 @@ body {
 }
 
 #sidebar {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 9999;
+  width:280px;
+  position:fixed;
+  text-align: center;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
 }
+
 .b-example-divider {
   height: 3rem;
   background-color: rgba(0, 0, 0, 0.1);
@@ -426,17 +425,7 @@ body {
   grid-template-columns: repeat(3,1fr);
   grid-gap: 40px;
 }
-.cartaBox-table-reception-datatables  .carta-table-reception-datatables {
-  position:relative;
-  background: var(--white);
-  padding: 30px;
-  border-radius: 20px;
-  display: flex;
-  flex:1;
-  justify-content: space-evenly;
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-  overflow: auto;
-}
+
 .cartaBox-table-reception-datatables  .carta-table-reception-datatables .numbers {
   position: relative;
   font-weight: 500;
@@ -462,6 +451,9 @@ body {
 }
 .cartaBox-table-reception-datatables  .carta-table-reception-datatables::-webkit-scrollbar {
   display: none;
+}
+.cartaBox-table-reception-datatables  .carta-table-reception-datatables .table td, .table th {
+  word-wrap: break-word;
 }
 
 
@@ -548,7 +540,7 @@ body {
   border-radius: 20px;
   display: flex;
   flex:1;
-  justify-content: space-evenly;
+  /* justify-content: space-evenly; */
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
   overflow: auto;
   font-size: 0.7em;
@@ -565,12 +557,11 @@ body {
   background: var(--white);
   padding: 30px;
   border-radius: 20px;
-  display: flex;
-  justify-content: space-evenly;
+  /* display: flex;
+  justify-content: space-evenly; */
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
   overflow: auto;
   max-height: 83vh;
-
 }
 .cartaBox-table-reception-datatables-big  .carta-table-reception-datatables-big {
   -ms-overflow-style: none;  /* IE and Edge */
@@ -655,7 +646,15 @@ body {
   text-overflow: ellipsis;
 }
 
-/* .cartaBox .carta:hover:not(.no-hover){
+.hidden {
+  display: none;
+}
+
+.fifty-px {
+  width: 80px;
+}
+/*
+.cartaBox .carta:hover:not(.no-hover){
   background-color: #0070dd;
   color: #ffffff;
   box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
@@ -664,7 +663,8 @@ body {
 .cartaBox .carta .no-hover{
   background-color: inherit;
   color: inherit;
-} */
+}
+*/
 
 .cartaBox .carta:hover .numbers ,
 .cartaBox .carta:hover .cartaName ,
@@ -690,6 +690,16 @@ body {
 {
   padding: 2px 4px;
   background: #8de02c;
+  color: #ffffff;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.stato.contrattostandard
+{
+  padding: 2px 4px;
+  background: #14A44D;
   color: #ffffff;
   border-radius: 10px;
   font-size: 14px;
@@ -736,10 +746,30 @@ body {
   font-weight: 500;
 }
 
+.stato.tirocinante
+{
+  padding: 2px 4px;
+  background: #ffc300;
+  color: #ffffff;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
 .stato.maternita
 {
   padding: 2px 4px;
   background: #f400a1;
+  color: #ffffff;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.stato.occasionale
+{
+  padding: 2px 4px;
+  background: #ffb6c1;
   color: #ffffff;
   border-radius: 10px;
   font-size: 14px;
@@ -788,4 +818,12 @@ body {
 a, a:hover, a:visited, a:active {
   color: inherit;
   text-decoration: none;
+}
+
+.dipendenti-datas_filter input {
+  width: 100%;
+}
+
+.reception-datas_filter input {
+  width: 100%;
 }

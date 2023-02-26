@@ -8,4 +8,3 @@ window.addEventListener("resize", function() {
       cartaBox.style.flexWrap = "";
     }
 });
-  

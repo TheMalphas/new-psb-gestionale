@@ -11,6 +11,7 @@ from django.db import models
 class AddIncForf(models.Model):
     id_inc_forf = models.BigAutoField(primary_key=True)
     id_ced = models.ForeignKey('Cedolini', models.DO_NOTHING, db_column='id_ced', blank=True, null=True)
+    id_dip = models.ForeignKey('AnaDipendenti', models.DO_NOTHING, db_column='id_dip', blank=True, null=True)
     inc_forf = models.FloatField(db_column='Inc_Forf', blank=True, null=True)  # Field name made lowercase.
     timestamp_creazione = models.DateTimeField(blank=True, null=True)
 
@@ -22,23 +23,45 @@ class AddIncForf(models.Model):
 class AddRimborsi(models.Model):
     id_rimborsi = models.BigAutoField(primary_key=True)
     id_ced = models.ForeignKey('Cedolini', models.DO_NOTHING, db_column='id_ced', blank=True, null=True)
-    rel_giorno = models.IntegerField(blank=True, null=True)
+    id_dip = models.ForeignKey('AnaDipendenti', models.DO_NOTHING, db_column='id_dip', blank=True, null=True)
+    rel_giorno = models.DateField(blank=True, null=True)
+    stato = models.IntegerField(blank=True, null=True)
     ore = models.FloatField(blank=True, null=True)
     valore = models.FloatField(blank=True, null=True)
-    timestamp_creazione = models.DateTimeField(blank=True, null=True)
+    timestamp_creazione = models.DateTimeField(auto_now_add=True,blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'Add_Rimborsi'
 
 
-class AddTrasferte(models.Model):
-    id_trasferte = models.BigAutoField(primary_key=True)
+class AddStraordinari(models.Model):
+    id_straordinari = models.BigAutoField(primary_key=True)
+    id_dip = models.ForeignKey('AnaDipendenti', models.DO_NOTHING, db_column='id_dip', blank=True, null=True)
     id_ced = models.ForeignKey('Cedolini', models.DO_NOTHING, db_column='id_ced', blank=True, null=True)
-    rel_giorno = models.IntegerField(blank=True, null=True)
+    rel_giorno = models.DateField(blank=True, null=True)
+    rel_time = models.TimeField(blank=True, null=True)
+    stato = models.IntegerField(blank=True, null=True)
     ore = models.FloatField(blank=True, null=True)
     valore = models.FloatField(blank=True, null=True)
-    timestamp_creazione = models.DateTimeField(blank=True, null=True)
+    note = models.TextField(blank=True, null=True)
+    timestamp_creazione = models.DateTimeField(auto_now_add=True,blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'Add_Straordinari'
+
+
+class AddTrasferte(models.Model):
+    id_trasferte = models.BigAutoField(primary_key=True)
+    id_dip = models.ForeignKey('AnaDipendenti', models.DO_NOTHING, db_column='id_dip', blank=True, null=True)
+    id_ced = models.ForeignKey('Cedolini', models.DO_NOTHING, db_column='id_ced', blank=True, null=True)
+    rel_giorno = models.DateField(blank=True, null=True)
+    stato = models.IntegerField(blank=True, null=True)
+    ore = models.FloatField(blank=True, null=True)
+    valore = models.FloatField(blank=True, null=True)
+    note = models.TextField(blank=True, null=True)
+    timestamp_creazione = models.DateTimeField(auto_now_add=True,blank=True, null=True)
 
     class Meta:
         managed = False
@@ -388,8 +411,11 @@ class Contratti(models.Model):
     id_dip = models.ForeignKey(AnaDipendenti, models.DO_NOTHING, db_column='ID_Dip', blank=True, null=True)  # Field name made lowercase.
     id_societa = models.ForeignKey('ListaSocieta', models.DO_NOTHING, db_column='ID_Societa', blank=True, null=True)  # Field name made lowercase.
     tipologia = models.ForeignKey('TipoContratto', models.DO_NOTHING, db_column='Tipologia', blank=True, null=True)  # Field name made lowercase.
+    ccnl = models.ForeignKey('TabellaCcnl', models.DO_NOTHING, db_column='ccnl', blank=True, null=True)
     codicecontratto = models.CharField(db_column='CodiceContratto', max_length=50, blank=True, null=True)  # Field name made lowercase.
     percentuale = models.ForeignKey('PercentualiContratto', models.DO_NOTHING, db_column='Percentuale', blank=True, null=True)  # Field name made lowercase.
+    trasferte_fisse = models.IntegerField(blank=True, null=True)
+    trasferte_fisse_tipo = models.CharField(max_length=2, blank=True, null=True)
     datainizio = models.DateField(db_column='DataInizio', blank=True, null=True)  # Field name made lowercase.
     datafine = models.DateField(db_column='DataFine', blank=True, null=True)  # Field name made lowercase.
     note = models.TextField(db_column='Note', blank=True, null=True)  # Field name made lowercase.
@@ -460,6 +486,23 @@ class Ingressidip(models.Model):
     class Meta:
         managed = False
         db_table = 'IngressiDip'
+
+
+class IngressidipM(models.Model):
+    id_ingresso = models.BigAutoField(primary_key=True)
+    id_dip_ing = models.IntegerField(blank=True, null=True)
+    id_permesso = models.IntegerField(blank=True, null=True)
+    tipo_permesso = models.IntegerField(blank=True, null=True)
+    in_permesso = models.IntegerField(blank=True, null=True)
+    nominativo = models.CharField(max_length=150, blank=True, null=True)
+    registrato_da_user = models.IntegerField(blank=True, null=True)
+    giorno = models.DateField(blank=True, null=True)
+    tempo = models.TimeField(blank=True, null=True)
+    timestamp_scan = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'IngressiDip_m'
 
 
 class Istruzione(models.Model):
@@ -674,7 +717,7 @@ class Stipendi(models.Model):
 class TipoContratto(models.Model):
     id_contratto = models.AutoField(primary_key=True)
     nome_contratto = models.CharField(unique=True, max_length=100, blank=True, null=True)
-    codice_contratto = models.CharField(max_length=2, blank=True, null=True)
+    codice_contratto = models.CharField(max_length=10, blank=True, null=True)
     data_creazione = models.DateTimeField(blank=True, null=True)
     data_modifica = models.DateTimeField(blank=True, null=True)
     note = models.TextField(db_column='Note', blank=True, null=True)  # Field name made lowercase.
@@ -699,13 +742,12 @@ class AnadipControl(models.Model):
 
 
 class AppoggioVerificaQr(models.Model):
-    uuid_qr = models.CharField(primary_key=True, max_length=50)
-    id_dipendente = models.ForeignKey(AnaDipendenti, models.DO_NOTHING, db_column='id_dipendente')
+    uuid_qr = models.CharField(max_length=50)
+    id_dipendente = models.OneToOneField(AnaDipendenti, models.DO_NOTHING, db_column='id_dipendente')
 
     class Meta:
         managed = False
         db_table = 'appoggio_verifica_qr'
-        unique_together = (('uuid_qr', 'id_dipendente'),)
 
 
 class AuthGroup(models.Model):
@@ -820,3 +862,29 @@ class DjangoSession(models.Model):
     class Meta:
         managed = False
         db_table = 'django_session'
+
+
+class TabellaCcnl(models.Model):
+    id_ccnl = models.AutoField(primary_key=True)
+    tipo_contratto = models.CharField(max_length=250, blank=True, null=True)
+    codice_ccnl = models.CharField(max_length=10, blank=True, null=True)
+    note = models.CharField(max_length=50, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'tabella_ccnl'
+
+
+class TodoList(models.Model):
+    id_lista = models.BigAutoField(primary_key=True)
+    user = models.ForeignKey(AuthUser, models.DO_NOTHING, db_column='user')
+    todo = models.CharField(max_length=50, blank=True, null=True)
+    priority = models.IntegerField(blank=True, null=True)
+    fatta = models.IntegerField(blank=True, null=True)
+    setter = models.ForeignKey(CapoArea, models.DO_NOTHING, db_column='setter', blank=True, null=True)
+    gruppo = models.IntegerField(blank=True, null=True)
+    data = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'todo_list'

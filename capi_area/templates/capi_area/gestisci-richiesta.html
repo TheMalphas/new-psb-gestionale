@@ -2,7 +2,7 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h2 class="modal-title">Modifica</h2>
+        <h2 class="modal-title">Modifica richiesta di {{richiesta.id_dipendente_richiesta.nominativo}}</h2>
         <button type="submit" class="btn btn-danger" data-bs-dismiss="modal" aria-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -31,6 +31,7 @@
         <hr>
 
         <!-- ====  Note ==== -->
+        {% if richiesta.note_richiesta %}
         <div class="justify-content-between">
             <div class="container ">
                 <h3 class="display">Note</h3>
@@ -40,7 +41,7 @@
         <!-- ==== Fine Note ==== -->
 
         <hr>
-
+        {% endif %}
         <!-- ==== Stato ==== -->
         <div class="d-flex justify-content-between align-items-center">
             <div class="container">
@@ -75,7 +76,6 @@
                 </div>
             </div>
         </div>
-      </form>
     </div>
 </div>
 

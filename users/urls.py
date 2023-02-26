@@ -1,11 +1,18 @@
-from django.urls import path,include,reverse_lazy
+from django.urls import path, include, reverse_lazy
 from .import views 
 from reception.documents import generaReportExcel
 
 
 app_name = "users"
-
+ 
 urlpatterns= [
+    #HTMX
+    path('partials/todolist',views.todoUtenteList,name='todolist'),
+    path('users/todo_utente',views.todoUtenteList,name="todo_utente"),
+    path('users/add_todo',views.add_todo,name="add_todo"),
+    path('users/delete_todo/<int:pk>',views.delete_todo,name="delete_todo"),
+    path('users/todo_utente/<int:pk>',views.UpdateTodo.as_view(),name="update_todo"),
+    
     path('dashboard/', views.UsersView.as_view(), name="dashboard"),
     path('cambia_password/', views.CustomChangePassword.as_view(
         template_name="users/cambia_password.html",
@@ -13,6 +20,8 @@ urlpatterns= [
     path('password_cambiata/',views.CustomChangePasswordDone.as_view(), name="password_cambiata"),
     path('richiesta-permesso/',views.SceltaPermessi.as_view(), name='richiesta-permesso'),
     
+    path('dashboard/richiedi-straordinario/',views.AddStraordinariUtente.as_view(), name='richiedi-straordinario'),
+    path('dashboard/richiedi-trasferta/',views.AddTrasferteUtente.as_view(), name='richiedi-trasferta'),
     path('dashboard/richiedi-permesso-giorni/',views.RichiesteCreate.as_view(), name='richiedi-permesso-giorni'),
     path('dashboard/richiedi-permesso-orario/',views.RichiesteCreateOrario.as_view(), name='richiedi-permesso-orario'),
     
@@ -24,6 +33,7 @@ urlpatterns= [
     
     path('documenti/',views.documentiView, name='documenti'),
     path('scarica_qrcode/',views.printQrUser, name='scarica_qrcode'),
+    
     path('get_qr/',views.get_qr, name='get_qr'),
     path('scarica_report_entrate/', generaReportExcel, name='scarica_report_entrate'),
 

@@ -11,7 +11,7 @@ from django.views import View
 from django.db.models import Q
 from django.views.generic import View,TemplateView
 from django.urls import reverse, reverse_lazy
-from .models import Richieste, AuthUser, AnaDipendenti, AppoggioVerificaQr, BancaOrari, CapoArea, Permessi, RichiesteAccettate, Ingressidip, Ritardi_Anticipi, Area, Societa, Sede
+from .models import Richieste, AuthUser, AnaDipendenti, AppoggioVerificaQr, BancaOrari, CapoArea, Dirigenti, Permessi, RichiesteAccettate, Ingressidip, Ritardi_Anticipi, Area, Societa, Sede
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import Group
 from django.contrib.auth import login
@@ -28,6 +28,7 @@ from django.conf import settings
 from wsgiref.util import FileWrapper
 from docxtpl import DocxTemplate
 import holidays
+import calendar
 from workalendar.europe import Italy
 from cedolini import settaggio_ore as so
 from io import BytesIO
@@ -39,11 +40,93 @@ import gc
 from django.shortcuts import render, redirect, reverse
 from django.http import HttpResponse, JsonResponse
 from django.core import serializers
+import qrcode
+import cv2
+import textwrap
+from PIL import Image, ImageDraw, ImageFont, PSDraw
+
+#QR
+@login_required
+def printQR(request):
+    try:
+        dips = AnaDipendenti.objects.filter(stato="attivo").order_by("cognome")
+        context = {'dips': dips}
+        
+        if request.method == 'POST':
+            input_data = request.POST['dipendente']
+            uuid = AppoggioVerificaQr.objects.get(id_dipendente=input_data)
+            response = HttpResponse(content_type='image/png')
+            dippo = AnaDipendenti.objects.get(id_dip=input_data)
+            filename = f"QR - {dippo}.png"
+            response['Content-Disposition'] = f'attachment; filename="{filename}"'
+            
+            qr = qrcode.QRCode(
+                version=1,
+                box_size=10,
+                border=8
+            )
+            qr.add_data(uuid.uuid_qr)
+            qr.make(fit=True)
+            img = qr.make_image(fill_color='black', back_color=(255, 255, 255))
+            
+            font_size = 16
+            font = ImageFont.truetype("Roboto-Bold.ttf", size=font_size)
+            
+            text = dippo.nominativo.upper()
+            text_width, text_height = font.getsize(text)
+            border_size = qr.border * qr.box_size
+            center_x = (qr.modules_count * qr.box_size) / 1.25
+            center_y = (qr.modules_count * qr.box_size) / 0.95
+            
+            draw = ImageDraw.Draw(img)
+            draw.text((center_x - text_width / 2, center_y + border_size + 10), text, (0, 0, 0), font=font, align='center')
+            
+            buffer = BytesIO()
+            img.save(buffer, format='PNG')
+            response.write(buffer.getvalue())
+            
+            return response
+        
+        return render(request, 'reception/makeqr-uuid.html', context=context)
+    except:
+        return redirect(request.META.get('HTTP_REFERER', 'redirect_if_referer_not_found'))
+
+    
+@login_required
+def printQRStandard(request):
+    dips=AnaDipendenti.objects.filter(stato="attivo").order_by("cognome")
+    context={'dips':dips}
+    
+    if request.method == 'POST':
+        input_data = request.POST['dipendente']
+        uuid = AppoggioVerificaQr.objects.get(id_dipendente=input_data)
+        response = HttpResponse(content_type='image/png')
+        dippo = AnaDipendenti.objects.get(id_dip=input_data)
+        fl = f'{dippo}'
+        response['Content-Disposition'] = f'attachment; filename= "QR - {fl}".png'
+        qr = qrcode.QRCode(
+            version=1,
+            box_size=10,
+            border=8
+        )
+        qr.add_data(uuid.id_dipendente.id_dip)
+        qr.make(fit=True)
+        img = qr.make_image(fill='black', back_color='white')
+        img.save(response)
+        return response
+    
+    return render(request,'reception/makeqr-standard.html',context=context)
+
 
 
 def getDashboardCompletaPresenze(request):
     today = datetime.now().date()
     template_name = "reception/datatables.html"
+    return render(request,template_name,{'data':today})
+
+def getDashboardCompletaPresenzeMese(request):
+    today = datetime.now().date()
+    template_name = "reception/datatables_mese.html"
     return render(request,template_name,{'data':today})
 
 
@@ -52,9 +135,11 @@ class DashboardPresenzeView(LoginRequiredMixin,PermissionRequiredMixin,View):
     template_name = "reception/dashboard_presenze.html"
     today = datetime.now().date()
     def get(self,request,*args,**kwargs):
+        dipendenti = AnaDipendenti.objects.filter(stato="Attivo").values_list("id_dip","cognome","nome").order_by("-cognome")
+        context = {"dipendenti":dipendenti}
         
         ingressi = Ingressidip.objects.filter(giorno=self.today).count()
-        context = {"tutti":ingressi}
+        context["tutti"] = ingressi
                 
         dipInPermesso = Ingressidip.objects.filter(giorno=self.today,in_permesso=True) 
         inpermesso = dipInPermesso.count()
@@ -77,7 +162,7 @@ class DashboardPresenzeView(LoginRequiredMixin,PermissionRequiredMixin,View):
         attiviAriano = dipAttivi.filter(id_dip_ing__sede__id_sede=1).count()
         context["attiviAriano"] = attiviAriano
         
-        nonBadgiatoAriano = dipAttivi.filter(id_dip_ing__sede__id_sede=1,in_permesso=False).exclude(tipo="Assente").count()
+        nonBadgiatoAriano = dipAttivi.filter(id_dip_ing__sede__id_sede=1,timestamp_scan_entrata__isnull=True,in_permesso=False).exclude(tipo="Assente").count()
         context["nonBadgiatoAriano"] = nonBadgiatoAriano
         
         inPermessoAriano = dipInPermesso.filter(id_dip_ing__sede__id_sede=1,in_permesso=True).count()
@@ -92,7 +177,7 @@ class DashboardPresenzeView(LoginRequiredMixin,PermissionRequiredMixin,View):
         attiviBagnoli = dipAttivi.filter(id_dip_ing__sede__id_sede=8).count()
         context["attiviBagnoli"] = attiviBagnoli
         
-        nonBadgiatoBagnoli = dipAttivi.filter(id_dip_ing__sede__id_sede=8,in_permesso=False).exclude(tipo="Assente").count()
+        nonBadgiatoBagnoli = dipAttivi.filter(id_dip_ing__sede__id_sede=8,timestamp_scan_entrata__isnull=True,in_permesso=False).exclude(tipo="Assente").count()
         context["nonBadgiatoBagnoli"] = nonBadgiatoBagnoli
         
         inPermessoBagnoli = dipInPermesso.filter(id_dip_ing__sede__id_sede=8,in_permesso=True).count()
@@ -107,7 +192,7 @@ class DashboardPresenzeView(LoginRequiredMixin,PermissionRequiredMixin,View):
         attiviMedina = dipAttivi.filter(id_dip_ing__sede__id_sede=9).count()
         context["attiviMedina"] = attiviMedina
         
-        nonBadgiatoMedina = dipAttivi.filter(id_dip_ing__sede__id_sede=9,in_permesso=False).exclude(tipo="Assente").count()
+        nonBadgiatoMedina = dipAttivi.filter(id_dip_ing__sede__id_sede=9,timestamp_scan_entrata__isnull=True,in_permesso=False).exclude(tipo="Assente").count()
         context["nonBadgiatoMedina"] = nonBadgiatoMedina
 
         inPermessoMedina = dipInPermesso.filter(id_dip_ing__sede__id_sede=9,in_permesso=True).count()
@@ -122,7 +207,7 @@ class DashboardPresenzeView(LoginRequiredMixin,PermissionRequiredMixin,View):
         attiviNato = dipAttivi.filter(id_dip_ing__sede__id_sede=10).count()
         context["attiviNato"] = attiviNato
         
-        nonBadgiatoNato = dipAttivi.filter(id_dip_ing__sede__id_sede=10,in_permesso=False).exclude(tipo="Assente").count()
+        nonBadgiatoNato = dipAttivi.filter(id_dip_ing__sede__id_sede=10,timestamp_scan_entrata__isnull=True,in_permesso=False).exclude(tipo="Assente").count()
         context["nonBadgiatoNato"] = nonBadgiatoNato
         
         inPermessoNato = dipInPermesso.filter(id_dip_ing__sede__id_sede=10,in_permesso=True).count()
@@ -137,7 +222,7 @@ class DashboardPresenzeView(LoginRequiredMixin,PermissionRequiredMixin,View):
         attiviCampi = dipAttivi.filter(id_dip_ing__sede__id_sede=13).count()
         context["attiviCampi"] = attiviCampi
         
-        nonBadgiatoCampi = dipAttivi.filter(id_dip_ing__sede__id_sede=13,in_permesso=False).exclude(tipo="Assente").count()
+        nonBadgiatoCampi = dipAttivi.filter(id_dip_ing__sede__id_sede=13,timestamp_scan_entrata__isnull=True,in_permesso=False).exclude(tipo="Assente").count()
         context["nonBadgiatoCampi"] = nonBadgiatoCampi
         
         inPermessoCampi = dipInPermesso.filter(id_dip_ing__sede__id_sede=13,in_permesso=True).count()
@@ -457,31 +542,48 @@ class ListaGiorniPresenzeDip(LoginRequiredMixin,PermissionRequiredMixin,ListView
 
         return context
 
-
-class ListaPresenzeDip(LoginRequiredMixin,PermissionRequiredMixin,ListView):
-    model=AnaDipendenti
-    context_object_name= "dipendenti"
-    permission_required = 'reception.change_ingressidip'
+@login_required
+@permission_required('reception.change_ingressidip')
+def listaPresenzeDip(request):
     template_name = "reception/presenze_per_dip.html"
-    esclusioni = [9,23,24,26]
-    query = ""
+    data = datetime.now().date()
+    dipendenti = AnaDipendenti.objects.filter(stato="Attivo").values_list("id_dip","cognome","nome").order_by("-cognome")
+    context = {"dipendenti":dipendenti}
+    start = datetime(data.year, 1, 1).date() 
+    end = datetime.now().date()
+        
+    if request.method == "POST" and request.POST.get("dipendente") and request.POST.get("start") == "" and request.POST.get("end") == "":
+        query = request.POST.get("dipendente")
+        dip = AnaDipendenti.objects.get(id_dip=query)
+        queryset = Ingressidip.objects.filter(giorno__range=[start, end],id_dip_ing=query).order_by("giorno")
+        return render(request,template_name,{'dipendenti':dipendenti,'queryset':queryset,"dipper":dip.nominativo,"start":start,"end":end})
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        if self.query != "":
-            data=self.query
-            return context
+    elif request.method == "POST" and request.POST.get("dipendente") and request.POST.get("end") != "" and request.POST.get("start") != "":
+        start = request.POST.get("start")
+        end = request.POST.get("end")
+        query = request.POST.get("dipendente")
+        dip = AnaDipendenti.objects.get(id_dip=query)
+        queryset = Ingressidip.objects.filter(giorno__range=[start, end],id_dip_ing=query).order_by("giorno")
+        start = datetime.strptime(f'{start} 00:00:00', '%Y-%m-%d %H:%M:%S').date()
+        end = datetime.strptime(f'{end} 00:00:00', '%Y-%m-%d %H:%M:%S').date()
+        
+        return render(request,template_name,{'dipendenti':dipendenti,'queryset':queryset,"dipper":dip.nominativo,"start":start,"end":end})
+    
+    elif request.method == "POST" and request.POST.get("dipendente") or request.POST.get("end") != "" or request.POST.get("start") != "":
+        start = request.POST.get("start") or start
+        end = request.POST.get("end") or end
+        query = request.POST.get("dipendente") or ""
+        if query == "":
+            return render(request,template_name,{'dipendenti':dipendenti})
         else:
-            data = self.query
-            return context
+            dip = AnaDipendenti.objects.get(id_dip=query)
+            queryset = Ingressidip.objects.filter(giorno__range=[start, end],id_dip_ing=query).order_by("giorno")
+            start = datetime.strptime(f'{start} 00:00:00', '%Y-%m-%d %H:%M:%S').date()
+            end = datetime.strptime(f'{end} 00:00:00', '%Y-%m-%d %H:%M:%S').date()
+        
+        return render(request,template_name,{'dipendenti':dipendenti,'queryset':queryset,"dipper":dip.nominativo,"start":start,"end":end})
 
-    def get_queryset(self):
-        queryset = AnaDipendenti.objects.filter(stato="Attivo").exclude(area__in=self.esclusioni).order_by("cognome")
-        self.query = self.request.GET.get("dip") or ""
-        if self.query:
-            queryset = AnaDipendenti.objects.filter(stato="Attivo").filter(Q(nome__icontains=self.query) | Q(cognome__icontains=self.query)).order_by("cognome")
-            return queryset
-        return queryset
+    return render(request,template_name,{'dipendenti':dipendenti})
 
 class CreaIngresso(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model=Ingressidip
@@ -490,10 +592,17 @@ class CreaIngresso(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     permission_required = 'reception.change_ingressidip'
     template_name = "reception/crea-ingresso.html"
     success_url= reverse_lazy('reception:presenze')
-        
+    
+    def updateCheck(ingresso):
+        return ingresso
+    
     def get_context_data(self, **kwargs):
+        print(kwargs)
         kwargs["CreaIngresso"] = self.get_form()
+        print(kwargs)
         return super().get_context_data(**kwargs)
+
+    
     
 class CreaIngressoDoppio(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
     model=Ingressidip
@@ -592,6 +701,7 @@ def listaPresenze(request):
         totale_permessi = presenze.filter(giorno=date,in_permesso=True).count()
         totale_ferie = presenze.filter(giorno=date,id_permesso=6).count()
         return render(request, template_name, {"presenze":presenze,"totale_entrate":totale_entrate,"totale_uscite":totale_uscite,"totale_assenze":totale_assenze,"totale_permessi":totale_permessi,"totale_ferie":totale_ferie,"data":date})
+    
     elif request.method == "POST" and (request.POST.get("precedente")):
         if request.POST.get("precedente"):
             data_object = request.POST.get("giorno")
@@ -624,6 +734,7 @@ def listaPresenze(request):
         totale_permessi = presenze.filter(giorno=date,in_permesso=True).count()
         totale_ferie = presenze.filter(giorno=date,id_permesso=6).count()
         return render(request, template_name, {"presenze":presenze,"totale_entrate":totale_entrate,"totale_uscite":totale_uscite,"totale_assenze":totale_assenze,"totale_permessi":totale_permessi,"totale_ferie":totale_ferie,"data":date,"dipendente":dipendente})
+    
     elif request.method == "POST" and request.POST.get("successivo"):
         if request.POST.get("giorno"):
             data_object = request.POST.get("giorno")
@@ -641,29 +752,32 @@ def listaPresenze(request):
         return render(request, template_name, {"presenze":presenze,"totale_entrate":totale_entrate,"totale_uscite":totale_uscite,"totale_assenze":totale_assenze,"totale_permessi":totale_permessi,"totale_ferie":totale_ferie,"data":date})
     
     elif request.method == "POST" and request.POST.get("giorno"):
+        if request.POST.get("giorno"):
+            data = request.POST.get("giorno")
+        dipendente = request.POST.get("dipendente")
         data = request.POST.get("giorno") or today
-        presenze = Ingressidip.objects.filter(giorno=today,id_dip_ing__stato='Attivo').exclude(id_dip_ing__area__in=excludeIdList).order_by("nominativo")
-        totale_entrate = presenze.filter(giorno=today,timestamp_scan_entrata__isnull=False).count()
-        totale_uscite = presenze.filter(giorno=today,timestamp_scan_entrata__isnull=False,timestamp_scan_uscita__isnull=False).count()
-        totale_assenze = presenze.filter(giorno=today,timestamp_scan_entrata__isnull=True,in_permesso=False).count()
-        totale_permessi = presenze.filter(giorno=today,in_permesso=True).count()
-        totale_ferie = presenze.filter(giorno=today,id_permesso=6).count()
+        date = datetime.strptime(str(data), "%Y-%m-%d").date()
+        dip = Ingressidip.objects.filter(giorno=date,id_dip_ing__stato='Attivo').filter(Q(nominativo__icontains=dipendente)).exclude(id_dip_ing__area__in=excludeIdList).order_by("nominativo")
+        presenze = Ingressidip.objects.filter(giorno=date,id_dip_ing__stato='Attivo').exclude(id_dip_ing__area__in=excludeIdList).order_by("nominativo")
+        totale_entrate = presenze.filter(giorno=data,timestamp_scan_entrata__isnull=False).count()
+        totale_uscite = presenze.filter(giorno=data,timestamp_scan_entrata__isnull=False,timestamp_scan_uscita__isnull=False).count()
+        totale_assenze = presenze.filter(giorno=data,timestamp_scan_entrata__isnull=True,in_permesso=False).count()
+        totale_permessi = presenze.filter(giorno=data,in_permesso=True).count()
+        totale_ferie = presenze.filter(giorno=data,id_permesso=6).count()
+        return render(request, template_name, {"presenze":dip,"totale_entrate":totale_entrate,"totale_uscite":totale_uscite,"totale_assenze":totale_assenze,"totale_permessi":totale_permessi,"totale_ferie":totale_ferie,"data":date,"dipendente":dipendente})
+
+    elif request.method == "POST" and request.POST.get("dipendente") and request.POST.get("giorno"):
+        dipendente = request.POST.get("dipendente")
+        data = request.POST.get("giorno") or today
+        presenze = Ingressidip.objects.filter(giorno=data,id_dip_ing__stato='Attivo').exclude(id_dip_ing__area__in=excludeIdList).order_by("nominativo")
+        totale_entrate = presenze.filter(giorno=data,timestamp_scan_entrata__isnull=False).count()
+        totale_uscite = presenze.filter(giorno=data,timestamp_scan_entrata__isnull=False,timestamp_scan_uscita__isnull=False).count()
+        totale_assenze = presenze.filter(giorno=data,timestamp_scan_entrata__isnull=True,in_permesso=False).count()
+        totale_permessi = presenze.filter(giorno=data,in_permesso=True).count()
+        totale_ferie = presenze.filter(giorno=data,id_permesso=6).count()
         data = datetime.strptime(str(data), "%Y-%m-%d").date()
         return render(request, template_name, {"presenze":presenze,"totale_entrate":totale_entrate,"totale_uscite":totale_uscite,"totale_assenze":totale_assenze,"totale_permessi":totale_permessi,"totale_ferie":totale_ferie,"data":data})
     
-    elif request.method == "POST" and request.POST.get("dipendente"):
-        dipendente = request.POST.get("dipendente")
-        data_object = request.POST.get("giorno") or today
-        date = datetime.strptime(str(data_object), "%Y-%m-%d").date()
-        dip = Ingressidip.objects.filter(giorno=date,id_dip_ing__stato='Attivo').filter(Q(nominativo__icontains=dipendente)).exclude(id_dip_ing__area__in=excludeIdList).order_by("nominativo")
-        presenze = Ingressidip.objects.filter(giorno=date,id_dip_ing__stato='Attivo').exclude(id_dip_ing__area__in=excludeIdList).order_by("nominativo")
-        totale_entrate = presenze.filter(giorno=today,timestamp_scan_entrata__isnull=False).count()
-        totale_uscite = presenze.filter(giorno=today,timestamp_scan_entrata__isnull=False,timestamp_scan_uscita__isnull=False).count()
-        totale_assenze = presenze.filter(giorno=today,timestamp_scan_entrata__isnull=True,in_permesso=False).count()
-        totale_permessi = presenze.filter(giorno=today,in_permesso=True).count()
-        totale_ferie = presenze.filter(giorno=today,id_permesso=6).count()
-        return render(request, template_name, {"presenze":dip,"totale_entrate":totale_entrate,"totale_uscite":totale_uscite,"totale_assenze":totale_assenze,"totale_permessi":totale_permessi,"totale_ferie":totale_ferie,"data":today,"dipendente":dipendente})
-
     else:
         presenze = Ingressidip.objects.filter(giorno=today,id_dip_ing__stato='Attivo').exclude(in_permesso=True,id_dip_ing__area__in=excludeIdList).order_by("nominativo")
         totale_entrate = presenze.filter(giorno=today,timestamp_scan_entrata__isnull=False).count()
@@ -673,10 +787,25 @@ def listaPresenze(request):
         totale_ferie = presenze.filter(giorno=today,id_permesso=6).count()
         return render(request, template_name, {"presenze":presenze,"totale_entrate":totale_entrate,"totale_uscite":totale_uscite,"totale_assenze":totale_assenze,"totale_permessi":totale_permessi,"totale_ferie":totale_ferie,"data":today})
 
+@login_required
+@permission_required('reception.change_ingressidip')
+def listaPresenzeMese(request):
+    today = datetime.now().date()
+    excludeIdList = [9,23,24,31,32]
+    template_name = "reception/presenze_mese.html"
+    anno = datetime.now().date().year
+    mese = datetime.now().date().month
+    calendario = calendar.monthrange(anno, mese)
+    start_date = timezone.datetime(anno,mese,calendario[0])
+    end_date = timezone.datetime(anno,mese,calendario[1])
+    
+    presenze = Ingressidip.objects.filter(giorno__range=[start_date,end_date],id_dip_ing__stato='Attivo').exclude(id_dip_ing__area__in=excludeIdList).order_by("nominativo")
 
-class EntrateQR(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    return render(request, template_name, {"presenze":presenze})
+
+
+class EntrateQR(LoginRequiredMixin, ListView):
     model = Ingressidip
-    permission_required = 'reception.change_ingressidip'
     template_name = "reception/entrate-qr.html"
     success_url= reverse_lazy('reception:entrate-qr')
     login_url = "/login/"
@@ -702,6 +831,7 @@ class EntrateQR(LoginRequiredMixin, PermissionRequiredMixin, ListView):
         
         try:
             if len(qr) == 36:
+                qr = qr.replace("'","-")
                 if AppoggioVerificaQr.objects.get(uuid_qr=qr):
                     try: 
                         qr_row = AppoggioVerificaQr.objects.get(uuid_qr=qr)

@@ -26,6 +26,14 @@ from django.db.models import Count
 import qrcode
 import traceback 
 
+
+
+def getDashboardCompletaContratti(request):
+    today = datetime.now().date()
+    template_name = "gestione/datatables_contratti.html"
+    
+    return render(request,template_name)
+
 def getDashboardCompletaDipendenti(request):
     today = datetime.now().date()
     template_name = "gestione/datatables.html"
@@ -35,6 +43,27 @@ def getDashboardCompletaDipendenti(request):
     
     return render(request,template_name,{'dipendentiAttivi':dipendentiAttivi,'dipendentiCessati':dipendentiCessati,'dipendentiSospesi':dipendentiSospesi})
 
+def getDashboardDipendentiMisc(request):
+    today = datetime.now().date()
+    template_name = "gestione/datatables_misc.html"
+    dipendentiAttivi = AnaDipendenti.objects.filter(stato="Attivo").count()
+    dipendentiCessati = AnaDipendenti.objects.filter(stato="Cessato").count()
+    dipendentiSospesi = AnaDipendenti.objects.filter(stato="Sospeso").count()
+    
+    return render(request,template_name,{'dipendentiAttivi':dipendentiAttivi,'dipendentiCessati':dipendentiCessati,'dipendentiSospesi':dipendentiSospesi})
+
+
+class DashboardRichiesteView(LoginRequiredMixin, PermissionRequiredMixin,View):
+    template_name= "gestione/dashboard-richieste.html"
+    permission_required = 'gestione.change_anadipendenti'
+
+    def get(self, request, *args, **kwargs):
+        richiesteAccettate = RichiesteAccettate.objects.filter(in_corso=False)
+        context = {'richiesteAccetate':richiesteAccettate.count()}
+        trasferte = AddTrasferte.objects.filter(stato=False)
+        context['trasferte'] = trasferte.count()
+        
+        return render(request, self.template_name,context)
 
 class DashboardGestioneView(LoginRequiredMixin, PermissionRequiredMixin,View):
     template_name= "gestione/dashboard-gestione.html"
@@ -43,7 +72,7 @@ class DashboardGestioneView(LoginRequiredMixin, PermissionRequiredMixin,View):
     def get(self, request, *args, **kwargs):
         dipendenti = AnaDipendenti.objects.filter(stato="Attivo")
         context = {'dipendenti':dipendenti.count()}
-        contratti = Contratti.objects.all()
+        contratti = Contratti.objects.filter()
         context['contratti'] = contratti.count()
         
         sedes= Sede.objects.all()
@@ -114,6 +143,7 @@ class AltriDatiGestioneView(LoginRequiredMixin, PermissionRequiredMixin,View):
         context["istruzioneNumero"] = Istruzione.objects.all().count()
 
         return render(request, self.template_name, context)
+
 
 #DASHBOARD RESPONSABILI
 class DashboardResponsabiliView(LoginRequiredMixin, PermissionRequiredMixin,View):
@@ -408,10 +438,10 @@ class StatoDipendenteUpdate(LoginRequiredMixin,PermissionRequiredMixin,UpdateVie
 
 class AnagraficaDipendenteUpdate(LoginRequiredMixin,PermissionRequiredMixin,UpdateView):
     model= AnaDipendenti
-    template_name = "gestione/update-anagrafica.html"
+    template_name = "gestione/anagrafica-dipendente-update.html"
     permission_required = 'gestione.change_anadipendenti'
     context_object_name = "dipendente"
-    form_class = UpdateDipendentiForm
+    form_class = AnaDipendentiCarloUpdateForm
     success_url= reverse_lazy('gestione:dipendenti')
 
 
@@ -420,7 +450,6 @@ class AnagraficaDipendenteDelete(LoginRequiredMixin,PermissionRequiredMixin, Del
     template_name = "gestione/delete-anagrafica.html"
     permission_required = 'gestione.change_anadipendenti'
     context_object_name = "dipendente"
-    # form_class = DipendentiForm
     success_url= reverse_lazy('gestione/dipendenti')
 
 
@@ -954,7 +983,7 @@ class AreaUpddateView(LoginRequiredMixin,PermissionRequiredMixin,UpdateView):
 
 class AreaDeleteView(LoginRequiredMixin,PermissionRequiredMixin, DeleteView):
     model = Area
-    template_name = "gestione/elimina-area.html"
+    template_name = "gestione/delete-area.html"
     permission_required = 'gestione.change_anadipendenti'
     context_object_name = "area"
     form_class = AreaForm
@@ -1027,7 +1056,7 @@ class IstruzioneUpdateView(LoginRequiredMixin,PermissionRequiredMixin,UpdateView
     
 class IstruzioneDeleteView(LoginRequiredMixin,PermissionRequiredMixin, DeleteView):
     model = Istruzione
-    template_name = "gestione/elimina-tipo-di-istruzione.html"
+    template_name = "gestione/delete-tipo-di-istruzione.html"
     permission_required = 'gestione.change_anadipendenti'
     context_object_name = "istruzione"
     form_class = IstruzioneForm
@@ -1098,7 +1127,7 @@ class MansioneUpdateView(LoginRequiredMixin,PermissionRequiredMixin,UpdateView):
     
 class MansioneDeleteView(LoginRequiredMixin,PermissionRequiredMixin, DeleteView):
     model = Mansione
-    template_name = "gestione/elimina-mansione.html"
+    template_name = "gestione/delete-mansione.html"
     permission_required = 'gestione.change_anadipendenti'
     context_object_name = "mansione"
     form_class = MansioneForm
@@ -1161,9 +1190,9 @@ class SedeUpdateView(LoginRequiredMixin,PermissionRequiredMixin,UpdateView):
         kwargs["SedeForm"] = self.get_form()
         return super().get_context_data(**kwargs)
     
-class SedeDeleteViews(LoginRequiredMixin,PermissionRequiredMixin, DeleteView):
+class SedeDeleteView(LoginRequiredMixin,PermissionRequiredMixin, DeleteView):
     model = Sede
-    template_name = "gestione/delete-sede-views.html"
+    template_name = "gestione/delete-sede.html"
     permission_required = 'gestione.change_anadipendenti'
     context_object_name = "sede"
     form_class = SedeForm
@@ -1232,9 +1261,9 @@ class SocietaUpdateView(LoginRequiredMixin,PermissionRequiredMixin,UpdateView):
         kwargs["SocietaForm"] = self.get_form()
         return super().get_context_data(**kwargs)
 
-class SocietaDeleteViews(LoginRequiredMixin,PermissionRequiredMixin, DeleteView):
+class SocietaDeleteView(LoginRequiredMixin,PermissionRequiredMixin, DeleteView):
     model = Societa
-    template_name = "gestione/delete-societa-views.html"
+    template_name = "gestione/delete-societa.html"
     permission_required = 'gestione.change_anadipendenti'
     context_object_name = "societa"
     form_class = SocietaForm
@@ -1305,9 +1334,9 @@ class TipoContrattoUpdateView(LoginRequiredMixin,PermissionRequiredMixin,UpdateV
         return super().get_context_data(**kwargs)
     
     
-class TipoContrattoDeleteViews(LoginRequiredMixin,PermissionRequiredMixin, DeleteView):
+class TipoContrattoDeleteView(LoginRequiredMixin,PermissionRequiredMixin, DeleteView):
     model = TipoContratto
-    template_name = "gestione/elimina-tipo-di-contratto.html"
+    template_name = "gestione/delete-tipo-di-contratto.html"
     permission_required = 'gestione.change_anadipendenti'
     context_object_name = "contratto"
     form_class = TipoContrattoForm
@@ -1404,7 +1433,7 @@ class ModifcaRichiesteAccettate(LoginRequiredMixin,PermissionRequiredMixin,Updat
         return super().get_context_data(**kwargs)
         
         
-# CONTRATTO
+# CONTRATTO PERCENTUALI
 @login_required
 @permission_required('gestione.change_anadipendenti')
 def ListaPercContratti(request):
@@ -1415,9 +1444,9 @@ def ListaPercContratti(request):
         queryset = PercentualiContratto.objects.filter(Q(perc_contratto__icontains=query) | Q(dicitura_percentuale__icontains=query)).order_by("perc_contratto")
     elif query == "":
         queryset = PercentualiContratto.objects.all().order_by("perc_contratto")
-        return render(request,'gestione/lista_percentuali_contratti.html',{'perc_contratti':queryset})
+        return render(request,'gestione/lista_perc_contratti.html',{'perc_contratti':queryset})
     
-    return render(request,'gestione/lista_percentuali_contratti.html',{'perc_contratti':queryset})
+    return render(request,'gestione/lista_perc_contratti.html',{'perc_contratti':queryset})
 
 
     
@@ -1426,7 +1455,7 @@ class PercContrattiCreateView(LoginRequiredMixin, PermissionRequiredMixin, Creat
     form_class = OreContrattiForm   
     permission_required = 'gestione.change_anadipendenti'
     template_name = 'gestione/aggiungi-perc-contratto.html'
-    success_url= reverse_lazy('gestione:lista_percentuali_contratti')
+    success_url= reverse_lazy('gestione:lista_perc_contratti')
         
     def form_valid(self, form):
         if form.is_valid():
@@ -1438,7 +1467,7 @@ class PercContrattiUpdateView(LoginRequiredMixin,PermissionRequiredMixin,UpdateV
     permission_required = 'gestione.change_anadipendenti'
     context_object_name = "perc_contratto"
     form_class = OreContrattiForm
-    success_url= reverse_lazy('gestione:lista_percentuali_contratti')
+    success_url= reverse_lazy('gestione:lista_perc_contratti')
         
     def get_context_data(self, **kwargs):
         kwargs["OreContrattiForm"] = self.get_form()
@@ -1446,11 +1475,11 @@ class PercContrattiUpdateView(LoginRequiredMixin,PermissionRequiredMixin,UpdateV
     
 class PercContrattiDeleteView(LoginRequiredMixin,PermissionRequiredMixin, DeleteView):
     model = PercentualiContratto
-    template_name = "gestione/elimina-perc-contratto.html"
+    template_name = "gestione/delete-perc-contratto.html"
     permission_required = 'gestione.change_anadipendenti'
     context_object_name = "perc_contratto"
     form_class = OreContrattiForm
-    success_url= reverse_lazy('gestione:lista_percentuali_contratti')
+    success_url= reverse_lazy('gestione:lista_perc_contratti')
     
 
 # #### CRUD CONTRATTI
@@ -1461,9 +1490,9 @@ class ListaContrattiListView(LoginRequiredMixin, PermissionRequiredMixin, ListVi
     context_object_name = "contratti"
     permission_required = 'gestione.change_anadipendenti'
     template_name = 'gestione/lista_contratti.html'
-    paginate_by = 10
     form_class = ContrattiFormInsert
     query = ""
+    today = datetime.now().date()
     
     
     def get_context_data(self, **kwargs):
@@ -1471,9 +1500,11 @@ class ListaContrattiListView(LoginRequiredMixin, PermissionRequiredMixin, ListVi
         context["form"] = self.form_class()
         if self.query != "":
             data=self.query
+            context["dipendente"] = data
             return context
         else:
             data = self.query
+            context["dipendente"] = data
             return context
     
     def get_queryset(self):
@@ -1481,7 +1512,39 @@ class ListaContrattiListView(LoginRequiredMixin, PermissionRequiredMixin, ListVi
         if self.request.GET.get("contratto") or "":
             self.query = self.request.GET.get("contratto") or ""
         if self.query:
-            queryset = Contratti.objects.filter(Q(codicecontratto__icontains=self.query)|Q(id_dip__cognome__icontains=self.query)|Q(id_dip__nome__icontains=self.query)).order_by("id_dip")
+            queryset = Contratti.objects.filter(datafine__lte=self.today).filter(Q(codicecontratto__icontains=self.query)|Q(id_dip__cognome__icontains=self.query)|Q(id_dip__nome__icontains=self.query)).order_by("id_dip__cognome")
+            return queryset
+        return queryset
+    
+    
+class ListaContrattiScadutiListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+    model = Contratti
+    context_object_name = "contratti"
+    permission_required = 'gestione.change_anadipendenti'
+    template_name = 'gestione/lista_contratti_scaduti.html'
+    form_class = ContrattiFormInsert
+    query = ""
+    today = datetime.now().date()
+    
+    
+    def get_context_data(self, **kwargs):
+        context = super(ListaContrattiScadutiListView, self).get_context_data(**kwargs)
+        context["form"] = self.form_class()
+        if self.query != "":
+            data=self.query
+            context["dipendente"] = data
+            return context
+        else:
+            data = self.query
+            context["dipendente"] = data
+            return context
+    
+    def get_queryset(self):
+        queryset = Contratti.objects.filter(datafine__gte=self.today).order_by("id_dip__cognome")
+        if self.request.GET.get("contratto") or "":
+            self.query = self.request.GET.get("contratto") or ""
+        if self.query:
+            queryset = Contratti.objects.filter(datafine__gte=self.today).filter(Q(codicecontratto__icontains=self.query)|Q(id_dip__cognome__icontains=self.query)|Q(id_dip__nome__icontains=self.query)).order_by("id_dip__cognome")
             return queryset
         return queryset
 
@@ -1495,12 +1558,11 @@ class ContrattiCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateVie
     def form_valid(self, form):
         dipendente = form.cleaned_data['dipendenti']
         dipendente_id = dipendente.pk
-        tipo_contratto = form.cleaned_data['tipologia']
+        id_contratto = form.cleaned_data['id_contratto']
         dip = AnaDipendenti.objects.get(id_dip=dipendente_id)
         temp = form.save()
         temp.id_dipendente = AnaDipendenti.objects.get(id_dip=dipendente_id)
-        contratto = TipoContratto.objects.get(nome_contratto=tipo_contratto)
-        temp.codicecontratto = contratto.codice_contratto
+        contratto = Contratti.objects.get(id_contratto=id_contratto)
         temp.save()
         return super().form_valid(form)  
 
@@ -1518,10 +1580,7 @@ class ContrattiUpdateView(LoginRequiredMixin,PermissionRequiredMixin,UpdateView)
         return super().get_context_data(**kwargs)
     
     def form_valid(self, form):
-        tipo_contratto = form.cleaned_data['tipologia']
         temp = form.save()
-        contratto = TipoContratto.objects.get(nome_contratto=tipo_contratto)
-        temp.codicecontratto = contratto.codice_contratto
         temp.save()
         return super().form_valid(form)  
     
@@ -1532,3 +1591,59 @@ class ContrattoDeleteViews(LoginRequiredMixin,PermissionRequiredMixin, DeleteVie
     context_object_name = "contratto"
     form_class = ContrattiFormInsert
     success_url= reverse_lazy('gestione:lista_contratti')
+
+
+#Trasferte
+
+@login_required
+@permission_required("gestione.change_richiesteaccettate")
+def gestioneTrasfertePersonale(request):
+    context_object_name = "richieste"
+    template_name = "gestione/richieste-trasferte.html"
+    today = datetime.now().date()
+    try:
+        if request.method == "POST" and request.POST.get('dipendente'):
+            query= request.POST.get('dipendente')
+            queryset = AddTrasferte.objects.filter(Q(id_dip__cognome__icontains=query)|Q(id_dip__nome__icontains=query)).filter(stato=0).order_by("-timestamp_creazione")
+            
+            return render(request, template_name, {'richieste':queryset,'cerca':query})
+        
+        elif request.method == "POST" and request.POST.get('search-giorno'):
+            data = request.POST.get('giorno') or f'{today.year}-{today.month}-{today.day}'
+            date = datetime.strptime(data, "%Y-%m-%d").date()
+            queryset = AddTrasferte.objects.filter(data_fine_permesso__gte=data)
+
+            return render(request, template_name, {'richieste':queryset,'data':date})
+        
+        elif request.method == "POST" and request.POST.get('precedente'):
+            if request.POST.get("precedente"):
+                data = request.POST.get("giorno")
+                date = datetime.strptime(data, "%Y-%m-%d").date()
+                date = (date - timedelta(1))
+            else:
+                data = datetime.now().date()
+                date = (data - timedelta(1))
+            queryset = AddTrasferte.objects.filter(rel_giorno__gte=data).order_by("-timestamp_creazione")
+            
+            return render(request, template_name, {'richieste':queryset,'data':date})
+        
+        elif request.method == "POST" and request.POST.get('successivo'):
+            if request.POST.get("precedente"):
+                data = request.POST.get("giorno")
+                date = datetime.strptime(data, "%Y-%m-%d").date()
+                date = (date - timedelta(1))
+            else:
+                data = datetime.now().date()
+                date = (data + timedelta(1))
+            queryset = AddTrasferte.objects.filter(rel_giorno__gte=data).order_by("-timestamp_creazione")
+
+            return render(request, template_name, {'richieste':queryset,'data':date})
+        
+        else:
+            queryset = AddTrasferte.objects.filter(stato=0).order_by("-timestamp_creazione")
+            
+            return render(request, template_name, {'richieste':queryset})
+    except:
+            queryset = AddTrasferte.objects.filter(stato=0).order_by("-timestamp_creazione")
+
+            return render(request, template_name, {'richieste':queryset,'errore':"Per favore seleziona una data per sfogliare le richieste."})

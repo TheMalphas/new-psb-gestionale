@@ -49,6 +49,9 @@
                             {{ form.codice_fiscale|as_crispy_field}}
                         </div>
                         <div class ="col-2">
+                            {{ form.stato|as_crispy_field}}
+                        </div>
+                        <div class ="col-1">
                             {{ form.sesso|as_crispy_field}}
                         </div>
                         <div class="h6 pb-2 mb-2 text-primary border-bottom border-primary">
@@ -175,15 +178,5 @@
         </div>
     </div> 
 </section>
-
-<script>
-
-$(document).ready(function ({
-    $('#cellulare').
-}
-
-))
-
-</script>
 
 {% endblock %}

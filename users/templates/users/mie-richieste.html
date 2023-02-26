@@ -3,14 +3,17 @@
 {% block content %}
 
 <title>{% block title%}Le mie richieste{% endblock %}</title>
+<link href="https://cdn.datatables.net/1.13.2/css/jquery.dataTables.min.css" rel="stylesheet" crossorigin="anonymous">
 
-<section style="box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
-<header class="p-3 bg-light text-black">
+
+
+<section id="styler-navbar" style="box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); margin-left:210px;">
+    <header class="p-3 bg-light text-black">
     <div class="container">
     <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
 
     <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-        <li class="nav-link px-2 text-dark"></li>
+        <li class="nav-link px-2 text-dark">Hai:</li>
         <li class="nav-link px-2 text-dark"><strong>{{accettate}}</strong> Richieste Accettate</li>
         <li class="nav-link px-2 text-dark"><strong>{{rifiutate}}</strong> Richieste Rifiutate</li>
         <li class="nav-link px-2 text-dark"><strong>{{inAttesa}}</strong> Richieste in Attesa</li>
@@ -24,34 +27,38 @@
 <section class="second-item" style="margin-top:50px; margin-left:268px; float:right;">
 
     <div class="container-liste">
-            <table class="table table-striped table-hover caption-top">
+            <table class="table table-striped table-hover caption-top" id="table-richieste">
                 <caption>Lista Richieste</caption>
                 <thead>
                 <tr>
-                    <th scope="col"></th>
-                    <td> Richiesta del</td>
-                    <td> Tipologia </td>
-                    <td> Inizio </td>
-                    <td> Fine </td>
-                    <td> Stato </td>
+                    <th> Richiesta del</th>
+                    <th> Tipologia </th>
+                    <th> Inizio </th>
+                    <th> Fine </th>
+                    <th> Stato </th>
                 </tr>
                 </thead>
                 <tbody>
                     {% for richiesta in richieste %}
                     <tr>
-                        <th scope="col">
+                        <td>
+                            <div class="d-flex align-items-center">
+                            <span>{{richiesta.timestamp|date:"d/M/Y"}}&nbsp;</span>
+                            <span>
                             <div class="dropdown">
                                 <a href="#" class="d-flex align-items-center link-dark text-decoration-none dropdown-toggle" id="dropdownUser2" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="bi bi-plus-square-fill"></i>
                                 </a>
                                     <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser2">
+                                    {% if richiesta.stato != 1 %}
                                     <li><a class="dropdown-item" onclick="open_modal_modifica_richiesta('{% url 'users:richiesta-modifica' richiesta.id_richiesta %}')">Modifica</a></li>
                                     <li><hr class="dropdown-divider"></li>
+                                    {% endif %}
                                     <li><a class="dropdown-item" onclick="open_modal_elimina_richiesta('{% url 'users:richiesta-annulla' richiesta.id_richiesta %}')">Cancella</a></li>
                                 </ul>
+                            </span>
                             </div>
-                        </th>
-                        <td>{{richiesta.timestamp|date:"d/M/Y"}}</td>
+                        </td>
                         <td>{% if richiesta.id_permessi_richieste %}{{richiesta.id_permessi_richieste|title}}{% else %}Permesso Orario{% endif %}</td>
                         <td>{{richiesta.da_giorno_richiesta|date:"d/M"|lower}}{% if richiesta.da_ora_richiesta %}-{{richiesta.da_ora_richiesta|time:"H:i"}}{% endif %}</td>
                         <td>{{richiesta.a_giorno_richiesta|date:"d/M"|lower}}{% if richiesta.a_ora_richiesta %}-{{richiesta.a_ora_richiesta|time:"H:i"}}{% endif %}</td>
@@ -59,6 +66,15 @@
                     </tr>
                     {% endfor %}
                 </tbody>
+                <tfoot>
+                    <tr>
+                        <th> Richiesta del</th>
+                        <th> Tipologia </th>
+                        <th> Inizio </th>
+                        <th> Fine </th>
+                        <th> Stato </th>
+                    </tr>
+                </tfoot>
             </table>
     </div>
 
@@ -70,6 +86,12 @@
 
 <div class="modal fade" id="elimina_richiesta" role="dialog" tabindex="-1">
 </div>
+
+<script src="https://cdn.datatables.net/1.13.2/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/v/bs5/jszip-2.5.0/dt-1.13.2/af-2.5.2/b-2.3.4/b-colvis-2.3.4/b-html5-2.3.4/b-print-2.3.4/cr-1.6.1/date-1.3.0/fc-4.2.1/fh-3.3.1/kt-2.8.1/r-2.4.0/rg-1.3.0/rr-1.3.2/sc-2.1.0/sb-1.4.0/sp-2.1.1/sr-1.2.1/datatables.min.js"></script>
+
 
 <script>
     var $ = jQuery.noConflict();
@@ -98,6 +120,100 @@ $.ajax({
     }
 });
 });
+
+
+$(document).ready(function () {
+    // Setup - add a text input to each footer cell
+    $('#table-richieste thead tr')
+        .clone(true)
+        .addClass('filters')
+        .appendTo('#table-richieste thead');
+    
+    var table = $('#table-richieste').DataTable({
+        orderCellsTop: true,
+        fixedHeader: true,
+        dom: 'Bfrtip',
+        buttons: [
+        {
+            extend: 'copy',
+            className: 'btn btn-secondary',
+            text: 'Copia'
+        },
+        {
+            extend: 'excel',
+            className: 'btn btn-success',
+            text: 'Excel'
+        },
+        {
+            extend: 'pdfHtml5',
+            className: 'btn btn-danger',
+            text: 'PDF',
+            orientation: 'landscape',
+            pageSize: 'A3',
+            exportOptions: {
+            columns: ':visible'
+            },
+            customize: function(doc) {
+                doc.content.forEach(function(item) {
+                if (item.text) {
+                item.text[0].fontSize = 8 // Set the font size to 8pt
+                }
+            });
+            }
+        },
+    ],
+        initComplete: function () {
+            var api = this.api();
+    
+            // For each column
+            api
+                .columns()
+                .eq(0)
+                .each(function (colIdx) {
+                    // Set the header cell to contain the input element
+                    var cell = $('.filters th').eq(
+                        $(api.column(colIdx).header()).index()
+                    );
+                    var title = $(cell).text();
+                    $(cell).html('<input type="text" placeholder="' + title + '" />');
+    
+                    // On every keypress in this input
+                    $(
+                        'input',
+                        $('.filters th').eq($(api.column(colIdx).header()).index())
+                    )
+                        .off('keyup change')
+                        .on('change', function (e) {
+                            // Get the search value
+                            $(this).attr('title', $(this).val());
+                            var regexr = '({search})'; //$(this).parents('th').find('select').val();
+    
+                            var cursorPosition = this.selectionStart;
+                            // Search the column for that value
+                            api
+                                .column(colIdx)
+                                .search(
+                                    this.value != ''
+                                        ? regexr.replace('{search}', '(((' + this.value + ')))')
+                                        : '',
+                                    this.value != '',
+                                    this.value == ''
+                                )
+                                .draw();
+                        })
+                        .on('keyup', function (e) {
+                            e.stopPropagation();
+    
+                            $(this).trigger('change');
+                            $(this)
+                                .focus()[0]
+                                .setSelectionRange(cursorPosition, cursorPosition);
+                        });
+                });
+        },
+    });
+  });
+  
 
 </script>
 

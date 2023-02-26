@@ -1,0 +1,192 @@
+{% extends 'base/main.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% crispy form helper %}
+{% block content %}
+
+<title>{% block title%}Anagrafica Dipendente{% endblock %}</title>
+<link rel="stylesheet" href="{% static 'gestione/css/style.css' %}">
+<script src="{% static 'gestione/js/script.js' %}"></script>
+
+<section id="styler-navbar" style="box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); margin-left:210px;">
+    <header class="p-3 bg-light text-black">
+        <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+            {% if form.errors %}
+            <div class="alert alert-danger">
+                <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+                    {% for field, errors in form.errors.items %}
+                        {% for error in errors %}
+                        <li class="nav-link px-2 text-dark">{{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                <ul>
+            </div>
+            {% endif %}
+    
+</header>
+</section>
+
+
+<section style="margin-top:50px; margin-left:280px; float:right;">
+    <div class="cartaBox-table-reception-datatables">
+        <div class="carta-table-reception-datatables">
+            <div>
+                <div class="numbers"></div>
+                <form method="POST" enctype="multipart/form-data" autocomplete="off">
+                    {% csrf_token %}
+                    <!-- {{form|crispy}}    Se vogliamo rendere tutto crispy!-->
+
+                    <!-- se invece vogliamo rendere una riga alla volta crispy facciamo :-->
+
+                    <div class="row">
+                        <div class ="col-3">
+                            {{ form.cognome|as_crispy_field}}
+                        </div>
+                        <div class ="col-3">
+                            {{ form.nome|as_crispy_field}}
+                        </div>
+                        <div class ="col-3">
+                            {{ form.codice_fiscale|as_crispy_field}}
+                        </div>
+                        <div class ="col-2">
+                            {{ form.stato|as_crispy_field}}
+                        </div>
+                        <div class ="col-1">
+                            {{ form.sesso|as_crispy_field}}
+                        </div>
+                        <div class="h6 pb-2 mb-2 text-primary border-bottom border-primary">
+
+                            Dettagli Personali :
+                        </div> 
+
+                        <div class ="col-4">
+                            {{ form.asl|as_crispy_field}}
+                        </div>
+                        <div class ="col-4">
+                            {{ form.provincia_nascita|as_crispy_field}}
+                        </div>
+                        <div class ="col-2">
+                            {{ form.luogo_nascita|as_crispy_field}}
+                        </div>
+                        <div class ="col-2">
+                            {{ form.data_nascita|as_crispy_field}}
+                        </div>
+                        <div class ="col-3">
+                            {{ form.provincia_domicilio|as_crispy_field}}
+                        </div>
+                        <div class ="col-3">
+                            {{ form.citta_domicilio|as_crispy_field}}
+                        </div>
+                        <div class ="col-3">
+                            {{ form.cap_domicilio|as_crispy_field}}
+                        </div>
+                        <div class ="col-3">
+                            {{ form.indirizzo_domicilio|as_crispy_field}}
+                        </div>
+                        <div class ="col-3">
+                            {{ form.provincia_residenza|as_crispy_field}}
+                        </div>
+                        <div class ="col-3">
+                            {{ form.citta_residenza|as_crispy_field}}
+                        </div>
+                        <div class ="col-3">
+                            {{ form.cap_residenza|as_crispy_field}}
+                        </div>
+                        <div class ="col-3">
+                            {{ form.indirizzo_residenza|as_crispy_field}}
+                        </div>
+                    <div class="h6 pb-2 mb-2 text-primary border-bottom border-primary">
+                        Informazioni Personali : 
+                    </div>
+                    <div class ="col-3">
+                        {{ form.email_pers|as_crispy_field}}
+                    </div>
+                    <div class ="col-3">
+                        {{ form.email_lav|as_crispy_field}}
+                    </div>
+                    <div class ="col-3">
+                        {{ form.cellulare|as_crispy_field}}
+                    </div>        
+                    <div class ="col-3">
+                        {{ form.cell_alternativo|as_crispy_field}}
+                    </div>
+                    <div class="h6 pb-2 mb-2 text-primary border-bottom border-primary">
+                        Coordinate Bancarie/Fiscali : 
+                    </div>
+                    <div class ="col-6">
+                        {{ form.iban|as_crispy_field}}
+                    </div>
+                    <div class ="col-6">
+                        {{ form.p_iva|as_crispy_field}}
+                    </div>
+                    <div class ="col-3">
+                        {{ form.societa|as_crispy_field}}
+                    </div>
+                    <div class ="col-2">
+                        {{ form.sede|as_crispy_field}}
+                    </div>
+                    <div class ="col-3">
+                        {{ form.area|as_crispy_field}}
+                    </div>
+                    <div class ="col-2">
+                        {{ form.data_inizio_rap|as_crispy_field}}
+                    </div>
+                    <div class ="col-2">
+                        {{ form.data_fine_rap|as_crispy_field}}
+                    </div>
+                    <div class="h6 pb-2 mb-2 text-primary border-bottom border-primary">
+                        Informazioni Professionali  : 
+                    </div>
+                    <div class ="col-4">
+                        {{ form.istruzione|as_crispy_field}}
+                    </div>
+                    <div class ="col-4">
+                        {{ form.tipo_contratto|as_crispy_field}}
+                    </div>
+                    <div class ="col-4">
+                        {{ form.mansione|as_crispy_field}}
+                    </div>
+
+
+                        <div class="h6 pb-2 mb-2 text-primary border-bottom border-primary">
+                            Stato Professionale ed eventuali Note:
+                        </div>
+                        <div class ="col-12">
+                        {{ form.note|as_crispy_field }}
+                        </div>
+
+
+                        <div class="d-grid gap-2">
+                        <button class="btn btn-success" type="submit"> Aggiorna Dipendente </button>
+                </div>
+                </form>
+
+                <!-- Messaggio dal Backend -->
+
+            {% for message in messages %}
+                {% if message.tags == 'success' %}
+                    <div class = "text-center alert alert-primary alert-dimissible fade show" role="alert"> {{message}}
+                        <a href="{%url 'home'%}" type="button" class="btn btn-close" data-bs-dismiss="alert" aria-label="Close"></a>
+                    </div>
+            
+                {% endif %}
+            {% endfor %}
+            </div>
+            <div class="iconBox">
+            </div>
+            </a>
+        </div>
+    </div> 
+</section>
+
+<script>
+
+$(document).ready(function ({
+    $('#cellulare').
+}
+
+))
+
+</script>
+
+{% endblock %}

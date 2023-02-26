@@ -1,0 +1,122 @@
+{% load static %}
+{% load auth_extras %}
+
+<section class="sidebar" id="sidebarnav" style="position:fixed;text-align: center; box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);">
+  <div class="d-flex flex-column flex-shrink-0 p-3 bg-light" style="height:100vh;">
+      <span class ="icon" id="logo-psb">
+        <img id="sidebarToggle" width="160" height="50" src="{% static 'base/images/gif_psb_dark.gif' %}"></span>
+      <span class="fs-4"></span>
+    <hr>
+    <ul class="nav nav-pills red flex-column mb-auto">
+      <li class="hover-link">
+        <a href="/" class="nav-link active" aria-current="page" id="nav-home">
+          <svg id="home" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-house-fill" viewBox="0 0 16 16">
+            <path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L8 2.207l6.646 6.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.707 1.5Z"/>
+            <path d="m8 3.293 6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293l6-6Z"/>
+          </svg>
+          <span>Home</span>
+        </a>
+      </li>
+      {% if user|in_group:"Timbratori" == False %}
+      <li class="hover-link">
+        <a href="{% url 'users:dashboard' %}" class="nav-link link-dark" id="nav-dashboard">
+          <svg id="dashboard-utente"  xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-workspace" viewBox="0 0 16 16">
+            <path d="M4 16s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H4Zm4-5.95a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"/>
+            <path d="M2 1a2 2 0 0 0-2 2v9.5A1.5 1.5 0 0 0 1.5 14h.653a5.373 5.373 0 0 1 1.066-2H1V3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v9h-2.219c.554.654.89 1.373 1.066 2h.653a1.5 1.5 0 0 0 1.5-1.5V3a2 2 0 0 0-2-2H2Z"/>
+          </svg>
+          <span>Dashboard Utente</span>
+        </a>
+      </li>
+      {% endif %}
+      {% if perms.capi_area.change_richiesteaccettate %}
+      <li class="hover-link">
+        <a href="{% url 'capi_area:dashboard-capo-area' %}" class="nav-link link-dark" id="nav-capi_area">
+          <svg id="dashboard-responsabili" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-terminal-dash" viewBox="0 0 16 16">
+            <path d="M2 3a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h5.5a.5.5 0 0 1 0 1H2a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v4a.5.5 0 0 1-1 0V4a1 1 0 0 0-1-1H2Z"/>
+            <path d="M3.146 5.146a.5.5 0 0 1 .708 0L5.177 6.47a.75.75 0 0 1 0 1.06L3.854 8.854a.5.5 0 1 1-.708-.708L4.293 7 3.146 5.854a.5.5 0 0 1 0-.708ZM5.5 9a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1H6a.5.5 0 0 1-.5-.5ZM16 12.5a3.5 3.5 0 1 1-7 0 3.5 3.5 0 0 1 7 0Zm-5.5 0a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 0-1h-3a.5.5 0 0 0-.5.5Z"/>
+          </svg>
+          <span>Responsabili</span>
+        </a>
+      </li>
+      {% endif %}
+      {% if perms.reception.change_ingressidip %}
+      <li class="hover-link">
+        <a href="{% url 'reception:dashboard_presenze' %}" class="nav-link link-dark" id="nav-reception">
+          <svg id="reception" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-calendar3" viewBox="0 0 16 16">
+            <path d="M14 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM1 3.857C1 3.384 1.448 3 2 3h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H2c-.552 0-1-.384-1-.857V3.857z"/>
+            <path d="M6.5 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+          </svg>
+          <span>Reception</span>
+        </a>
+      </li>
+      {% endif %}
+      {% if perms.gestione.change_anadipendenti %}
+      <li class="hover-link">
+        <a href="{% url 'gestione:dashboard-gestione' %}" class="nav-link link-dark" id="nav-gestione">
+          <svg id="gestione" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-file-earmark-spreadsheet" viewBox="0 0 16 16">
+            <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V9H3V2a1 1 0 0 1 1-1h5.5v2zM3 12v-2h2v2H3zm0 1h2v2H4a1 1 0 0 1-1-1v-1zm3 2v-2h3v2H6zm4 0v-2h3v1a1 1 0 0 1-1 1h-2zm3-3h-3v-2h3v2zm-7 0v-2h3v2H6z"/>
+          </svg>
+          <span>Gestione</span>
+        </a>
+      </li>
+      {% endif %}
+      {% if user|in_group:"Timbratori" %}
+      <li class="hover-link">
+        <a href="{% url 'reception:entrate-qr' %}" class="nav-link link-dark" id="nav-registrazione">
+          <svg id="registrazione" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-qr-code-scan" viewBox="0 0 16 16">
+            <path d="M0 .5A.5.5 0 0 1 .5 0h3a.5.5 0 0 1 0 1H1v2.5a.5.5 0 0 1-1 0v-3Zm12 0a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-1 0V1h-2.5a.5.5 0 0 1-.5-.5ZM.5 12a.5.5 0 0 1 .5.5V15h2.5a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5v-3a.5.5 0 0 1 .5-.5Zm15 0a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1 0-1H15v-2.5a.5.5 0 0 1 .5-.5ZM4 4h1v1H4V4Z"/>
+            <path d="M7 2H2v5h5V2ZM3 3h3v3H3V3Zm2 8H4v1h1v-1Z"/>
+            <path d="M7 9H2v5h5V9Zm-4 1h3v3H3v-3Zm8-6h1v1h-1V4Z"/>
+            <path d="M9 2h5v5H9V2Zm1 1v3h3V3h-3ZM8 8v2h1v1H8v1h2v-2h1v2h1v-1h2v-1h-3V8H8Zm2 2H9V9h1v1Zm4 2h-1v1h-2v1h3v-2Zm-4 2v-1H8v1h2Z"/>
+            <path d="M12 9h2V8h-2v1Z"/>
+          </svg>
+          <span>Registrazione</span>
+        </a>
+      </li>
+      {% endif %}
+    </ul>
+    <hr>
+    <div class="dropdown">
+      <a href="#" class="d-flex align-items-center link-dark text-decoration-none dropdown-toggle" id="dropdownUser2" data-bs-toggle="dropdown" aria-expanded="false">
+        {% if user.is_superuser %}
+        <svg id="utente" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#ff8000" class="bi bi-person-circle" viewBox="0 0 16 16">
+          <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+          <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
+        </svg>
+        {% elif perms.capi_area.change_anadipendenti %}
+        <svg id="utente" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#a335ee" class="bi bi-person-circle" viewBox="0 0 16 16">
+          <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+          <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
+        </svg>
+        {% elif perms.gestione.change_anadipendenti %}
+        <svg id="utente" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#0070dd" class="bi bi-person-circle" viewBox="0 0 16 16">
+          <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+          <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
+        </svg>
+        {% elif perms.reception.change_ingressidip %}
+        <svg id="utente" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#31e519" class="bi bi-person-circle" viewBox="0 0 16 16">
+          <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+          <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
+        </svg>
+        {% else %}
+        <svg id="utente" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#9d9d9d" class="bi bi-person-circle" viewBox="0 0 16 16">
+          <path d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+          <path fill-rule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8zm8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1z"/>
+        </svg>
+        {% endif %}
+        <span id="username-tag"><strong>&ensp;{{user.username}}</strong></span>
+      </a>
+      <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser2">
+        <li><a class="dropdown-item" href="{% url 'users:richiedi-permesso-orario' %}">Richiedi Permeso Orario</a></li>
+        <li><a class="dropdown-item" href="{% url 'users:richiedi-permesso-giorni' %}">Richiedi Permesso Esteso</a></li>
+        <li><a class="dropdown-item" href="{% url 'users:richiedi-straordinario' %}">Richiedi Straordinario</a></li>
+        <li><a class="dropdown-item" href="{% url 'users:richiedi-trasferta' %}">Richiedi Trasferta</a></li>
+        <li><a class="dropdown-item" href="{% url 'users:scarica_report_entrate' %}">Scarica le mie presenze</a></li>
+        <li><a class="dropdown-item" href="{% url 'users:get_qr' %}">Scarica il tuo QR</a></li>
+        <li><a class="dropdown-item" href="/reset_password/">Resetta Password</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item" href="/logout/">Sign out</a></li>
+      </ul>
+    </div>
+  </div>
+</section>

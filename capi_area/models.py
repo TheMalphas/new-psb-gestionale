@@ -9,6 +9,8 @@ from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 from datetime import datetime, date, timedelta
+from decimal import *
+import math
 
 
 class AddIncForf(models.Model):
@@ -21,27 +23,49 @@ class AddIncForf(models.Model):
         managed = False
         db_table = 'Add_Inc_Forf'
 
-
 class AddRimborsi(models.Model):
     id_rimborsi = models.BigAutoField(primary_key=True)
     id_ced = models.ForeignKey('Cedolini', models.DO_NOTHING, db_column='id_ced', blank=True, null=True)
-    rel_giorno = models.IntegerField(blank=True, null=True)
+    id_dip = models.ForeignKey('AnaDipendenti', models.DO_NOTHING, db_column='id_dip', blank=True, null=True)
+    rel_giorno = models.DateField(blank=True, null=True)
+    stato = models.IntegerField(blank=True, null=True)
     ore = models.FloatField(blank=True, null=True)
     valore = models.FloatField(blank=True, null=True)
-    timestamp_creazione = models.DateTimeField(blank=True, null=True)
+    timestamp_creazione = models.DateTimeField(auto_now_add=True,blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'Add_Rimborsi'
 
 
-class AddTrasferte(models.Model):
-    id_trasferte = models.BigAutoField(primary_key=True)
+class AddStraordinari(models.Model):
+    id_straordinari = models.BigAutoField(primary_key=True)
+    id_dip = models.ForeignKey('AnaDipendenti', models.DO_NOTHING, db_column='id_dip', blank=True, null=True)
     id_ced = models.ForeignKey('Cedolini', models.DO_NOTHING, db_column='id_ced', blank=True, null=True)
-    rel_giorno = models.IntegerField(blank=True, null=True)
+    rel_giorno = models.DateField(blank=True, null=True)
+    rel_time_start = models.TimeField(blank=True, null=True)
+    rel_time_end = models.TimeField(blank=True, null=True)
+    stato = models.IntegerField(blank=True, null=True)
     ore = models.FloatField(blank=True, null=True)
     valore = models.FloatField(blank=True, null=True)
-    timestamp_creazione = models.DateTimeField(blank=True, null=True)
+    note = models.TextField(blank=True, null=True)
+    timestamp_creazione = models.DateTimeField(auto_now_add=True,blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'Add_Straordinari'
+
+
+class AddTrasferte(models.Model):
+    id_trasferte = models.BigAutoField(primary_key=True)
+    id_dip = models.ForeignKey('AnaDipendenti', models.DO_NOTHING, db_column='id_dip', blank=True, null=True)
+    id_ced = models.ForeignKey('Cedolini', models.DO_NOTHING, db_column='id_ced', blank=True, null=True)
+    rel_giorno = models.DateField(blank=True, null=True)
+    stato = models.IntegerField(blank=True, null=True)
+    ore = models.FloatField(blank=True, null=True)
+    valore = models.FloatField(blank=True, null=True)
+    note = models.TextField(blank=True, null=True)
+    timestamp_creazione = models.DateTimeField(auto_now_add=True,blank=True, null=True)
 
     class Meta:
         managed = False
@@ -406,19 +430,21 @@ class Cedolini(models.Model):
 class Contratti(models.Model):
     id_contratto = models.AutoField(db_column='ID_Contratto', primary_key=True)  # Field name made lowercase.
     id_dip = models.ForeignKey(AnaDipendenti, models.DO_NOTHING, db_column='ID_Dip', blank=True, null=True)  # Field name made lowercase.
-    id_societa = models.IntegerField(db_column='ID_Societa', blank=True, null=True)  # Field name made lowercase.
-    codicecontratto = models.CharField(db_column='CodiceContratto', max_length=2, blank=True, null=True)  # Field name made lowercase.
-    tipologia = models.CharField(db_column='Tipologia', max_length=23, blank=True, null=True)  # Field name made lowercase.
-    parziale = models.CharField(db_column='Parziale', max_length=5, blank=True, null=True)  # Field name made lowercase.
-    orecontrattuali = models.CharField(db_column='OreContrattuali', max_length=3, blank=True, null=True)  # Field name made lowercase.
+    id_societa = models.ForeignKey('ListaSocieta', models.DO_NOTHING, db_column='ID_Societa', blank=True, null=True)  # Field name made lowercase.
+    tipologia = models.ForeignKey('TipoContratto', models.DO_NOTHING, db_column='Tipologia', blank=True, null=True)  # Field name made lowercase.
+    ccnl = models.ForeignKey('TabellaCcnl', models.DO_NOTHING, db_column='ccnl', blank=True, null=True)
+    codicecontratto = models.CharField(db_column='CodiceContratto', max_length=50, blank=True, null=True)  # Field name made lowercase.
+    percentuale = models.ForeignKey('PercentualiContratto', models.DO_NOTHING, db_column='Percentuale', blank=True, null=True)  # Field name made lowercase.
+    trasferte_fisse = models.IntegerField(blank=True, null=True)
+    trasferte_fisse_tipo = models.CharField(max_length=2, blank=True, null=True)
     datainizio = models.DateField(db_column='DataInizio', blank=True, null=True)  # Field name made lowercase.
     datafine = models.DateField(db_column='DataFine', blank=True, null=True)  # Field name made lowercase.
     note = models.TextField(db_column='Note', blank=True, null=True)  # Field name made lowercase.
-    id_permesso = models.IntegerField(db_column='ID_Permesso', blank=True, null=True)  # Field name made lowercase.
 
     class Meta:
         managed = False
         db_table = 'Contratti'
+        ordering = ["codicecontratto"]
 
 
 class Dirigenti(models.Model):
@@ -512,6 +538,32 @@ class Permessi(models.Model):
 
     def __str__(self):
         return self.tipopermesso
+
+class PercentualiContratto(models.Model):
+    id_ore_contratto = models.AutoField(primary_key=True)
+    dicitura_percentuale = models.CharField(max_length=50)
+    perc_contratto = models.DecimalField(max_digits=20, decimal_places=2)
+    ore_contratto = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
+    note = models.TextField(db_column='Note', blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'Percentuali_contratto'
+        ordering = ["perc_contratto"]
+
+    def __str__(self):
+        perc = f'{self.perc_contratto}%'
+        if '.00' in perc:
+            entuale = perc.split(".")
+            return f'{entuale[0]}%'
+        else: return perc
+
+    def save(self, *args, **kwargs):
+        if self.perc_contratto:
+            perce = round(self.perc_contratto,2)
+            ore = math.trunc((perce * 160)/100)
+            self.ore_contratto = Decimal(ore)
+        super(PercentualiContratto, self).save(*args, **kwargs)
 
 class Responsabili(models.Model):
     id_res = models.AutoField(primary_key=True)
@@ -637,10 +689,21 @@ class Societa(models.Model):
         return self.nome_societa
 
 
+class TabellaCcnl(models.Model):
+    id_ccnl = models.AutoField(primary_key=True)
+    tipo_contratto = models.CharField(max_length=250, blank=True, null=True)
+    codice_ccnl = models.CharField(max_length=10, blank=True, null=True)
+    note = models.CharField(max_length=50, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'tabella_ccnl'
+
+
 class TipoContratto(models.Model):
     id_contratto = models.AutoField(primary_key=True)
     nome_contratto = models.CharField(unique=True, max_length=100, blank=True, null=True)
-    codice_contratto = models.CharField(max_length=2, blank=True, null=True)
+    codice_contratto = models.CharField(max_length=10, blank=True, null=True)
     data_creazione = models.DateTimeField(blank=True, null=True)
     data_modifica = models.DateTimeField(blank=True, null=True)
     note = models.TextField(db_column='Note', blank=True, null=True)  # Field name made lowercase.
@@ -648,10 +711,28 @@ class TipoContratto(models.Model):
     class Meta:
         managed = False
         db_table = 'Tipo_Contratto'
+        ordering = ["nome_contratto"]
         
     def __str__(self):
-        return self.tipo_contratto
+        return self.nome_contratto
 
+class TodoList(models.Model):
+    id_lista = models.BigAutoField(primary_key=True)
+    user = models.ForeignKey('AuthUser', models.DO_NOTHING, db_column='user')
+    todo = models.CharField(max_length=50, blank=True, null=True)
+    priority = models.IntegerField(blank=True, null=True)
+    fatta = models.IntegerField(default=0,blank=True, null=True)
+    setter = models.ForeignKey(CapoArea, models.DO_NOTHING, db_column='setter', blank=True, null=True)
+    gruppo = models.IntegerField(blank=True, null=True)
+    data = models.DateTimeField(auto_now_add=True,blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'todo_list'
+    
+    def save(self, *args, **kwargs):
+            self.todo = str(self.todo).title()
+            super(TodoList, self).save(*args, **kwargs)
 
 class AuthGroup(models.Model):
     name = models.CharField(unique=True, max_length=150)

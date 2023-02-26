@@ -6,6 +6,8 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, UpdateView, DeleteView, FormView
 from django.views import View
 from django.db.models import Q
+from workalendar.europe import Italy
+import holidays
 from django.urls import reverse, reverse_lazy
 from .models import Richieste, AuthUser, AnaDipendenti, CapoArea, Permessi, RichiesteAccettate, Ingressidip, Cedolini
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
@@ -24,7 +26,7 @@ import qrcode
 from django.core.exceptions import PermissionDenied
 from io import BytesIO
 
-def cedFunction(self,giornoC,meseC,annoC,dippo,codPerm=None):
+def cedFunction(giornoC,meseC,annoC,dippo,codPerm=None):
     dip=AnaDipendenti.objects.get(id_dip=dippo)
     if giornoC == 1 and codPerm != 6:
         return Cedolini.objects.filter(dipendente=dip,mese=meseC,anno=annoC).update(perm_01=8,ord_01=None)
@@ -63,7 +65,7 @@ def cedFunction(self,giornoC,meseC,annoC,dippo,codPerm=None):
     if giornoC == 9 and codPerm == 6:
         return Cedolini.objects.filter(dipendente=dip,mese=meseC,anno=annoC).update(fer_09=8,ord_09=None)
     if giornoC == 10 and codPerm != 6:
-        return Cedolini.objects.filter(dipendente=dip,mese=meseC,anno=annoC).update(fer_10=8,ord_10=None)
+        return Cedolini.objects.filter(dipendente=dip,mese=meseC,anno=annoC).update(perm_10=8,ord_10=None)
     if giornoC == 10 and codPerm == 6:
         return Cedolini.objects.filter(dipendente=dip,mese=meseC,anno=annoC).update(fer_10=8,ord_10=None)
     if giornoC == 11 and codPerm != 6:
@@ -151,7 +153,7 @@ def cedFunction(self,giornoC,meseC,annoC,dippo,codPerm=None):
     if giornoC == 31 and codPerm == 6:
         return Cedolini.objects.filter(dipendente=dip,mese=meseC,anno=annoC).update(fer_31=8,ord_31=None)
 
-def delPermCedFunctionOra(self,giornoC,meseC,annoC,dippo,oraR,oraT,codPerm=None):
+def delPermCedFunctionOra(giornoC,meseC,annoC,dippo,oraR,oraT,codPerm=None):
     dip=AnaDipendenti.objects.get(id_dip=dippo)
     if giornoC == 1 and codPerm != 6:
         aggiorna = oraT-oraR
@@ -341,7 +343,7 @@ def delPermCedFunctionOra(self,giornoC,meseC,annoC,dippo,oraR,oraT,codPerm=None)
         aggiorna = oraT-oraR
         return Cedolini.objects.filter(dipendente=dip,mese=meseC,anno=annoC).update(fer_31=F('fer_031')-(aggiorna),ord_31=F('ord_31')+(aggiorna))
 
-def addPermCedFunctionOra(self,giornoC,meseC,annoC,dippo,oraR,oraT,codPerm=None):
+def addPermCedFunctionOra(giornoC,meseC,annoC,dippo,oraR,oraT,codPerm=None):
     dip=AnaDipendenti.objects.get(id_dip=dippo)
     if giornoC == 1 and codPerm != 6:
         aggiorna = oraT-oraR
@@ -530,7 +532,7 @@ def addPermCedFunctionOra(self,giornoC,meseC,annoC,dippo,oraR,oraT,codPerm=None)
         aggiorna = oraT-oraR
         return Cedolini.objects.filter(dipendente=dip,mese=meseC,anno=annoC).update(fer_31=aggiorna,ord_31=F('ord_31')-(aggiorna))
 
-def delCedFunction(self,giornoC,meseC,annoC,dippo,codPerm=None):
+def delCedFunction(giornoC,meseC,annoC,dippo,codPerm=None):
     dip=AnaDipendenti.objects.get(id_dip=dippo)
     if giornoC == 1 and codPerm != 6:
         return Cedolini.objects.filter(dipendente=dip,mese=meseC,anno=annoC).update(perm_01=None,ord_01=8)
@@ -569,7 +571,7 @@ def delCedFunction(self,giornoC,meseC,annoC,dippo,codPerm=None):
     if giornoC == 9 and codPerm == 6:
         return Cedolini.objects.filter(dipendente=dip,mese=meseC,anno=annoC).update(fer_09=None,ord_09=8)
     if giornoC == 10 and codPerm != 6:
-        return Cedolini.objects.filter(dipendente=dip,mese=meseC,anno=annoC).update(fer_10=None,ord_10=8)
+        return Cedolini.objects.filter(dipendente=dip,mese=meseC,anno=annoC).update(perm_10=None,ord_10=8)
     if giornoC == 10 and codPerm == 6:
         return Cedolini.objects.filter(dipendente=dip,mese=meseC,anno=annoC).update(fer_10=None,ord_10=8)
     if giornoC == 11 and codPerm != 6:
@@ -656,3 +658,268 @@ def delCedFunction(self,giornoC,meseC,annoC,dippo,codPerm=None):
         return Cedolini.objects.filter(dipendente=dip,mese=meseC,anno=annoC).update(perm_31=None,ord_31=8)
     if giornoC == 31 and codPerm == 6:
         return Cedolini.objects.filter(dipendente=dip,mese=meseC,anno=annoC).update(fer_31=None,ord_31=8)
+
+#STRAORDINARI
+
+def cedStraordinari(giornoC,meseC,annoC,dippo,ore):
+    dip=AnaDipendenti.objects.get(id_dip=dippo.id_dip)
+    cal = Italy()
+    my_date = date(annoC, meseC, giornoC)
+    if cal.is_working_day(my_date):
+        if giornoC == 1:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_01=ore)
+        if giornoC == 2:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_02=ore)
+        if giornoC == 3:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_03=ore)
+        if giornoC == 4:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_04=ore)
+        if giornoC == 5:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_05=ore)
+        if giornoC == 6:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_06=ore)
+        if giornoC == 7:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_07=ore)
+        if giornoC == 8:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_08=ore)
+        if giornoC == 9:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_09=ore)
+        if giornoC == 10:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_10=ore)
+        if giornoC == 11:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_11=ore)
+        if giornoC == 12:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_12=ore)
+        if giornoC == 13:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_13=ore)
+        if giornoC == 14:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_14=ore)
+        if giornoC == 15:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_15=ore)
+        if giornoC == 16:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_16=ore)
+        if giornoC == 17:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_17=ore)
+        if giornoC == 18:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_18=ore)
+        if giornoC == 19:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_19=ore)
+        if giornoC == 20:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_20=ore)
+        if giornoC == 21:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_21=ore)
+        if giornoC == 22:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_22=ore)
+        if giornoC == 23:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_23=ore)
+        if giornoC == 24:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_24=ore)
+        if giornoC == 25:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_25=ore)
+        if giornoC == 26:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_26=ore)
+        if giornoC == 27:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_27=ore)
+        if giornoC == 28:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_28=ore)
+        if giornoC == 29:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_29=ore)
+        if giornoC == 30:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_30=ore)
+        if giornoC == 31:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_31=ore)
+    else:
+        if giornoC == 1:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_01=ore)
+        if giornoC == 2:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_02=ore)
+        if giornoC == 3:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_03=ore)
+        if giornoC == 4:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_04=ore)
+        if giornoC == 5:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_05=ore)
+        if giornoC == 6:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_06=ore)
+        if giornoC == 7:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_07=ore)
+        if giornoC == 8:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_08=ore)
+        if giornoC == 9:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_09=ore)
+        if giornoC == 10:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_10=ore)
+        if giornoC == 11:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_11=ore)
+        if giornoC == 12:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_12=ore)
+        if giornoC == 13:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_13=ore)
+        if giornoC == 14:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_14=ore)
+        if giornoC == 15:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_15=ore)
+        if giornoC == 16:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_16=ore)
+        if giornoC == 17:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_17=ore)
+        if giornoC == 18:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_18=ore)
+        if giornoC == 19:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_19=ore)
+        if giornoC == 20:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_20=ore)
+        if giornoC == 21:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_21=ore)
+        if giornoC == 22:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_22=ore)
+        if giornoC == 23:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_23=ore)
+        if giornoC == 24:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_24=ore)
+        if giornoC == 25:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_25=ore)
+        if giornoC == 26:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_26=ore)
+        if giornoC == 27:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_27=ore)
+        if giornoC == 28:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_28=ore)
+        if giornoC == 29:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_29=ore)
+        if giornoC == 30:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_30=ore)
+        if giornoC == 31:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_31=ore)
+
+
+def delCedStraordinari(giornoC,meseC,annoC,dippo):
+    dip=AnaDipendenti.objects.get(id_dip=dippo.id_dip)
+    cal = Italy()
+    my_date = date(annoC, meseC, giornoC)
+    if cal.is_working_day(my_date):
+        if giornoC == 1:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_01=None)
+        if giornoC == 2:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_02=None)
+        if giornoC == 3:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_03=None)
+        if giornoC == 4:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_04=None)
+        if giornoC == 5:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_05=None)
+        if giornoC == 6:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_06=None)
+        if giornoC == 7:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_07=None)
+        if giornoC == 8:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_08=None)
+        if giornoC == 9:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_09=None)
+        if giornoC == 10:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_10=None,)
+        if giornoC == 11:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_11=None)
+        if giornoC == 12:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_12=None)
+        if giornoC == 13:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_13=None)
+        if giornoC == 14:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_14=None)
+        if giornoC == 15:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_15=None)
+        if giornoC == 16:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_16=None)
+        if giornoC == 17:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_17=None)
+        if giornoC == 18:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_18=None)
+        if giornoC == 19:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_19=None)
+        if giornoC == 20:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_20=None)
+        if giornoC == 21:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_21=None)
+        if giornoC == 22:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_22=None)
+        if giornoC == 23:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_23=None)
+        if giornoC == 24:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_24=None)
+        if giornoC == 25:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_25=None)
+        if giornoC == 26:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_26=None)
+        if giornoC == 27:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_27=None)
+        if giornoC == 28:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_28=None)
+        if giornoC == 29:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_29=None)
+        if giornoC == 30:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_30=None)
+        if giornoC == 31:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(stra_31=None)
+    else:
+        if giornoC == 1:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_01=None)
+        if giornoC == 2:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_02=None)
+        if giornoC == 3:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_03=None)
+        if giornoC == 4:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_04=None)
+        if giornoC == 5:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_05=None)
+        if giornoC == 6:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_06=None)
+        if giornoC == 7:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_07=None)
+        if giornoC == 8:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_08=None)
+        if giornoC == 9:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_09=None)
+        if giornoC == 10:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_10=None,)
+        if giornoC == 11:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_11=None)
+        if giornoC == 12:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_12=None)
+        if giornoC == 13:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_13=None)
+        if giornoC == 14:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_14=None)
+        if giornoC == 15:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_15=None)
+        if giornoC == 16:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_16=None)
+        if giornoC == 17:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_17=None)
+        if giornoC == 18:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_18=None)
+        if giornoC == 19:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_19=None)
+        if giornoC == 20:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_20=None)
+        if giornoC == 21:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_21=None)
+        if giornoC == 22:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_22=None)
+        if giornoC == 23:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_23=None)
+        if giornoC == 24:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_24=None)
+        if giornoC == 25:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_25=None)
+        if giornoC == 26:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_26=None)
+        if giornoC == 27:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_27=None)
+        if giornoC == 28:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_28=None)
+        if giornoC == 29:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_29=None)
+        if giornoC == 30:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_30=None)
+        if giornoC == 31:
+            return Cedolini.objects.filter(dipendente=dip.id_dip, mese=meseC,anno=annoC).update(strafes_31=None)

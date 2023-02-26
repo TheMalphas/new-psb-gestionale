@@ -6,13 +6,14 @@
 <link rel="stylesheet" href="{% static 'reception/css/style.css' %}">
 <script src="{% static 'reception/js/script.js' %}"></script>
 
+
 <!-- Datatables -->
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/bs5/jszip-2.5.0/dt-1.13.2/af-2.5.2/b-2.3.4/b-html5-2.3.4/b-print-2.3.4/date-1.3.0/fc-4.2.1/fh-3.3.1/kt-2.8.1/r-2.4.0/sc-2.1.0/sb-1.4.0/sp-2.1.1/sl-1.6.0/sr-1.2.1/datatables.min.css"/>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
 <script type="text/javascript" src="https://cdn.datatables.net/v/bs5/jszip-2.5.0/dt-1.13.2/af-2.5.2/b-2.3.4/b-html5-2.3.4/b-print-2.3.4/date-1.3.0/fc-4.2.1/fh-3.3.1/kt-2.8.1/r-2.4.0/sc-2.1.0/sb-1.4.0/sp-2.1.1/sl-1.6.0/sr-1.2.1/datatables.min.js"></script>
 
-<section style="box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); margin-left:268px;">
+<section id="styler-navbar" style="box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); margin-left:210px;">
     <header class="p-3 bg-light text-black">
         <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
     
@@ -37,7 +38,7 @@
         <div class="carta-table-reception-datatables-big">
             <div>
                 <div class="numbers"></div>
-                <table class="table table-striped table-hover caption-top" id="reception-datas-mese">
+                <table class="table table-striped table-hover caption-top table-bordered" style="width:100%; table-layout: fixed; word-wrap:break-word;" id="reception-datas-mese">
                     <caption>Lista Presenze - {{data}}</caption>
                     <thead id="reception-datas-head-mese">
                     </thead>
@@ -53,7 +54,6 @@
         </div>
     </div> 
 </section>
-
 
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>

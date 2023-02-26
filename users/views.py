@@ -9,7 +9,7 @@ from django.views import generic
 from django.views.generic import TemplateView
 from django.contrib.auth.views import PasswordChangeView, PasswordChangeDoneView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
-from .models import Richieste, AuthUser, AnaDipendenti, CapoArea, Permessi, RichiesteAccettate, AppoggioVerificaQr
+from .models import Richieste, AuthUser, AnaDipendenti, CapoArea, Cedolini, Permessi, RichiesteAccettate, AppoggioVerificaQr, AddTrasferte, TodoList, AddStraordinari
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
@@ -17,17 +17,104 @@ from datetime import time, datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from django import forms
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
-from .forms import CreateRichiestaForm, CreateRichiestaOrarioForm
+from . import forms
 import qrcode
 
-# Create your views here.
+
+#HTMX Views
+@login_required #LIST
+def todoUtenteList(request):
+    template_name='users/todo_utente.html'
+    todos = TodoList.objects.filter(user=request.user.pk,fatta=False).order_by("-data").order_by("-priority")
+    context = {'todos':todos}
+    
+    return render(request,template_name,context)
+
+
+@login_required #CREATE
+def add_todo(request):
+    template_name = 'partials/todolist.html'
+    appunto = request.POST.get('aggiungi')
+    if appunto != "" or appunto != None:
+        utente = AuthUser.objects.get(id=request.user.pk)
+        oggetto = TodoList.objects.get_or_create(todo=appunto.title(),user=utente)
+    
+    todos = TodoList.objects.filter(user=request.user.pk,fatta=False).order_by("-data").order_by("-priority")
+    
+    return render(request,template_name,{'todos':todos})
+
+
+@login_required #DELETE
+def delete_todo(request,pk):
+    template_name = 'partials/todolist.html'
+    oggetto = TodoList.objects.filter(id_lista=pk).update(fatta=1)
+    
+    todos = TodoList.objects.filter(user=request.user.pk,fatta=False).order_by("-data").order_by("-priority")
+
+    return render(request,template_name,{'todos':todos})
+
+
+class UpdateTodo(LoginRequiredMixin,UpdateView):
+    model= TodoList
+    form_class = forms.TodoListUpdateForm
+    template_name = "users/update_todo.html"
+    context_object_name = "todo"
+    success_url= reverse_lazy('users:todo_utente')
+
+
+#FORM TRASFERTE
+class AddTrasferteUtente(LoginRequiredMixin,CreateView):
+    model= AddTrasferte
+    form_class = forms.AddTrasferteFormRichiesta
+    template_name = 'users/richiedi-trasferta.html'
+    success_url = reverse_lazy('users:mie-richieste')
+    
+    def form_valid(self, form):
+        dip = AnaDipendenti.objects.get(user_id=self.request.user.pk)
+        form.instance.id_dip = dip
+        
+        if form.is_valid():
+            print(form.instance.rel_giorno)
+            if form.instance.rel_giorno:
+                meseQ = form.instance.rel_giorno.month
+                annoQ = form.instance.rel_giorno.year
+                form.instance.id_ced = Cedolini.objects.get(dipendente=dip,anno=annoQ,mese=meseQ)
+            
+            return super(AddTrasferteUtente, self).form_valid(form)
+        
+#FORM STRAORDINARI
+class AddStraordinariUtente(LoginRequiredMixin,CreateView):
+    model= AddStraordinari
+    form_class = forms.AddStraordinario
+    template_name = 'users/richiedi-straordinario.html'
+    success_url = reverse_lazy('users:mie-richieste')
+    
+    def form_valid(self, form):
+        dip = AnaDipendenti.objects.get(user_id=self.request.user.pk)
+        form.instance.id_dip = dip
+        
+        if form.is_valid():
+            if form.instance.rel_giorno:
+                meseQ = form.instance.rel_giorno.month
+                annoQ = form.instance.rel_giorno.year
+                form.instance.id_ced = Cedolini.objects.get(dipendente=dip,anno=annoQ,mese=meseQ)
+                oreStart = form.instance.rel_time_start
+                oreEnd = form.instance.rel_time_end
+                time_diff = datetime.combine(datetime.today().date(), oreEnd) - datetime.combine(datetime.today().date(), oreStart)
+                time_diff_minutes = time_diff.total_seconds() / 60
+                hours_diff = round(time_diff_minutes / 60)
+                form.instance.ore = hours_diff
+            
+            return super(AddStraordinariUtente, self).form_valid(form)
+
 
 @login_required
 def documentiView(request):
     listaMesi = ["Gennaio","Febbraio", "Marzo","Aprile","Maggio","Giugno","Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"]
     context = {'mesi':listaMesi}
     return render(request,'users/documenti.html', context)
-    
+
+
 @login_required
 def get_qr(request):
     dip = AnaDipendenti.objects.get(user_id=request.user.id)
@@ -81,9 +168,11 @@ class CustomChangePassword(PasswordChangeView):
     template_name="users/cambia_password.html"
     success_url = reverse_lazy("users:password_cambiata")
 
+
 class CustomChangePasswordDone(PasswordChangeDoneView):
     template_name= "users/password_cambiata.html"
     fields = "__all__"
+
 
 class UsersView(LoginRequiredMixin, View):
     template_name= "users/dashboard.html"
@@ -98,9 +187,11 @@ class UsersView(LoginRequiredMixin, View):
         numeroPermessiAttiviGiorno = RichiesteAccettate.objects.filter(id_richieste__in=richieste,ora_inizio_permesso__isnull=False).count()
         numeroPermessiAttiviOre = RichiesteAccettate.objects.filter(id_richieste__in=richieste,ora_inizio_permesso=None).count()
         permessiInAttesa = richieste.count()
+        todos = TodoList.objects.filter(user=self.request.user.pk,fatta=False).count()
         context["numeroPermessiAttiviGiorno"] = numeroPermessiAttiviGiorno
         context["numeroPermessiAttiviOre"] = numeroPermessiAttiviOre
         context["permessiInAttesa"] = permessiInAttesa
+        context["todos"] = todos
 
         return context
 
@@ -128,7 +219,7 @@ class SceltaPermessi(LoginRequiredMixin, TemplateView):
 
 class RichiesteCreate(LoginRequiredMixin,CreateView):
     model= Richieste
-    form_class = CreateRichiestaForm
+    form_class = forms.CreateRichiestaForm
     template_name = 'users/richiedi-permesso-giorni.html'
     success_url= reverse_lazy('users:mie-richieste')
     
@@ -141,12 +232,13 @@ class RichiesteCreate(LoginRequiredMixin,CreateView):
             
             return super(RichiesteCreate, self).form_valid(form)
 
+
 class RichiesteCreateOrario(LoginRequiredMixin,CreateView):
     model= Richieste
-    form_class = CreateRichiestaOrarioForm
+    form_class = forms.CreateRichiestaOrarioForm
     template_name = 'users/richiedi-permesso-orario.html'
     success_url= reverse_lazy('users:mie-richieste')
-    
+
     def form_valid(self, form):
         form.instance.id_user=AuthUser.objects.get(id=self.request.user.pk)
         form.instance.id_dipendente_richiesta = AnaDipendenti.objects.get(user_id=self.request.user.pk)
@@ -155,6 +247,7 @@ class RichiesteCreateOrario(LoginRequiredMixin,CreateView):
         form.instance.a_giorno_richiesta = form.instance.da_giorno_richiesta
         if form.is_valid():
             return super(RichiesteCreateOrario, self).form_valid(form)
+
 
 @login_required
 def richiesteList(request):
@@ -194,9 +287,8 @@ class RichiesteUpdate(LoginRequiredMixin,UpdateView):
     model= Richieste
     template_name = "users/richiesta-modifica.html"
     context_object_name = "richiesta"
-    form_class = CreateRichiestaForm
+    form_class = forms.CreateRichiestaForm
     success_url= reverse_lazy('users:mie-richieste')
-    # fields= ('da_giorno_richiesta', 'a_giorno_richiesta', 'urgente', 'note_richiesta')
 
     def get_object(self):
         id_richiesta = self.kwargs.get("id_richiesta")
