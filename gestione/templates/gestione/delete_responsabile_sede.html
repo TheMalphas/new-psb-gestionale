@@ -7,12 +7,12 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <form method="POST" action="{% url 'gestione:delete_capo_area' dipendente.pk %}">
+      <form method="POST" action="{% url 'gestione:delete_responsabile_sede' dipendente.pk %}">
         <div class="modal-body">
           {% csrf_token %}
         <!-- Form -->
           {{form.as_p}}
-          <p>Si &#233; certi di voler <strong>rimuovere</strong> {{dipendente.nomecompleto|title}} dai Capo Area?</p>
+          <p>Si &#233; certi di voler <strong>rimuovere</strong> {{dipendente.nomecompleto|title}} dai Responsabili Sede?</p>
         <!-- End form -->
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancella</button>

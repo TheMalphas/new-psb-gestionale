@@ -12,12 +12,13 @@ from datetime import date, time, datetime, timedelta
 from django.core.signals import setting_changed, request_finished, request_started
 from django.db.models.signals import pre_save, post_save, pre_delete, post_delete
 from django.dispatch import receiver
-
+from decimal import *
+import math
 
 class AnaDipendenti(models.Model):
     id_dip = models.AutoField(db_column='ID_Dip', primary_key=True)  # Field name made lowercase.
     user = models.ForeignKey('AuthUser', models.DO_NOTHING, db_column='User_id', blank=True, null=True)  # Field name made lowercase.
-    id_stipendio = models.IntegerField(blank=True, null=True)
+    id_contratto = models.ForeignKey('Contratti', models.DO_NOTHING, db_column='id_contratto', blank=True, null=True)
     nome = models.CharField(db_column='Nome', max_length=100)  # Field name made lowercase.
     cognome = models.CharField(db_column='Cognome', max_length=100)  # Field name made lowercase.
     sesso = models.ForeignKey('Sesso', models.DO_NOTHING, db_column='Sesso', blank=True, null=True)  # Field name made lowercase.
@@ -46,8 +47,6 @@ class AnaDipendenti(models.Model):
     istruzione = models.ForeignKey('Istruzione', models.DO_NOTHING, db_column='Istruzione', blank=True, null=True)  # Field name made lowercase.
     tipo_contratto = models.ForeignKey('TipoContratto', models.DO_NOTHING, db_column='Tipo_Contratto', blank=True, null=True)  # Field name made lowercase.
     mansione = models.ForeignKey('Mansione', models.DO_NOTHING, db_column='Mansione', blank=True, null=True)  # Field name made lowercase.
-    data_inizio_rap = models.DateField(db_column='Data_inizio_rap', blank=True, null=True)  # Field name made lowercase.
-    data_fine_rap = models.DateField(db_column='Data_fine_rap', blank=True, null=True)  # Field name made lowercase.
     stato = models.CharField(db_column='Stato', max_length=7, blank=True, null=True)  # Field name made lowercase.
     data_creazione = models.DateTimeField(db_column='Data_creazione', blank=True, null=True)  # Field name made lowercase.
     note = models.TextField(db_column='Note', blank=True, null=True)  # Field name made lowercase.
@@ -119,16 +118,17 @@ class CapoArea(models.Model):
 class Contratti(models.Model):
     id_contratto = models.AutoField(db_column='ID_Contratto', primary_key=True)  # Field name made lowercase.
     id_dip = models.ForeignKey(AnaDipendenti, models.DO_NOTHING, db_column='ID_Dip', blank=True, null=True)  # Field name made lowercase.
-    id_societa = models.IntegerField(db_column='ID_Societa', blank=True, null=True)  # Field name made lowercase.
-    codicecontratto = models.CharField(db_column='CodiceContratto', max_length=2, blank=True, null=True)  # Field name made lowercase.
-    tipologia = models.CharField(db_column='Tipologia', max_length=23, blank=True, null=True)  # Field name made lowercase.
-    parziale = models.CharField(db_column='Parziale', max_length=5, blank=True, null=True)  # Field name made lowercase.
-    orecontrattuali = models.CharField(db_column='OreContrattuali', max_length=3, blank=True, null=True)  # Field name made lowercase.
+    id_societa = models.ForeignKey('ListaSocieta', models.DO_NOTHING, db_column='ID_Societa', blank=True, null=True)  # Field name made lowercase.
+    tipologia = models.ForeignKey('TipoContratto', models.DO_NOTHING, db_column='Tipologia', blank=True, null=True)  # Field name made lowercase.
+    ccnl = models.ForeignKey('TabellaCcnl', models.DO_NOTHING, db_column='ccnl', blank=True, null=True)
+    codicecontratto = models.CharField(db_column='CodiceContratto', max_length=50, blank=True, null=True)  # Field name made lowercase.
+    percentuale = models.ForeignKey('PercentualiContratto', models.DO_NOTHING, db_column='Percentuale', blank=True, null=True)  # Field name made lowercase.
+    trasferte_fisse = models.IntegerField(blank=True, null=True)
+    trasferte_fisse_tipo = models.CharField(max_length=2, blank=True, null=True)
     datainizio = models.DateField(db_column='DataInizio', blank=True, null=True)  # Field name made lowercase.
     datafine = models.DateField(db_column='DataFine', blank=True, null=True)  # Field name made lowercase.
     note = models.TextField(db_column='Note', blank=True, null=True)  # Field name made lowercase.
-    id_permesso = models.IntegerField(db_column='ID_Permesso', blank=True, null=True)  # Field name made lowercase.
-
+    
     class Meta:
         managed = False
         db_table = 'Contratti'
@@ -178,59 +178,142 @@ class Ingressidip(models.Model):
         orariolav = datetime.strptime("09:05:00", '%H:%M:%S').time()
         orariolavpulizieritardo = datetime.strptime("07:00:00", '%H:%M:%S').time()
         orariolavpulizie = datetime.strptime("07:05:00", '%H:%M:%S').time()
-        if self.entrata and self.entrata > orariolav  and self.id_dip_ing.area != 21:
-            ritardo = datetime.combine(date.today(), self.entrata) - datetime.combine(date.today(), orarioritardo)
-            return ritardo
-        if self.entrata and self.entrata > orariolavpulizie:
-            ritardo = datetime.combine(date.today(), self.entrata) - datetime.combine(date.today(), orariolavpulizieritardo)
-            return ritardo
-    
+        orariolavediliziaritardo = datetime.strptime("08:00:00", '%H:%M:%S').time()
+        orariolavedilizia = datetime.strptime("08:05:00", '%H:%M:%S').time()
+        
+        if self.id_dip_ing.area:
+            if self.id_dip_ing.area.id_area == 21:
+                if self.entrata and self.entrata > orariolavpulizie:
+                    ritardo = datetime.combine(date.today(), self.entrata) - datetime.combine(date.today(), orariolavpulizieritardo)
+                    return f'{str(ritardo)}'
+            elif self.id_dip_ing.area.id_area == 10:
+                if self.entrata and self.entrata > orariolavedilizia:
+                    ritardo = datetime.combine(date.today(), self.entrata) - datetime.combine(date.today(), orariolavediliziaritardo)
+                    return f'{str(ritardo)}'
+            else:
+                if self.entrata and self.entrata > orariolav:
+                    ritardo = datetime.combine(date.today(), self.entrata) - datetime.combine(date.today(), orarioritardo)
+                    return f'{str(ritardo)}'
+        
     @property
     def anticipo(self):
-        orariolav = datetime.strptime("07:00:00", '%H:%M:%S').time()
+        orariolav = datetime.strptime("09:00:00", '%H:%M:%S').time()
         orariolavpulizie = datetime.strptime("07:00:00", '%H:%M:%S').time()
-
-        if self.entrata and self.entrata < orariolav and self.id_dip_ing.area != 21:
-            anticipo = datetime.combine(date.today(), orariolav) - datetime.combine(date.today(), self.entrata)
-            return anticipo
-        elif self.entrata and self.entrata < orariolavpulizie:
-            anticipo = datetime.combine(date.today(), orariolavpulizie) - datetime.combine(date.today(), self.entrata)
-            return anticipo
-
+        orariolavedilizia = datetime.strptime("08:00:00", '%H:%M:%S').time()
+        
+        if self.id_dip_ing.area:
+            if self.id_dip_ing.area.id_area == 21:
+                if self.entrata and self.entrata < orariolavpulizie:
+                    anticipo = datetime.combine(date.today(), orariolavpulizie) - datetime.combine(date.today(), self.entrata)
+                    return f'{str(anticipo)}'
+            elif self.id_dip_ing.area.id_area == 10:
+                if self.entrata and self.entrata < orariolavedilizia:
+                    anticipo = datetime.combine(date.today(), orariolavedilizia) - datetime.combine(date.today(), self.entrata)
+                    return f'{str(anticipo)}'
+            else:
+                if self.entrata and self.entrata < orariolav:
+                    anticipo = datetime.combine(date.today(), orariolav) - datetime.combine(date.today(), self.entrata)
+                    return f'{str(anticipo)}'
     
     @property
     def straordinario(self):
-        orariolav = datetime.strptime("09:00:00", '%H:%M:%S').time()
-        orariolavfine = datetime.strptime("18:00:00", '%H:%M:%S').time()
-        straordinario = 0
-        if self.entrata and self.entrata < orariolav and self.seconda_uscita and self.seconda_uscita > orariolavfine:
-            straE = datetime.combine(date.today(), orariolav) - datetime.combine(date.today(), self.entrata)
-            if straE.total_seconds() > 1800:
-                straordinario = straE
-                straU = datetime.combine(date.today(), self.seconda_uscita) - datetime.combine(date.today(), orariolavfine)
-                if straU.total_seconds() > 1800:
-                    straordinario = straordinario + timedelta(seconds=straE.total_seconds())
-                    if self.seconda_entrata and self.seconda_uscita:
-                        checkEntrata = datetime.combine(date.today(), self.entrata) - datetime.combine(date.today(), self.uscita)
-                        checkUscita = datetime.combine(date.today(), self.seconda_entrata) - datetime.combine(date.today(), self.seconda_uscita)
-                        timeLavoro = checkEntrata.total_seconds() + checkUscita.total_seconds()
-                        if timeLavoro > 30600:
-                            checkEntrata + timedelta(seconds=checkUscita.total_seconds())
-                            return checkEntrata
+        if self.id_dip_ing.area == 21:
+            orariolav = datetime.strptime("09:00:00", '%H:%M:%S').time()
+            orariolavfine = datetime.strptime("18:00:00", '%H:%M:%S').time()
+            straordinario = 0
+            if self.entrata and self.entrata < orariolav and self.seconda_uscita and self.seconda_uscita > orariolavfine:
+                straE = datetime.combine(date.today(), orariolav) - datetime.combine(date.today(), self.entrata)
+                if straE.total_seconds() > 1800:
+                    straordinario = straE
+                    straU = datetime.combine(date.today(), self.seconda_uscita) - datetime.combine(date.today(), orariolavfine)
+                    if straU.total_seconds() > 1800:
+                        straordinario = straordinario + timedelta(seconds=straE.total_seconds())
+                        if self.seconda_entrata and self.seconda_uscita:
+                            checkEntrata = datetime.combine(date.today(), self.entrata) - datetime.combine(date.today(), self.uscita)
+                            checkUscita = datetime.combine(date.today(), self.seconda_entrata) - datetime.combine(date.today(), self.seconda_uscita)
+                            timeLavoro = checkEntrata.total_seconds() + checkUscita.total_seconds()
+                            if timeLavoro > 30600:
+                                checkEntrata + timedelta(seconds=checkUscita.total_seconds())
+                                return str(checkEntrata)
+                    return straordinario
+            if self.entrata and self.entrata < orariolav and self.uscita and self.uscita > orariolavfine:
+                straE = datetime.combine(date.today(), orariolav) - datetime.combine(date.today(), self.entrata)
+                if straE.total_seconds() > 1800:
+                    straordinario = straE
+                    straU = datetime.combine(date.today(), self.uscita) - datetime.combine(date.today(), orariolavfine)
+                    if straU.total_seconds() > 1800:
+                        straordinario = straordinario + timedelta(seconds=straE.total_seconds())
                 return straordinario
-        if self.entrata and self.entrata < orariolav and self.uscita and self.uscita > orariolavfine:
-            straE = datetime.combine(date.today(), orariolav) - datetime.combine(date.today(), self.entrata)
-            if straE.total_seconds() > 1800:
-                straordinario = straE
-                straU = datetime.combine(date.today(), self.uscita) - datetime.combine(date.today(), orariolavfine)
-                if straU.total_seconds() > 1800:
-                    straordinario = straordinario + timedelta(seconds=straE.total_seconds())
-            return straordinario
-        elif self.entrata and self.entrata < orariolav:
-            straE = datetime.combine(date.today(), orariolav) - datetime.combine(date.today(), self.entrata)
-            if straE.total_seconds() > 1800:
-                straordinario = straE
-            return straordinario
+            elif self.entrata and self.entrata < orariolav:
+                straE = datetime.combine(date.today(), orariolav) - datetime.combine(date.today(), self.entrata)
+                if straE.total_seconds() > 1800:
+                    straordinario = straE
+                return str(straordinario)
+        elif self.id_dip_ing.area == 10:
+            orariolav = datetime.strptime("08:00:00", '%H:%M:%S').time()
+            orariolavfine = datetime.strptime("17:00:00", '%H:%M:%S').time()
+            straordinario = 0
+            if self.entrata and self.entrata < orariolav and self.seconda_uscita and self.seconda_uscita > orariolavfine:
+                straE = datetime.combine(date.today(), orariolav) - datetime.combine(date.today(), self.entrata)
+                if straE.total_seconds() > 1800:
+                    straordinario = straE
+                    straU = datetime.combine(date.today(), self.seconda_uscita) - datetime.combine(date.today(), orariolavfine)
+                    if straU.total_seconds() > 1800:
+                        straordinario = straordinario + timedelta(seconds=straE.total_seconds())
+                        if self.seconda_entrata and self.seconda_uscita:
+                            checkEntrata = datetime.combine(date.today(), self.entrata) - datetime.combine(date.today(), self.uscita)
+                            checkUscita = datetime.combine(date.today(), self.seconda_entrata) - datetime.combine(date.today(), self.seconda_uscita)
+                            timeLavoro = checkEntrata.total_seconds() + checkUscita.total_seconds()
+                            if timeLavoro > 30600:
+                                checkEntrata + timedelta(seconds=checkUscita.total_seconds())
+                                return str(checkEntrata)
+                    return straordinario
+            if self.entrata and self.entrata < orariolav and self.uscita and self.uscita > orariolavfine:
+                straE = datetime.combine(date.today(), orariolav) - datetime.combine(date.today(), self.entrata)
+                if straE.total_seconds() > 1800:
+                    straordinario = straE
+                    straU = datetime.combine(date.today(), self.uscita) - datetime.combine(date.today(), orariolavfine)
+                    if straU.total_seconds() > 1800:
+                        straordinario = straordinario + timedelta(seconds=straE.total_seconds())
+                return straordinario
+            elif self.entrata and self.entrata < orariolav:
+                straE = datetime.combine(date.today(), orariolav) - datetime.combine(date.today(), self.entrata)
+                if straE.total_seconds() > 1800:
+                    straordinario = straE
+                return str(straordinario)
+        else:
+            orariolav = datetime.strptime("09:00:00", '%H:%M:%S').time()
+            orariolavfine = datetime.strptime("18:00:00", '%H:%M:%S').time()
+            straordinario = 0
+            if self.entrata and self.entrata < orariolav and self.seconda_uscita and self.seconda_uscita > orariolavfine:
+                straE = datetime.combine(date.today(), orariolav) - datetime.combine(date.today(), self.entrata)
+                if straE.total_seconds() > 1800:
+                    straordinario = straE
+                    straU = datetime.combine(date.today(), self.seconda_uscita) - datetime.combine(date.today(), orariolavfine)
+                    if straU.total_seconds() > 1800:
+                        straordinario = straordinario + timedelta(seconds=straE.total_seconds())
+                        if self.seconda_entrata and self.seconda_uscita:
+                            checkEntrata = datetime.combine(date.today(), self.entrata) - datetime.combine(date.today(), self.uscita)
+                            checkUscita = datetime.combine(date.today(), self.seconda_entrata) - datetime.combine(date.today(), self.seconda_uscita)
+                            timeLavoro = checkEntrata.total_seconds() + checkUscita.total_seconds()
+                            if timeLavoro > 30600:
+                                checkEntrata + timedelta(seconds=checkUscita.total_seconds())
+                                return str(checkEntrata)
+                    return straordinario
+            if self.entrata and self.entrata < orariolav and self.uscita and self.uscita > orariolavfine:
+                straE = datetime.combine(date.today(), orariolav) - datetime.combine(date.today(), self.entrata)
+                if straE.total_seconds() > 1800:
+                    straordinario = straE
+                    straU = datetime.combine(date.today(), self.uscita) - datetime.combine(date.today(), orariolavfine)
+                    if straU.total_seconds() > 1800:
+                        straordinario = straordinario + timedelta(seconds=straE.total_seconds())
+                return straordinario
+            elif self.entrata and self.entrata < orariolav:
+                straE = datetime.combine(date.today(), orariolav) - datetime.combine(date.today(), self.entrata)
+                if straE.total_seconds() > 1800:
+                    straordinario = straE
+                return str(straordinario)
+
     @property
     def in_permState(self):
         if self.in_permesso and self.id_permesso != None:
@@ -243,26 +326,29 @@ class Ingressidip(models.Model):
             return
     
     @property
-    def ingressoArea(self):
+    def getarea(self):
         if self.id_dip_ing.area:
-            return (self.id_dip_ing.area.nome_area).title()
-        else:
-            return "Non segnato"
-    
+            areas = f'{self.id_dip_ing.area.nome_area}'
+            ar = areas.split(" ")
+            return ar[0].title()
+        else: "No Area"
+        
     @property
-    def ingressoSede(self):
-        if self.id_dip_ing.sede:
-            return (self.id_dip_ing.sede.nome_sede).title()
-        else:
-            return "Non segnato"
-    
-    @property
-    def ingressoSocieta(self):
+    def getsocieta(self):
         if self.id_dip_ing.societa:
-            return (self.id_dip_ing.societa.nome_societa).title()
-        else:
-            return "Non segnato"
+            societas = f'{self.id_dip_ing.societa.nome_societa}'
+            soc = societas.split(" ")
+            return soc[0].title()
+        else: "No Società"
     
+    @property
+    def getsede(self):
+        if self.id_dip_ing.sede:
+            sed = f'{self.id_dip_ing.sede.nome_sede}'
+            sedez = sed.split(" ")
+            return sedez[0].title()
+        else: "No Sede"
+        
     def get_data(self):
         try:
             data = {
@@ -385,6 +471,31 @@ class Permessi(models.Model):
     def __str__(self):
         return self.tipopermesso
 
+class PercentualiContratto(models.Model):
+    id_ore_contratto = models.AutoField(primary_key=True)
+    dicitura_percentuale = models.CharField(max_length=50)
+    perc_contratto = models.DecimalField(max_digits=20, decimal_places=2)
+    ore_contratto = models.DecimalField(max_digits=20, decimal_places=2, blank=True, null=True)
+    note = models.TextField(db_column='Note', blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False
+        db_table = 'Percentuali_contratto'
+        ordering = ["perc_contratto"]
+
+    def __str__(self):
+        perc = f'{self.perc_contratto}%'
+        if '.00' in perc:
+            entuale = perc.split(".")
+            return f'{entuale[0]}%'
+        else: return perc
+
+    def save(self, *args, **kwargs):
+        if self.perc_contratto:
+            perce = round(self.perc_contratto,2)
+            ore = math.trunc((perce * 160)/100)
+            self.ore_contratto = Decimal(ore)
+        super(PercentualiContratto, self).save(*args, **kwargs)
 
 class Responsabili(models.Model):
     id_res = models.AutoField(primary_key=True)
@@ -520,10 +631,21 @@ class Societa(models.Model):
         return self.nome_societa
 
 
+class TabellaCcnl(models.Model):
+    id_ccnl = models.AutoField(primary_key=True)
+    tipo_contratto = models.CharField(max_length=250, blank=True, null=True)
+    codice_ccnl = models.CharField(max_length=10, blank=True, null=True)
+    note = models.CharField(max_length=50, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'tabella_ccnl'
+
+
 class TipoContratto(models.Model):
     id_contratto = models.AutoField(primary_key=True)
     nome_contratto = models.CharField(unique=True, max_length=100, blank=True, null=True)
-    codice_contratto = models.CharField(max_length=2, blank=True, null=True)
+    codice_contratto = models.CharField(max_length=10, blank=True, null=True)
     data_creazione = models.DateTimeField(blank=True, null=True)
     data_modifica = models.DateTimeField(blank=True, null=True)
     note = models.TextField(db_column='Note', blank=True, null=True)  # Field name made lowercase.
@@ -531,6 +653,7 @@ class TipoContratto(models.Model):
     class Meta:
         managed = False
         db_table = 'Tipo_Contratto'
+        ordering = ["nome_contratto"]
         
     def __str__(self):
         return self.nome_contratto

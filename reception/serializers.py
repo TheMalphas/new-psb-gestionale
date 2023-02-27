@@ -8,5 +8,5 @@ class IngressidipSerializer(serializers.ModelSerializer):
     # specify model and fields
     class Meta:
         model = Ingressidip
-        fields = ["nominativo","giorno","in_permState","entrata","uscita","seconda_entrata","seconda_uscita","anticipo","ritardo","straordinario","ingressoArea","ingressoSede","ingressoSocieta"]
-        ordering = ["nominativo","giorno"]
+        fields = ["nominativo","giorno","in_permState","entrata","uscita","seconda_entrata","seconda_uscita","anticipo","ritardo","straordinario","getarea","getsede","getsocieta"]
+        ordering = ["giorno","nominativo"]

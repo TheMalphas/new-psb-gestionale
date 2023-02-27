@@ -1,17 +1,17 @@
 .hover-link:hover {
-    background-color: #1eff00 !important;
+    background-color: #31e519 !important;
     border-radius: 0.4em;
     color: #ffffff !important;
 }
 
 .nav-pills > li > a.active {
     color: #ffffff !important;
-    background-color: #1eff00 !important;
+    background-color: #31e519 !important;
 }
 
 .nav-pills > li > a.active:hover {
     color: #ffffff !important;
-    background-color: #1eff00 !important;
+    background-color: #31e519 !important;
 }
 
 .nav-pills > li:hover {
@@ -19,7 +19,7 @@
 }
 
 .hover-link:hover {
-    background-color: #1eff00 !important;
+    background-color: #31e519 !important;
     color: #ffffff !important;
     border-radius: 0.4em;
 }
@@ -33,73 +33,75 @@ a:hover, a:active {
 }
 
 .cartaBox .carta .numbers {
-    color: #1eff00;
+    color: #31e519;
 }
 
 .cartaBox .carta-table .numbers {
-    color: #1eff00;
+    color: #31e519;
 }
 
 .cartaBox .carta-table-reception .numbers {
-    color: #1eff00;
+    color: #31e519;
 }
 
 .cartaBox .carta:hover:not(#child){
-    background-color: #1eff00;
+    background-color: #31e519;
     color: #ffffff;
 }
 .cartaBox-table-reception-datatables  .carta .numbers {
-    color: #1eff00;
+    color: #31e519;
 }
 
 .cartaBox-table-reception-datatables  .carta-table .numbers {
-    color: #1eff00;
+    color: #31e519;
 }
 
 .cartaBox-table-reception-datatables  .carta-table-reception .numbers {
-    color: #1eff00;
+    color: #31e519;
 }
 
 .cartaBox-table-reception-datatables  .carta-table-reception-datatables .numbers {
-    color: #1eff00;
+    color: #31e519;
 }
 
 .cartaBox-table-reception-datatables  .carta:hover:not(#child){
-    background-color: #1eff00;
+    background-color: #31e519;
     color: #ffffff;
 }
 
 .cartaBox-table-reception-capi-area  .carta .numbers {
-    color: #1eff00;
+    color: #31e519;
 }
 
 .cartaBox-table-reception-capi-area  .carta-table .numbers {
-    color: #1eff00;
+    color: #31e519;
 }
 
 .cartaBox-table-reception-capi-area  .carta-table-reception .numbers {
-    color: #1eff00;
+    color: #31e519;
 }
 
 .cartaBox-table-reception-capi-area  .carta-table-reception-capi-area .numbers {
-    color: #1eff00;
+    color: #31e519;
 }
-
+.cartaBox-table-reception-datatables-big .carta-table-reception-datatables-big .numbers  {
+    color: #31e519;
+}
 .cartaBox-table-reception-capi-area  .carta:hover:not(#child){
-    background-color: #1eff00;
+    background-color: #31e519;
     color: #ffffff;
 }
 
 .table-hover tbody tr:hover td, .table-hover tbody tr:hover th {
     color: #ffffff;
-    background-color: #1eff00;
+    background-color: #31e519;
 }
 
 .dropdown-item:hover{
     color: #ffffff;
-    background-color: #1eff00;
+    background-color: #31e519;
 }
 
 strong {
-    color: #1eff00;
+    color: #31e519;
 }

@@ -1,0 +1,33 @@
+.tab-filter-container {
+    padding: 2rem;
+    text-align: center;
+    --bs-bg-opacity: 1;
+    background-color: rgba(var(--bs-light-rgb),var(--bs-bg-opacity))!important;
+    border-radius: 20px 20px 0px 0px;
+    box-shadow: 10px 5px 5px #bf72f3;
+}
+
+.btn-primary{
+color: #ffffff !important;
+background: #bf72f3 !important;
+}
+
+.filter-btn.active {
+    background: #bf72f3;
+    color: var(--white);
+}
+
+.tab-filter-item-container {
+    background: var(--white);
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+    border-radius: 0px 0px 20px 20px;
+    box-shadow: 10px 10px 5px #bf72f3 ;
+}
+
+.filter-btn:hover{
+    background: #bf72f3;
+    color: var(--white);
+}
+

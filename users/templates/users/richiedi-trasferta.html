@@ -1,0 +1,64 @@
+{% extends 'base/main.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<title>{% block title%}Richiedi permesso{% endblock %}</title>
+
+<script src="{% static 'base/js/jquery.js' %}"></script>
+<script src="{% static 'users/js/script.js' %}"></script>
+<link rel="stylesheet" href="{% static 'users/css/style.css' %}">
+
+<section id="styler-navbar" style="box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); margin-left:210px;">
+    <header class="p-3 bg-light text-black">
+        <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+    
+        <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+            <li class="nav-link px-2 text-dark"></li>            
+            <li class="nav-link px-2 text-dark">Buon lavoro, {{user.first_name}}</li> 
+        </ul>
+</header>
+
+</section>
+    
+<section class="right-side-element">
+    
+<div class="card-richiesta-permesso" style="align:center;">
+    <div class="row mb-4" >
+        <div class="col-auto">
+            <h2>Richiedi Trasferta</h2>
+        </div>
+    </div>
+    <form class="" method="POST" action="">
+    {%csrf_token%}
+    {% if form.non_field_errors%}
+    <div class="row mb-4" >
+        <div class="col-auto">
+            {{form.non_field_errors}}
+        </div>
+    </div>
+    {% endif %}
+    <div class="row mb-4" >
+        <div class="col-auto">
+        {{form.rel_giorno.label}}
+        {{form.rel_giorno}}
+        <strong style="color:red;">{{form.rel_giorno.errors}}</strong>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-auto">{{form.note.label}}</div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-auto">{{form.note}}</div>
+    </div>
+
+    <input type="submit" class="btn btn-success" class="warp" value="Richiedi">
+</form>
+</div>
+</div>
+
+</section>
+{% endblock %}

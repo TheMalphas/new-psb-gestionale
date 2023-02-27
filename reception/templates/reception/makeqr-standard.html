@@ -7,8 +7,15 @@
 <title>{% block title%}Tutte le richieste{% endblock %}</title>
 <link rel="stylesheet" href="{% static 'capi_area/css/style.css' %}">
 
-{% include "capi_area/header-capi_area.html" %}
+<section id="styler-navbar" style="box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); margin-left:210px;">
+    <header class="p-3 bg-light text-black">
+        <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
 
+            <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+                <li class="nav-link px-2 text-dark"></li>
+            </ul>
+    </header>
+</section>
 
 <section style="margin-left:300px; margin-top:25px;">
    
@@ -27,7 +34,7 @@
         <option value="{{dip.id_dip}}">{{dip}}</option>
         {% endfor %}
     </select>
-    <input style="margin-top:1em;" type="submit" value="Conferma">
+    <button type"submit" class="btn btn-success" style="margin-top:1em;" type="submit" value="Conferma">Scarica</button>
 </form>
 </div>
 </div>

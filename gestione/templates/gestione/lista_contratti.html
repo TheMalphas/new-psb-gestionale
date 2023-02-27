@@ -5,102 +5,219 @@
 <title>{% block title%}Contratti{% endblock %}</title>
 <link rel="stylesheet" href="{% static 'gestione/css/style.css' %}">
 <script src="{% static 'gestione/js/script.js' %}"></script>
+<!-- Datatables -->
 
-<section style="box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); margin-left:268px;">
+<link href="https://cdn.datatables.net/1.13.2/css/jquery.dataTables.min.css" rel="stylesheet" crossorigin="anonymous">
+
+<section id="styler-navbar" style="box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); margin-left:210px;">
     <header class="p-3 bg-light text-black">
         <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
     
         <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-            <li class="nav-link px-2 text-dark"></li>            
-            <li class="nav-link px-2 text-dark">Buon lavoro, {{user.first_name}}</li> 
+            <li class="nav-link px-2 text-dark"><a href="{% url 'gestione:lista_contratti_scaduti' %}">Vai agli Scaduti</a></li> 
         </ul>
-        <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" method="GET" action="{% url 'gestione:lista_contratti' %}" value="{{contratto.id_contratto}}">
+        <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" method="GET" id="scarica-contratti" action="{% url 'gestione:lista_contratti' %}">
             {% csrf_token %}
-            <input type="search" id="contratti-input" name="contratto" class="form-control form-control-dark" value="Cerca" placeholder="Cerca..." aria-label="Cerca">
+            <input type="search" id="contratti-input" name="contratto" class="form-control form-control-dark" value="" placeholder="Cerca..." aria-label="Cerca">
         </form>
-        <div class="text-end">
-            <button type="button" class="btn btn-success">Cerca</button>
-            {% comment %} <a href="/lista-contratti-excel/?contratti=" id="contratto-anchor"><button type="button" class="btn btn-warning">Scarica</button></a> {% endcomment %}
-            </div>
 </header>
 </section> 
 
 <section style="margin-left:300px; margin-top:25px;">
     <div class="cartaBox-table-reception-datatables">
-
-            <div class="carta-table-reception-datatables text-nowrap">
-                <div>
-                    <div class="numbers">{{contratti|length}}</div>
-                    <div class="no-hover">
-                    <table class="table table-striped table-hover caption-top">
-                        <caption>Contratti</caption>
-                        <thead>
+        <div class="carta-table-reception-datatables text-nowrap">
+            <div>
+                <div class="numbers">{{contratti|length}}</div>
+                <div class="no-hover">
+                <table class="table table-striped table-hover caption-top" id="table-contratti">
+                    <caption>Contratti</caption>
+                    <thead>
+                    <tr>
+                    <th> Dipendente </th>
+                    <th> Societ&#224; </th>
+                    <th> Tipologia </th>
+                    <th> CCNL </th>
+                    <th> Percentuale </th>
+                    <th> Data inizio </th>
+                    <th> Data termine </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        {% for contratto in contratti %}
                         <tr>
-                            <th scope="col"></th>
-                            <td> Dipendente</td>
-                            <td> Codice Contratto</td>
-                            <td> Percentuale</td>
-                            <td> Data inizio</td>
-                            <td> Data termine</td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                <span>{{contratto.id_dip.cognome|title}} {{contratto.id_dip.nome|title}}&nbsp;</span>
+                                <span>
+                                <div class="dropdown">
+                                    <a href="#" class="d-flex align-items-center link-dark text-decoration-none dropdown-toggle" id="dropdownUser2" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-plus-square-fill"></i>
+                                    </a>
+                                        <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser2">
+                                        <li><a class="dropdown-item" onclick="open_modal_update_contratto('{% url 'gestione:modifica-contratto' contratto.id_contratto %}')">Modifica</a></li>
+                                    </ul>
+                                </div>
+                                </span>
+                            </div>
+                            </td>
+                            <td>{% if contratto.id_societa != none %}{{contratto.id_societa|title}}{% endif %}</td>
+                            <td>{% if contratto.tipologia %} <div {% if contratto.tipologia.id_contratto == 5 %} class="stato piva text-center" style="color:white;" {% elif contratto.tipologia.id_contratto == 1 or contratto.tipologia.id_contratto == 2 or contratto.tipologia.id_contratto == 3 %} class="stato contrattostandard text-center" style="color:white;" {% elif contratto.tipologia.id_contratto == 4 %} class="stato occasionale text-center" style="color:white;" {% elif contratto.tipologia.id_contratto == 7 %} class="stato tirocinante text-center" style="color:white;" {% endif %}> {% if not contratto.tipologia.nome_contratto|title %} Mancante {% elif contratto.tipologia.nome_contratto|title  %} {{ contratto.tipologia.nome_contratto|title }} {% endif %}</div>{% endif %}</td>
+                            <td>{% if contratto.ccnl != none %}{{contratto.ccnl.tipo_contratto|title}}{% endif %}</td>
+                            <td>{% if contratto.percentuale != none %}{{contratto.percentuale}}{% endif %}</td>
+                            <td>{% if contratto.datainizio != none %}{{contratto.datainizio}}{% endif %}</td>
+                            <td>{% if contratto.datafine != none %}{{contratto.datafine}}{% endif %}</td>
                         </tr>
-                        </thead>
-                        <tbody>
-                            {% for contratto in contratti %}
-                            <tr>
-                                <th scope="col">
-                                    <div class="dropdown">
-                                        <a href="#" class="d-flex align-items-center link-dark text-decoration-none dropdown-toggle" id="dropdownUser2" data-bs-toggle="dropdown" aria-expanded="false">
-                                            <i class="bi bi-plus-square-fill"></i>
-                                        </a>
-                                            <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser2">
-                                            <li><a class="dropdown-item" onclick="open_modal_create_contratto('{% url 'gestione:crea-contratto'%}')">Aggiungi</a></li>
-                                            <li><hr class="dropdown-divider"></li>
-                                            <li><a class="dropdown-item" onclick="open_modal_update_contratto('{% url 'gestione:modifica-contratto' contratto.id_contratto %}')">Modifica</a></li>
-                                        </ul>
-                                    </div>
-                                </th>
-                                <td>{{contratto.id_dip.nome|title}} {{contratto.id_dip.cognome|title}}</td>
-                                <td>{% if contratto.codicecontratto != none %}{{contratto.codicecontratto|upper}}{% endif %}</td>
-                                <td>{% if contratto.percentuale != none %}{{contratto.percentuale}}{% endif %}</td>
-                                <td>{% if contratto.datainizio != none %}{{contratto.datainizio}}{% endif %}</td>
-                                <td>{% if contratto.datafine != none %}{{contratto.datafine}}{% endif %}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                </div>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <th> Dipendente </th>
+                        <th> Societ&#224; </th>
+                        <th> Tipologia </th>
+                        <th> CCNL </th>
+                        <th> Percentuale </th>
+                        <th> Data inizio </th>
+                        <th> Data termine </th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            </div>
+            <div class="iconBox">
                 <div class="iconBox">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="55" height="55" fill="currentColor" class="bi bi-folder-plus" viewBox="0 0 16 16">
-                        <path d="m.5 3 .04.87a1.99 1.99 0 0 0-.342 1.311l.637 7A2 2 0 0 0 2.826 14H9v-1H2.826a1 1 0 0 1-.995-.91l-.637-7A1 1 0 0 1 2.19 4h11.62a1 1 0 0 1 .996 1.09L14.54 8h1.005l.256-2.819A2 2 0 0 0 13.81 3H9.828a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 6.172 1H2.5a2 2 0 0 0-2 2zm5.672-1a1 1 0 0 1 .707.293L7.586 3H2.19c-.24 0-.47.042-.683.12L1.5 2.98a1 1 0 0 1 1-.98h3.672z"/>
-                        <path d="M13.5 10a.5.5 0 0 1 .5.5V12h1.5a.5.5 0 1 1 0 1H14v1.5a.5.5 0 1 1-1 0V13h-1.5a.5.5 0 0 1 0-1H13v-1.5a.5.5 0 0 1 .5-.5z"/>
-                      </svg>
-                </div>
+                <a onclick="open_modal_create_contratto('{% url 'gestione:crea-contratto'%}')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="55" height="55" fill="currentColor" class="bi bi-folder-plus" viewBox="0 0 16 16">
+                    <path d="m.5 3 .04.87a1.99 1.99 0 0 0-.342 1.311l.637 7A2 2 0 0 0 2.826 14H9v-1H2.826a1 1 0 0 1-.995-.91l-.637-7A1 1 0 0 1 2.19 4h11.62a1 1 0 0 1 .996 1.09L14.54 8h1.005l.256-2.819A2 2 0 0 0 13.81 3H9.828a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 6.172 1H2.5a2 2 0 0 0-2 2zm5.672-1a1 1 0 0 1 .707.293L7.586 3H2.19c-.24 0-.47.042-.683.12L1.5 2.98a1 1 0 0 1 1-.98h3.672z"/>
+                    <path d="M13.5 10a.5.5 0 0 1 .5.5V12h1.5a.5.5 0 1 1 0 1H14v1.5a.5.5 0 1 1-1 0V13h-1.5a.5.5 0 0 1 0-1H13v-1.5a.5.5 0 0 1 .5-.5z"/>
+                </svg>
                 </a>
             </div>
+        </div>
     </div>    
 </section>
-    
+
 <div class="modal fade" id="modificaContrattoModal" role="dialog" tabindex="-1">
 </div>
 
-<div class="modal fade" id="creadiContrattoModal" role="dialog" tabindex="-1">
+<div class="modal fade" id="creaContrattoModal" role="dialog" tabindex="-1">
 </div>
+
+<script src="https://cdn.datatables.net/1.13.2/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/v/bs5/jszip-2.5.0/dt-1.13.2/af-2.5.2/b-2.3.4/b-colvis-2.3.4/b-html5-2.3.4/b-print-2.3.4/cr-1.6.1/date-1.3.0/fc-4.2.1/fh-3.3.1/kt-2.8.1/r-2.4.0/rg-1.3.0/rr-1.3.2/sc-2.1.0/sb-1.4.0/sp-2.1.1/sr-1.2.1/datatables.min.js"></script>
+    
 
 <script>
     var $ = jQuery.noConflict();
 function open_modal_create_contratto(url){
-    $('#modificaContrattoModal').load(url,function(){
+    $('#creaContrattoModal').load(url,function(){
     $(this).modal('show'); 
     });
 };
 
 var $ = jQuery.noConflict();
 function open_modal_update_contratto(url){
-    $('#creaContrattoModal').load(url,function(){
+    $('#modificaContrattoModal').load(url,function(){
     $(this).modal('show'); 
     });
 };
+
+
+$(document).ready(function () {
+    // Setup - add a text input to each footer cell
+    $('#table-contratti thead tr')
+        .clone(true)
+        .addClass('filters')
+        .appendTo('#table-contratti thead');
+    
+    var table = $('#table-contratti').DataTable({
+        orderCellsTop: true,
+        fixedHeader: true,
+        dom: 'Bfrtip',
+        buttons: [
+        {
+            extend: 'copy',
+            className: 'btn btn-secondary',
+            text: 'Copia'
+        },
+        {
+            extend: 'excel',
+            className: 'btn btn-success',
+            text: 'Excel'
+        },
+        {
+            extend: 'pdfHtml5',
+            className: 'btn btn-danger',
+            text: 'PDF',
+            orientation: 'landscape',
+            pageSize: 'A3',
+            exportOptions: {
+            columns: ':visible'
+            },
+            customize: function(doc) {
+                doc.content.forEach(function(item) {
+                if (item.text) {
+                item.text[0].fontSize = 8 // Set the font size to 8pt
+                }
+            });
+            }
+        },
+    ],
+        initComplete: function () {
+            var api = this.api();
+    
+            // For each column
+            api
+                .columns()
+                .eq(0)
+                .each(function (colIdx) {
+                    // Set the header cell to contain the input element
+                    var cell = $('.filters th').eq(
+                        $(api.column(colIdx).header()).index()
+                    );
+                    var title = $(cell).text();
+                    $(cell).html('<input type="text" placeholder="' + title + '" />');
+    
+                    // On every keypress in this input
+                    $(
+                        'input',
+                        $('.filters th').eq($(api.column(colIdx).header()).index())
+                    )
+                        .off('keyup change')
+                        .on('change', function (e) {
+                            // Get the search value
+                            $(this).attr('title', $(this).val());
+                            var regexr = '({search})'; //$(this).parents('th').find('select').val();
+    
+                            var cursorPosition = this.selectionStart;
+                            // Search the column for that value
+                            api
+                                .column(colIdx)
+                                .search(
+                                    this.value != ''
+                                        ? regexr.replace('{search}', '(((' + this.value + ')))')
+                                        : '',
+                                    this.value != '',
+                                    this.value == ''
+                                )
+                                .draw();
+                        })
+                        .on('keyup', function (e) {
+                            e.stopPropagation();
+    
+                            $(this).trigger('change');
+                            $(this)
+                                .focus()[0]
+                                .setSelectionRange(cursorPosition, cursorPosition);
+                        });
+                });
+        },
+    });
+});
+
 </script>
 
 {% endblock content %}
+
+

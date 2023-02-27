@@ -6,20 +6,16 @@
 <script src="{% static 'capi_area/js/jquery.js' %}"></script>
 <link rel="stylesheet" href="{% static 'users/css/style.css' %}">
 
-<title>{% block title%}Dashboard Capo Area{% endblock %}</title>
+<title>{% block title%} Dashboard Capo Area {% endblock %}</title>
 
-<section style="box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); margin-left:268px;">
+<section id="styler-navbar" style="box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); margin-left:210px;">
     <header class="p-3 bg-light text-black">
         <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
     
         <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
             <li class="nav-link px-2 text-dark"></li>
-            <li class="nav-link px-2 text-dark">Ciao, {{user.first_name}}</li>
+            <li class="nav-link px-2 text-dark">Ciao, <strong>{{user.first_name}}</strong></li>
         </ul>
-    
-        <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3">
-            <input type="search" class="form-control form-control-dark" placeholder="Search..." aria-label="Search">
-        </form>
 </header>
 </section>
 
@@ -57,9 +53,9 @@
 
         <div class="carta">
             <div>
-                <a href="{% url 'capi_area:richieste' %}">
-                <div class="numbers">{{richiesteFerie}}</div>
-                <div class="cartaName">Richieste di Ferie</div>
+                <a href="{% url 'capi_area:richieste-straordinari' %}">
+                <div class="numbers">{{richiesteStraordinari}}</div>
+                <div class="cartaName">Richieste di Straordinari</div>
             </div>
             <div class="iconBox">
                 <svg xmlns="http://www.w3.org/2000/svg" width="55" height="55" fill="currentColor" class="bi bi-person-fill-dash" viewBox="0 0 16 16">
@@ -97,6 +93,24 @@
                     <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7Zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm-5.784 6A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1h4.216ZM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"/>
                 </svg>
             </div>
+        </div>
+
+
+        <div class="carta">
+            <div>
+                <a href="{% url 'capi_area:capi_area_todo' %}">
+                <div class="numbers">{{todos}} </div>
+                <div class="cartaName">Vai alla lista di todos</div>
+                </div>
+                <div class="iconBox">
+                    <a href="{% url 'capi_area:capi_area_todo' %}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="55" height="55" fill="currentColor" class="bi bi-card-checklist" viewBox="0 0 16 16">
+                        <path d="M14.5 3a.5.5 0 0 1 .5.5v9a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h13zm-13-1A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-9A1.5 1.5 0 0 0 14.5 2h-13z"/>
+                        <path d="M7 5.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 1 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0zM7 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm-1.496-.854a.5.5 0 0 1 0 .708l-1.5 1.5a.5.5 0 0 1-.708 0l-.5-.5a.5.5 0 0 1 .708-.708l.146.147 1.146-1.147a.5.5 0 0 1 .708 0z"/>
+                    </svg>    
+                    </a>        
+                </div>
+                </a>
         </div>
 
 </div>    

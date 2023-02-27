@@ -6,13 +6,11 @@
 <link rel="stylesheet" href="{% static 'gestione/css/style.css' %}">
 <script src="{% static 'gestione/js/script.js' %}"></script>
 
-<section style="box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); margin-left:268px;">
+<section id="styler-navbar" style="box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); margin-left:210px;">
     <header class="p-3 bg-light text-black">
         <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-    
         <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-            <li class="nav-link px-2 text-dark"></li>            
-            <li class="nav-link px-2 text-dark">Buon lavoro, {{user.first_name}}</li> 
+            <li><a class="nav-link px-2 text-dark" href="{% url 'gestione:altri-dati' %}">Torna alla Dati</a></li>
         </ul>
         <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" method="GET" action="{% url 'gestione:lista-mansioni' %}" value="{{mansione.id_mansione}}">
             {% csrf_token %}
@@ -53,6 +51,7 @@
                                             <li><a class="dropdown-item" onclick="open_modal_create_Mansione('{% url 'gestione:aggiungi-tipo-di-mansione'%}')">Crea Nuovo</a></li>
                                             <li><hr class="dropdown-divider"></li>
                                             <li><a class="dropdown-item" onclick="open_modal_update_Mansione('{% url 'gestione:modifica-mansione' mansione.id_mansione %}')">Modifica</a></li>
+                                            <li><a class="dropdown-item" onclick="open_modal_delete_Mansione('{% url 'gestione:delete-mansione' mansione.id_mansione %}')">Cancella</a></li>
                                         </ul>
                                     </div>
                                 </th>
@@ -65,11 +64,15 @@
                 </div>
                 </div>
                 <div class="iconBox">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="55" height="55" fill="currentColor" class="bi bi-pc-display-horizontal" viewBox="0 0 16 16">
-                        <path d="M1.5 0A1.5 1.5 0 0 0 0 1.5v7A1.5 1.5 0 0 0 1.5 10H6v1H1a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1h-5v-1h4.5A1.5 1.5 0 0 0 16 8.5v-7A1.5 1.5 0 0 0 14.5 0h-13Zm0 1h13a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-7a.5.5 0 0 1 .5-.5ZM12 12.5a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0Zm2 0a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0ZM1.5 12h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1ZM1 14.25a.25.25 0 0 1 .25-.25h5.5a.25.25 0 1 1 0 .5h-5.5a.25.25 0 0 1-.25-.25Z"/>
-                    </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="55" height="55" fill="currentColor" class="bi bi-pc-display" viewBox="0 0 16 16" style="margin-bottom:20px;">
+                        <path d="M8 1a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1V1Zm1 13.5a.5.5 0 1 0 1 0 .5.5 0 0 0-1 0Zm2 0a.5.5 0 1 0 1 0 .5.5 0 0 0-1 0ZM9.5 1a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5ZM9 3.5a.5.5 0 0 0 .5.5h5a.5.5 0 0 0 0-1h-5a.5.5 0 0 0-.5.5ZM1.5 2A1.5 1.5 0 0 0 0 3.5v7A1.5 1.5 0 0 0 1.5 12H6v2h-.5a.5.5 0 0 0 0 1H7v-4H1.5a.5.5 0 0 1-.5-.5v-7a.5.5 0 0 1 .5-.5H7V2H1.5Z"/>
+                      </svg>
+                    <a class="dropdown-item" onclick="open_modal_create_Mansione('{% url 'gestione:aggiungi-tipo-di-mansione'%}')">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="55" height="55" fill="currentColor" class="bi bi-pc" viewBox="0 0 16 16">
+                            <path d="M5 0a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V1a1 1 0 0 0-1-1H5Zm.5 14a.5.5 0 1 1 0 1 .5.5 0 0 1 0-1Zm2 0a.5.5 0 1 1 0 1 .5.5 0 0 1 0-1ZM5 1.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5ZM5.5 3h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1Z"/>
+                        </svg>
+                    </a>
                 </div>
-                </a>
             </div>
     </div>    
 </section>
@@ -77,6 +80,8 @@
 <div class="modal fade" id="modificaTipodiMansioneModal" role="dialog" tabindex="-1"></div>
 
 <div class="modal fade" id="creaTipodiMansioneModal" role="dialog" tabindex="-1"></div>
+
+<div class="modal fade" id="cancellaTipodiMansioneModal" role="dialog" tabindex="-1"></div>
 
 <script>
     var $ = jQuery.noConflict();
@@ -89,6 +94,13 @@ function open_modal_update_Mansione(url){
 var $ = jQuery.noConflict();
 function open_modal_create_Mansione(url){
     $('#creaTipodiMansioneModal').load(url,function(){
+    $(this).modal('show'); 
+    });
+};
+
+var $ = jQuery.noConflict();
+function open_modal_delete_Mansione(url){
+    $('#cancellaTipodiMansioneModal').load(url,function(){
     $(this).modal('show'); 
     });
 };

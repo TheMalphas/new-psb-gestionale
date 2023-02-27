@@ -1,0 +1,84 @@
+<!-- Modal -->
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Modifica</h2>
+        <button type="submit" class="btn btn-danger" data-bs-dismiss="modal" aria-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+      <div class="container text-center shadow" style="position:relative;">
+
+        
+        <!-- ==== Dettagli Richiesta==== -->
+        <div class="d-flex justify-content-between align-items-center">
+            
+            <div class="container pt-md-5 pb-md-4 ">
+                <div class="title"><h5 class="display">Giorno</h5></div>
+                    <small class="text-muted">{{richiesta.rel_giorno}}
+                        <br> 
+                        {% if richiesta.rel_time_start %} ore: {{richiesta.rel_time_start|time:"H:i"}} {% endif %}</small>
+            </div>
+            <div class="container">
+                <div class="title"><h5 class="display">Ore</h4></div>
+                    <small class="text-muted">{% if richiesta.rel_time_end %} ore: {{richiesta.rel_time_end|time:"H:i"}} {% endif %}</small>
+            </div>
+            <div class="container">
+                <div class="title"><h5 class="display">Data richiesta:</h5></div>
+                    <small class="text-muted">{{richiesta.timestamp_creazione|date}}</small><br>
+            </div>
+        </div>
+        <!-- ==== Fine Dettagli Richiesta==== -->
+        <hr>
+
+        {% if richiesta.note %}
+        <!-- ====  Note ==== -->
+        <div class="justify-content-between">
+            <div class="container ">
+                <h3 class="display">Note</h3>
+                <h5 class="text">{{richiesta.note}}</h5><br>
+            </div>
+        </div>
+        <!-- ==== Fine Note ==== -->
+
+        <hr>
+        {% endif %}
+        <!-- ==== Stato ==== -->
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="container">
+                <h3 class="title">Stato</h3>
+                <div class="container">
+                {%  if richiesta.stato == 1 %}
+                <div class="text"><strong><h4><p class="thick" style="color:#0275d8">Accettata</p></h4></strong></div>
+                {% elif richiesta.stato == 2 %}
+                <div class="text"><strong><h4><p class="thick" style="color:#dc3545">Respinta</p></h4></strong></div>
+                {% else %}
+                <div class="text"><small class="text-muted">Da controllare</small></div>
+                {% endif %}
+                </div>
+            </div>
+        </div>
+        <!-- ==== Fine Stato ==== -->
+
+</div>
+
+        <div class="modal-footer">
+            <div>
+                <div class="container t-3 p-3">
+                    <div class="btn-group" role="group" aria-label="Basic example">
+                        <form action="{% url 'capi_area:gestisci_richiesta_straordinari' richiesta.id_straordinari %}" name="accept_form" method="GET" value="accept">{% csrf_token %}
+                            <input hidden id="id" name="id" value="{{richiesta.id_straordinari}}">
+                            <button type="submit" class="btn btn-lg btn-primary" id="button accept" name="accept" value="accept">Accetta</button></form>
+                        
+                        <form action="{% url 'capi_area:gestisci_richiesta_straordinari' richiesta.id_straordinari %}" name="deny_form" method="GET" value="deny">{% csrf_token %}
+                            <input hidden id="id" name="id" value="{{richiesta.id_straordinari}}">
+                            <button type="submit" class="btn btn-lg btn-danger" id="button deny" name="deny" value="deny">Declina</button></form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    </div>
+</div>
+

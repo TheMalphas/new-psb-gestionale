@@ -1,0 +1,24 @@
+<!-- Modal -->
+<div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Annulla Richiesta del {{object.timestamp|date:"d N Y"}}</h2>
+        <button type="submit" class="btn btn-danger" data-bs-dismiss="modal" aria-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form method="POST" action="{% url 'users:richiesta-straordinario-annulla' richiesta.id_straordinari %}">
+        <div class="modal-body">
+          {% csrf_token %}
+        <!-- Form -->
+          {{form.as_p}}
+          <p>Si &#233; certi di voler annulla la richiesta del <strong>{{richiesta.rel_giorno|title}}</strong>?</p>
+        <!-- End form -->
+        <div class="modal-footer">
+          <button type="" class="btn btn-secondary" data-bs-dismiss="modal">Cancella</button>
+          <button type="submit" class="btn btn-danger" value="Conferma">Elimina</button>
+        </div>
+      </form>
+    </div>
+</div>
+

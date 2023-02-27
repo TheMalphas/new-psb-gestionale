@@ -121,6 +121,7 @@ var getUrlParameter = function getUrlParameter(sParam) {
     }
 };
 
+
 $(document).ready(function() {
     $('.nav-link').on('click', function(e) {
         var tab_id = $(this).attr('id');
@@ -278,73 +279,36 @@ function scaricaForm() {
     form.submit();
 }
 
-$(document).ready(function() {
-    var editor;
-    $('#dipendenti-datas-head').clone(true).addClass('filters').appendTo('#reception-datas-head');
-    // Clone the original table headers and add a class for styling purposes
-    var tableIngressi = $("#dipendenti-datas").DataTable({
-        // Specify the source of data for the table using the AJAX option
-        ajax: {
-            url: "../../gestione/datatables/dipendenti_json/",
-            type: "GET",
-            data: {
-                csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val()
-            },
-            dataSrc: "",
-        },
-        'columns': [
-        { data: 'nominativo', title: "Nominativo" },
-        { data: 'Contratto', title: "Contratto" },
-        { data: 'societa', title: "Società" },
-        { data: 'sede', title: "Sede" },
-        { data: 'area', title: "Area" },
-        { data: 'capoareadi', title: "Capo Area?" },
-        { data: 'email_pers', title: "Email" },
-        { data: 'iban', title: "IBAN" },
-        { data: 'p_iva', title: "P. IVA" },
-        { data: 'data_inizio_rap', title: "Inizio rapporto" },
-        { data: 'data_fine_rap', title: "Fine Contratto" },
-        { data: 'sesso', title: "Sesso" },
-        { data: 'codice_fiscale', title: "Codice Fiscale" },
-        { data: 'citta_residenza', title: "Città Residenza" },
-        { data: 'citta_domicilio', title: "Citta Domicilio" },
-        ],
-        paging:true,
-        dom: 'Bfrtip',
-        buttons: [
-            {
-                extend: 'copy',
-                className: 'btn btn-secondary',
-                text: 'Copia'
-            },
-            {
-                extend: 'excel',
-                className: 'btn btn-success',
-                text: 'Excel'
-            },
-            {
-                extend: 'pdf',
-                className: 'btn btn-danger',
-                text: 'PDF'
-            },
-        ],
-        pageLength: 8,
-        autoWidth:true,
-        datetime:true,
-        responsive: true,
-        lengthChange:true,
-        autoWidth: true,
-        autoFill:true,
-        keys: {
-            columns: ':not(:first-child)',
-            editor:  editor
-        },        searching:true,
-        scrollX:true,
-        bInfo:true,
-        bSort:true,
-        language: {
-            "url": "//cdn.datatables.net/plug-ins/1.13.1/i18n/it-IT.json"},
-        // Set the processing option to true to show a loading indicator
-        processing: true,
-    });
-});
+function scaricaContratti() {
+    // Get the value of the input field
+    var inputValue = document.getElementById("contratti-input").value;
+    // Get the form element
+    var form = document.createElement("form");
+
+    form.action = "../../gestione/lista_contratti/scarica/" + inputValue + "/";
+
+    // Set the method attribute of the form to GET
+    form.method = "post";
+
+    // Add the form to the HTML document
+    document.body.appendChild(form);
+
+    // Submit the form
+    form.submit();
+    console.log(inputValue)
+}
+document.getElementById("contratti-button-scarica");
+
+
+function submitFormDipendente() {
+    var form = document.getElementById("reception-form-cerca");
+    var input = document.createElement("dipendente");
+    input.setAttribute("type", "hidden");
+    input.setAttribute("name", "giorno");
+    input.setAttribute("value", document.getElementById("dipendente").value);
+    form.appendChild(input);
+    console.log(input);
+    form.submit();
+}
+ 
+document.getElementById("button-cerca-dipendente");

@@ -1,0 +1,23 @@
+<!-- Modal -->
+<div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Rifiuta la trasferta di {{richiesta.id_dip.nominativo|title}}</h2>
+        <button type="submit" class="btn btn-danger" data-bs-dismiss="modal" aria-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="container"></div>
+      <form method="POST" action="{% url 'gestione:rifiuta-richieste-trasferte' object.pk %}">
+        <div class="modal-body">
+          {% csrf_token %}
+        <!-- Form -->
+          {{form.as_p}}
+        <!-- End form -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancella</button>
+          <button type="submit" class="btn btn-danger" value="Conferma">Conferma</button>
+        </div>
+      </form>
+    </div>
+</div>

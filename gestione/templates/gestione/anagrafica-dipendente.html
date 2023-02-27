@@ -34,7 +34,7 @@
                 <div class="numbers"></div>
                 <form method="POST" enctype="multipart/form-data" autocomplete="off">
                     {% csrf_token %}
-                    <!-- {{form|crispy}}    Se vogliamo rendere tutto crispy!-->
+                    <!-- {{form|crispy}} Se vogliamo rendere tutto crispy!-->
 
                     <!-- se invece vogliamo rendere una riga alla volta crispy facciamo :-->
 
@@ -49,6 +49,9 @@
                             {{ form.codice_fiscale|as_crispy_field}}
                         </div>
                         <div class ="col-2">
+                            {{ form.stato|as_crispy_field}}
+                        </div>
+                        <div class ="col-1">
                             {{ form.sesso|as_crispy_field}}
                         </div>
                         <div class="h6 pb-2 mb-2 text-primary border-bottom border-primary">
@@ -116,20 +119,14 @@
                     <div class ="col-6">
                         {{ form.p_iva|as_crispy_field}}
                     </div>
-                    <div class ="col-3">
+                    <div class ="col-4">
                         {{ form.societa|as_crispy_field}}
                     </div>
-                    <div class ="col-2">
+                    <div class ="col-4">
                         {{ form.sede|as_crispy_field}}
                     </div>
-                    <div class ="col-3">
+                    <div class ="col-4">
                         {{ form.area|as_crispy_field}}
-                    </div>
-                    <div class ="col-2">
-                        {{ form.data_inizio_rap|as_crispy_field}}
-                    </div>
-                    <div class ="col-2">
-                        {{ form.data_fine_rap|as_crispy_field}}
                     </div>
                     <div class="h6 pb-2 mb-2 text-primary border-bottom border-primary">
                         Informazioni Professionali  : 
@@ -145,16 +142,16 @@
                     </div>
 
 
-                        <div class="h6 pb-2 mb-2 text-primary border-bottom border-primary">
-                            Stato Professionale ed eventuali Note:
-                        </div>
-                        <div class ="col-12">
-                        {{ form.note|as_crispy_field }}
-                        </div>
+                    <div class="h6 pb-2 mb-2 text-primary border-bottom border-primary">
+                        Stato Professionale ed eventuali Note:
+                    </div>
+                    <div class ="col-12">
+                    {{ form.note|as_crispy_field }}
+                    </div>
 
 
-                        <div class="d-grid gap-2">
-                        <button class="btn btn-success" type="submit"> Crea Dipendente </button>
+                    <div class="d-grid gap-2">
+                    <button class="btn btn-success" type="submit"> Crea Dipendente </button>
                 </div>
                 </form>
 
@@ -175,15 +172,5 @@
         </div>
     </div> 
 </section>
-
-<script>
-
-$(document).ready(function ({
-    $('#cellulare').
-}
-
-))
-
-</script>
 
 {% endblock %}

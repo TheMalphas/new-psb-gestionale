@@ -13,6 +13,7 @@ from calendar import monthrange
 from django.utils import timezone
 import pytz
 import math
+from workalendar.europe import Italy
 from django.db import connection
 from django.core.signals import setting_changed, request_finished, request_started
 from django.db.models.signals import pre_save, post_save, pre_delete, post_delete
@@ -24,11 +25,13 @@ from django.conf import settings
 import re
 import random
 from capi_area import updateCedolini
+from uuid import uuid4
 
 
 class AddIncForf(models.Model):
     id_inc_forf = models.BigAutoField(primary_key=True)
     id_ced = models.ForeignKey('Cedolini', models.DO_NOTHING, db_column='id_ced', blank=True, null=True)
+    id_dip = models.ForeignKey('AnaDipendenti', models.DO_NOTHING, db_column='id_dip', blank=True, null=True)
     inc_forf = models.FloatField(db_column='Inc_Forf', blank=True, null=True)  # Field name made lowercase.
     timestamp_creazione = models.DateTimeField(blank=True, null=True)
 
@@ -40,32 +43,56 @@ class AddIncForf(models.Model):
 class AddRimborsi(models.Model):
     id_rimborsi = models.BigAutoField(primary_key=True)
     id_ced = models.ForeignKey('Cedolini', models.DO_NOTHING, db_column='id_ced', blank=True, null=True)
-    rel_giorno = models.IntegerField(blank=True, null=True)
+    id_dip = models.ForeignKey('AnaDipendenti', models.DO_NOTHING, db_column='id_dip', blank=True, null=True)
+    rel_giorno = models.DateField(blank=True, null=True)
+    stato = models.IntegerField(default=0,blank=True, null=True)
     ore = models.FloatField(blank=True, null=True)
     valore = models.FloatField(blank=True, null=True)
-    timestamp_creazione = models.DateTimeField(blank=True, null=True)
+    timestamp_creazione = models.DateTimeField(auto_now_add=True,blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'Add_Rimborsi'
 
 
-class AddTrasferte(models.Model):
-    id_trasferte = models.BigAutoField(primary_key=True)
+class AddStraordinari(models.Model):
+    id_straordinari = models.BigAutoField(primary_key=True)
+    id_dip = models.ForeignKey('AnaDipendenti', models.DO_NOTHING, db_column='id_dip', blank=True, null=True)
     id_ced = models.ForeignKey('Cedolini', models.DO_NOTHING, db_column='id_ced', blank=True, null=True)
-    rel_giorno = models.IntegerField(blank=True, null=True)
+    rel_giorno = models.DateField(blank=True, null=True)
+    rel_time_start = models.TimeField(blank=True, null=True)
+    rel_time_end = models.TimeField(blank=True, null=True)
+    stato = models.IntegerField(default=0,blank=True, null=True)
     ore = models.FloatField(blank=True, null=True)
     valore = models.FloatField(blank=True, null=True)
-    timestamp_creazione = models.DateTimeField(blank=True, null=True)
+    note = models.TextField(blank=True, null=True)
+    timestamp_creazione = models.DateTimeField(auto_now_add=True,blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'Add_Straordinari'
+
+
+class AddTrasferte(models.Model):
+    id_trasferte = models.BigAutoField(primary_key=True)
+    id_dip = models.ForeignKey('AnaDipendenti', models.DO_NOTHING, db_column='id_dip', blank=True, null=True)
+    id_ced = models.ForeignKey('Cedolini', models.DO_NOTHING, db_column='id_ced', blank=True, null=True)
+    rel_giorno = models.DateField(blank=True, null=True)
+    stato = models.IntegerField(default=0,blank=True, null=True)
+    ore = models.FloatField(blank=True, null=True)
+    valore = models.FloatField(blank=True, null=True)
+    note = models.TextField(blank=True, null=True)
+    timestamp_creazione = models.DateTimeField(auto_now_add=True,blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'Add_Trasferte'
 
+
 class AnaDipendenti(models.Model):
     id_dip = models.AutoField(db_column='ID_Dip', primary_key=True)  # Field name made lowercase.
     user = models.ForeignKey('AuthUser', models.DO_NOTHING, db_column='User_id', blank=True, null=True)  # Field name made lowercase.
-    id_stipendio = models.IntegerField(blank=True, null=True)
+    id_contratto = models.ForeignKey('Contratti', models.DO_NOTHING, db_column='id_contratto', blank=True, null=True)
     nome = models.CharField(db_column='Nome', max_length=100)  # Field name made lowercase.
     cognome = models.CharField(db_column='Cognome', max_length=100)  # Field name made lowercase.
     sesso = models.ForeignKey('Sesso', models.DO_NOTHING, db_column='Sesso', blank=True, null=True)  # Field name made lowercase.
@@ -94,8 +121,6 @@ class AnaDipendenti(models.Model):
     istruzione = models.ForeignKey('Istruzione', models.DO_NOTHING, db_column='Istruzione', blank=True, null=True)  # Field name made lowercase.
     tipo_contratto = models.ForeignKey('TipoContratto', models.DO_NOTHING, db_column='Tipo_Contratto', blank=True, null=True)  # Field name made lowercase.
     mansione = models.ForeignKey('Mansione', models.DO_NOTHING, db_column='Mansione', blank=True, null=True)  # Field name made lowercase.
-    data_inizio_rap = models.DateField(db_column='Data_inizio_rap', blank=True, null=True)  # Field name made lowercase.
-    data_fine_rap = models.DateField(db_column='Data_fine_rap', blank=True, null=True)  # Field name made lowercase.
     stato = models.CharField(db_column='Stato', max_length=7, blank=True, null=True)  # Field name made lowercase.
     data_creazione = models.DateTimeField(db_column='Data_creazione', blank=True, null=True)  # Field name made lowercase.
     note = models.TextField(db_column='Note', blank=True, null=True)  # Field name made lowercase.
@@ -144,24 +169,30 @@ class AnaDipendenti(models.Model):
     def getarea(self):
         if self.area:
             areas = f'{self.area.nome_area}'
-            ar = areas.split(" ")
-            return f'{(self.area.nome_area).title()}'
+            return areas
+            # ar = areas.split(" ")
+            # return ar[0].title()
         else: "No Area"
         
     @property
     def getsocieta(self):
         if self.societa:
             societas = f'{self.societa.nome_societa}'
-            soc = societas.split(" ")
-            return soc[0].title()
+            return societas
+            # soc = societas.split(" ")
+            # try:
+            #     if soc[1] != "-":
+            #         return f'{(soc[0].title())} {(soc[1].title())}'
+            # except: return soc[0].title()
         else: "No Società"
     
     @property
     def getsede(self):
         if self.sede:
-            sex = f'{self.sede.nome_sede}'
-            sesso = sex.split(" ")
-            return sesso[0].title()
+            sed = f'{self.sede.nome_sede}'
+            return sed
+            # sedez = sed.split(" ")
+            # return sedez[0].title()
         else: "No Sede"
 
     @property
@@ -202,18 +233,11 @@ class AnaDipendenti(models.Model):
             contratti = ""
             for i, item in enumerate(contrattilist):
                 if i:  # print a separator if this isn't the first element
-                    contratti += f'{item.codicecontratto},'
-                contratti += f'{item.codicecontratto}'
+                    contratti += f'{item.tipologia.codice_contratto},'
+                contratti += f'{item.tipologia.codice_contratto}'
             return contratti
         else: return 'No contratto'
-    
-    @property
-    def capoareadi(self):
-        if self.dip_capo_area == True:
-            if self.area:
-                return f'Capo Area: {self.area.nome_area}'
-        else:
-            return "No"
+
 
 @receiver(pre_save, sender=AnaDipendenti)
 def upper_fields(sender, instance, *args, **kwargs):
@@ -392,19 +416,21 @@ def anadipcontrol_post_save_receiver(sender, instance, *args, **kwargs):
         
     new_row = AnadipControl.objects.create(row = instance.pk, table = sender, action =  "deleted", timestamp = timezone.now(), full_row  = full_row_instance)
 
+
+class AppoggioVerificaQr(models.Model):
+    uuid_qr = models.CharField(max_length=50,default=uuid4)
+    id_dipendente = models.OneToOneField(AnaDipendenti, models.DO_NOTHING, db_column='id_dipendente')
+
+    class Meta:
+        managed = False
+        db_table = 'appoggio_verifica_qr'
+
+
 @receiver(post_save, sender=AnaDipendenti)
 def qr_create(sender, instance, created, *args, **kwargs):
     if created:
         AppoggioVerificaQr.objects.create(id_dipendente = AnaDipendenti.objects.get(id_dip=instance.id_dip))
 
-class AppoggioVerificaQr(models.Model):
-    uuid_qr = models.CharField(primary_key=True, max_length=50)
-    id_dipendente = models.ForeignKey(AnaDipendenti, models.DO_NOTHING, db_column='id_dipendente')
-
-    class Meta:
-        managed = False
-        db_table = 'appoggio_verifica_qr'
-        unique_together = (('uuid_qr', 'id_dipendente'),)
 
 class Area(models.Model):
     id_area = models.AutoField(primary_key=True)
@@ -423,8 +449,9 @@ class Area(models.Model):
     
 @receiver(pre_save, sender=Area)
 def area_post_save_receiver(sender, instance, *args, **kwargs):
-    instance.nome_area = (instance.nome_area.upper())
-    
+    instance.nome_area = (instance.nome_area.title())
+
+
 class BancaOrari(models.Model):
     id_banca_dati = models.BigAutoField(db_column='Id_banca_dati', primary_key=True)  # Field name made lowercase.
     id_dip = models.ForeignKey(AnaDipendenti, models.DO_NOTHING, db_column='Id_dip', blank=True, null=True)  # Field name made lowercase.
@@ -437,6 +464,7 @@ class BancaOrari(models.Model):
     class Meta:
         managed = False
         db_table = 'Banca_Orari'
+
 
 class CapoArea(models.Model):
     id_capo = models.AutoField(db_column='ID_Capo', primary_key=True)  # Field name made lowercase.
@@ -456,237 +484,18 @@ class CapoArea(models.Model):
 class Cedolini(models.Model):
     id_cedolino = models.BigAutoField(primary_key=True)
     dipendente = models.ForeignKey(AnaDipendenti, models.DO_NOTHING, db_column='dipendente', blank=True, null=True)
-    add_rimborsi = models.ForeignKey(AddRimborsi, models.DO_NOTHING, db_column='add_rimborsi', blank=True, null=True)
-    add_trasferte = models.ForeignKey(AddTrasferte, models.DO_NOTHING, db_column='add_trasferte', blank=True, null=True)
-    add_inc_forf = models.ForeignKey(AddIncForf, models.DO_NOTHING, db_column='add_inc_forf', blank=True, null=True)
     mese = models.IntegerField(blank=True, null=True)
     anno = models.IntegerField(blank=True, null=True)
-    ord_01 = models.FloatField(blank=True, null=True)
-    ord_02 = models.FloatField(blank=True, null=True)
-    ord_03 = models.FloatField(blank=True, null=True)
-    ord_04 = models.FloatField(blank=True, null=True)
-    ord_05 = models.FloatField(blank=True, null=True)
-    ord_06 = models.FloatField(blank=True, null=True)
-    ord_07 = models.FloatField(blank=True, null=True)
-    ord_08 = models.FloatField(blank=True, null=True)
-    ord_09 = models.FloatField(blank=True, null=True)
-    ord_10 = models.FloatField(blank=True, null=True)
-    ord_11 = models.FloatField(blank=True, null=True)
-    ord_12 = models.FloatField(blank=True, null=True)
-    ord_13 = models.FloatField(blank=True, null=True)
-    ord_14 = models.FloatField(blank=True, null=True)
-    ord_15 = models.FloatField(blank=True, null=True)
-    ord_16 = models.FloatField(blank=True, null=True)
-    ord_17 = models.FloatField(blank=True, null=True)
-    ord_18 = models.FloatField(blank=True, null=True)
-    ord_19 = models.FloatField(blank=True, null=True)
-    ord_20 = models.FloatField(blank=True, null=True)
-    ord_21 = models.FloatField(blank=True, null=True)
-    ord_22 = models.FloatField(blank=True, null=True)
-    ord_23 = models.FloatField(blank=True, null=True)
-    ord_24 = models.FloatField(blank=True, null=True)
-    ord_25 = models.FloatField(blank=True, null=True)
-    ord_26 = models.FloatField(blank=True, null=True)
-    ord_27 = models.FloatField(blank=True, null=True)
-    ord_28 = models.FloatField(blank=True, null=True)
-    ord_29 = models.FloatField(blank=True, null=True)
-    ord_30 = models.FloatField(blank=True, null=True)
-    ord_31 = models.FloatField(blank=True, null=True)
-    fer_01 = models.FloatField(blank=True, null=True)
-    fer_02 = models.FloatField(blank=True, null=True)
-    fer_03 = models.FloatField(blank=True, null=True)
-    fer_04 = models.FloatField(blank=True, null=True)
-    fer_05 = models.FloatField(blank=True, null=True)
-    fer_06 = models.FloatField(blank=True, null=True)
-    fer_07 = models.FloatField(blank=True, null=True)
-    fer_08 = models.FloatField(blank=True, null=True)
-    fer_09 = models.FloatField(blank=True, null=True)
-    fer_10 = models.FloatField(blank=True, null=True)
-    fer_11 = models.FloatField(blank=True, null=True)
-    fer_12 = models.FloatField(blank=True, null=True)
-    fer_13 = models.FloatField(blank=True, null=True)
-    fer_14 = models.FloatField(blank=True, null=True)
-    fer_15 = models.FloatField(blank=True, null=True)
-    fer_16 = models.FloatField(blank=True, null=True)
-    fer_17 = models.FloatField(blank=True, null=True)
-    fer_18 = models.FloatField(blank=True, null=True)
-    fer_19 = models.FloatField(blank=True, null=True)
-    fer_20 = models.FloatField(blank=True, null=True)
-    fer_21 = models.FloatField(blank=True, null=True)
-    fer_22 = models.FloatField(blank=True, null=True)
-    fer_23 = models.FloatField(blank=True, null=True)
-    fer_24 = models.FloatField(blank=True, null=True)
-    fer_25 = models.FloatField(blank=True, null=True)
-    fer_26 = models.FloatField(blank=True, null=True)
-    fer_27 = models.FloatField(blank=True, null=True)
-    fer_28 = models.FloatField(blank=True, null=True)
-    fer_29 = models.FloatField(blank=True, null=True)
-    fer_30 = models.FloatField(blank=True, null=True)
-    fer_31 = models.FloatField(blank=True, null=True)
-    mal_01 = models.FloatField(blank=True, null=True)
-    mal_02 = models.FloatField(blank=True, null=True)
-    mal_03 = models.FloatField(blank=True, null=True)
-    mal_04 = models.FloatField(blank=True, null=True)
-    mal_05 = models.FloatField(blank=True, null=True)
-    mal_06 = models.FloatField(blank=True, null=True)
-    mal_07 = models.FloatField(blank=True, null=True)
-    mal_08 = models.FloatField(blank=True, null=True)
-    mal_09 = models.FloatField(blank=True, null=True)
-    mal_10 = models.FloatField(blank=True, null=True)
-    mal_11 = models.FloatField(blank=True, null=True)
-    mal_12 = models.FloatField(blank=True, null=True)
-    mal_13 = models.FloatField(blank=True, null=True)
-    mal_14 = models.FloatField(blank=True, null=True)
-    mal_15 = models.FloatField(blank=True, null=True)
-    mal_16 = models.FloatField(blank=True, null=True)
-    mal_17 = models.FloatField(blank=True, null=True)
-    mal_18 = models.FloatField(blank=True, null=True)
-    mal_19 = models.FloatField(blank=True, null=True)
-    mal_20 = models.FloatField(blank=True, null=True)
-    mal_21 = models.FloatField(blank=True, null=True)
-    mal_22 = models.FloatField(blank=True, null=True)
-    mal_23 = models.FloatField(blank=True, null=True)
-    mal_24 = models.FloatField(blank=True, null=True)
-    mal_25 = models.FloatField(blank=True, null=True)
-    mal_26 = models.FloatField(blank=True, null=True)
-    mal_27 = models.FloatField(blank=True, null=True)
-    mal_28 = models.FloatField(blank=True, null=True)
-    mal_29 = models.FloatField(blank=True, null=True)
-    mal_30 = models.FloatField(blank=True, null=True)
-    mal_31 = models.FloatField(blank=True, null=True)
-    perm_01 = models.FloatField(blank=True, null=True)
-    perm_02 = models.FloatField(blank=True, null=True)
-    perm_03 = models.FloatField(blank=True, null=True)
-    perm_04 = models.FloatField(blank=True, null=True)
-    perm_05 = models.FloatField(blank=True, null=True)
-    perm_06 = models.FloatField(blank=True, null=True)
-    perm_07 = models.FloatField(blank=True, null=True)
-    perm_08 = models.FloatField(blank=True, null=True)
-    perm_09 = models.FloatField(blank=True, null=True)
-    perm_10 = models.FloatField(blank=True, null=True)
-    perm_11 = models.FloatField(blank=True, null=True)
-    perm_12 = models.FloatField(blank=True, null=True)
-    perm_13 = models.FloatField(blank=True, null=True)
-    perm_14 = models.FloatField(blank=True, null=True)
-    perm_15 = models.FloatField(blank=True, null=True)
-    perm_16 = models.FloatField(blank=True, null=True)
-    perm_17 = models.FloatField(blank=True, null=True)
-    perm_18 = models.FloatField(blank=True, null=True)
-    perm_19 = models.FloatField(blank=True, null=True)
-    perm_20 = models.FloatField(blank=True, null=True)
-    perm_21 = models.FloatField(blank=True, null=True)
-    perm_22 = models.FloatField(blank=True, null=True)
-    perm_23 = models.FloatField(blank=True, null=True)
-    perm_24 = models.FloatField(blank=True, null=True)
-    perm_25 = models.FloatField(blank=True, null=True)
-    perm_26 = models.FloatField(blank=True, null=True)
-    perm_27 = models.FloatField(blank=True, null=True)
-    perm_28 = models.FloatField(blank=True, null=True)
-    perm_29 = models.FloatField(blank=True, null=True)
-    perm_30 = models.FloatField(blank=True, null=True)
-    perm_31 = models.FloatField(blank=True, null=True)
-    stra_01 = models.FloatField(blank=True, null=True)
-    stra_02 = models.FloatField(blank=True, null=True)
-    stra_03 = models.FloatField(blank=True, null=True)
-    stra_04 = models.FloatField(blank=True, null=True)
-    stra_05 = models.FloatField(blank=True, null=True)
-    stra_06 = models.FloatField(blank=True, null=True)
-    stra_07 = models.FloatField(blank=True, null=True)
-    stra_08 = models.FloatField(blank=True, null=True)
-    stra_09 = models.FloatField(blank=True, null=True)
-    stra_10 = models.FloatField(blank=True, null=True)
-    stra_11 = models.FloatField(blank=True, null=True)
-    stra_12 = models.FloatField(blank=True, null=True)
-    stra_13 = models.FloatField(blank=True, null=True)
-    stra_14 = models.FloatField(blank=True, null=True)
-    stra_15 = models.FloatField(blank=True, null=True)
-    stra_16 = models.FloatField(blank=True, null=True)
-    stra_17 = models.FloatField(blank=True, null=True)
-    stra_30 = models.FloatField(blank=True, null=True)
-    stra_29 = models.FloatField(blank=True, null=True)
-    stra_18 = models.FloatField(blank=True, null=True)
-    stra_19 = models.FloatField(blank=True, null=True)
-    stra_20 = models.FloatField(blank=True, null=True)
-    stra_21 = models.FloatField(blank=True, null=True)
-    stra_22 = models.FloatField(blank=True, null=True)
-    stra_23 = models.FloatField(blank=True, null=True)
-    stra_24 = models.FloatField(blank=True, null=True)
-    stra_25 = models.FloatField(blank=True, null=True)
-    stra_26 = models.FloatField(blank=True, null=True)
-    stra_27 = models.FloatField(blank=True, null=True)
-    stra_28 = models.FloatField(blank=True, null=True)
-    stra_31 = models.FloatField(blank=True, null=True)
-    strafes_01 = models.FloatField(blank=True, null=True)
-    strafes_02 = models.FloatField(blank=True, null=True)
-    strafes_03 = models.FloatField(blank=True, null=True)
-    strafes_04 = models.FloatField(blank=True, null=True)
-    strafes_05 = models.FloatField(blank=True, null=True)
-    strafes_06 = models.FloatField(blank=True, null=True)
-    strafes_07 = models.FloatField(blank=True, null=True)
-    strafes_08 = models.FloatField(blank=True, null=True)
-    strafes_09 = models.FloatField(blank=True, null=True)
-    strafes_10 = models.FloatField(blank=True, null=True)
-    strafes_11 = models.FloatField(blank=True, null=True)
-    strafes_12 = models.FloatField(blank=True, null=True)
-    strafes_13 = models.FloatField(blank=True, null=True)
-    strafes_14 = models.FloatField(blank=True, null=True)
-    strafes_15 = models.FloatField(blank=True, null=True)
-    strafes_16 = models.FloatField(blank=True, null=True)
-    strafes_17 = models.FloatField(blank=True, null=True)
-    strafes_18 = models.FloatField(blank=True, null=True)
-    strafes_19 = models.FloatField(blank=True, null=True)
-    strafes_20 = models.FloatField(blank=True, null=True)
-    strafes_21 = models.FloatField(blank=True, null=True)
-    strafes_22 = models.FloatField(blank=True, null=True)
-    strafes_23 = models.FloatField(blank=True, null=True)
-    strafes_24 = models.FloatField(blank=True, null=True)
-    strafes_25 = models.FloatField(blank=True, null=True)
-    strafes_26 = models.FloatField(blank=True, null=True)
-    strafes_27 = models.FloatField(blank=True, null=True)
-    strafes_28 = models.FloatField(blank=True, null=True)
-    strafes_29 = models.FloatField(blank=True, null=True)
-    strafes_30 = models.FloatField(blank=True, null=True)
-    strafes_31 = models.FloatField(blank=True, null=True)
-    tras_01 = models.CharField(max_length=3, blank=True, null=True)
-    tras_02 = models.CharField(max_length=3, blank=True, null=True)
-    tras_03 = models.CharField(max_length=3, blank=True, null=True)
-    tras_04 = models.CharField(max_length=3, blank=True, null=True)
-    tras_05 = models.CharField(max_length=3, blank=True, null=True)
-    tras_06 = models.CharField(max_length=3, blank=True, null=True)
-    tras_07 = models.CharField(max_length=3, blank=True, null=True)
-    tras_08 = models.CharField(max_length=3, blank=True, null=True)
-    tras_09 = models.CharField(max_length=3, blank=True, null=True)
-    tras_10 = models.CharField(max_length=3, blank=True, null=True)
-    tras_11 = models.CharField(max_length=3, blank=True, null=True)
-    tras_12 = models.CharField(max_length=3, blank=True, null=True)
-    tras_13 = models.CharField(max_length=3, blank=True, null=True)
-    tras_14 = models.CharField(max_length=3, blank=True, null=True)
-    tras_15 = models.CharField(max_length=3, blank=True, null=True)
-    tras_16 = models.CharField(max_length=3, blank=True, null=True)
-    tras_17 = models.CharField(max_length=3, blank=True, null=True)
-    tras_18 = models.CharField(max_length=3, blank=True, null=True)
-    tras_19 = models.CharField(max_length=3, blank=True, null=True)
-    tras_20 = models.CharField(max_length=3, blank=True, null=True)
-    tras_21 = models.CharField(max_length=3, blank=True, null=True)
-    tras_22 = models.CharField(max_length=3, blank=True, null=True)
-    tras_23 = models.CharField(max_length=3, blank=True, null=True)
-    tras_24 = models.CharField(max_length=3, blank=True, null=True)
-    tras_25 = models.CharField(max_length=3, blank=True, null=True)
-    tras_26 = models.CharField(max_length=3, blank=True, null=True)
-    tras_27 = models.CharField(max_length=3, blank=True, null=True)
-    tras_28 = models.CharField(max_length=3, blank=True, null=True)
-    tras_29 = models.CharField(max_length=3, blank=True, null=True)
-    tras_30 = models.CharField(max_length=3, blank=True, null=True)
-    tras_31 = models.CharField(max_length=3, blank=True, null=True)
     rimborsi = models.CharField(max_length=255, blank=True, null=True)
     inc_forf = models.CharField(max_length=255, blank=True, null=True)
     bonuses = models.CharField(max_length=255, blank=True, null=True)
-    documenti = models.TextField(blank=True, null=True)
+    documenti = models.CharField(max_length=1000, blank=True, null=True)
     id_ultima_modifica = models.IntegerField(blank=True, null=True)
     timestamp_modifica = models.DateTimeField(blank=True, null=True)
     id_creazione = models.IntegerField(blank=True, null=True)
-    timestamp_creazione = models.DateTimeField(blank=True, null=True)
+    timestamp_creazione = models.DateTimeField(auto_now_add=True,blank=True, null=True)
     notes = models.CharField(max_length=1000, blank=True, null=True)
+
 
     class Meta:
         managed = False
@@ -696,39 +505,121 @@ class Cedolini(models.Model):
         return f'LUL di {self.dipendente} mese {self.mese}, anno {self.anno}'
 
 
-@receiver(post_save, sender=AnaDipendenti)
-def cedolini_post_save_receiver(sender, instance, created, *args, **kwargs):
-    if created:
-        yeary = datetime.now().date().year
-        monthy = datetime.now().date().month
-        dataStart = datetime.now().date()
-        monthStart=dataStart.month
-        for el in range(monthy, 13):
-            try:
-                dipen = AnaDipendenti.objects.get(id_dip=instance.id_dip)
-                if not(Cedolini.objects.filter(dipendente=dipen,mese=el,anno=yeary)):
-                    Cedolini.objects.create(dipendente=dipen,mese=el,anno=yeary,timestamp_creazione=timezone.now())
-                else:
-                    pass
-            except Exception as err:
-                print(err)
-
-
 class Contratti(models.Model):
     id_contratto = models.AutoField(db_column='ID_Contratto', primary_key=True)  # Field name made lowercase.
-    id_dip = models.ForeignKey(AnaDipendenti, models.DO_NOTHING, db_column='ID_Dip', blank=True, null=True)  # Field name made lowercase.
-    id_societa = models.ForeignKey('ListaSocieta', models.DO_NOTHING, db_column='ID_Societa', blank=True, null=True)  # Field name made lowercase.
-    tipologia = models.ForeignKey('TipoContratto', models.DO_NOTHING, db_column='Tipologia', blank=True, null=True)  # Field name made lowercase.
+    id_dip = models.ForeignKey(AnaDipendenti, models.DO_NOTHING, db_column='ID_Dip')  # Field name made lowercase.
+    id_societa = models.ForeignKey('ListaSocieta', models.DO_NOTHING, db_column='ID_Societa')  # Field name made lowercase.
+    tipologia = models.ForeignKey('TipoContratto', models.DO_NOTHING, db_column='Tipologia')  # Field name made lowercase.
+    ccnl = models.ForeignKey('TabellaCcnl', models.DO_NOTHING, db_column='ccnl', blank=True, null=True)
     codicecontratto = models.CharField(db_column='CodiceContratto', max_length=50, blank=True, null=True)  # Field name made lowercase.
-    percentuale = models.ForeignKey('PercentualiContratto', models.DO_NOTHING, db_column='Percentuale', blank=True, null=True)  # Field name made lowercase.
-    datainizio = models.DateField(db_column='DataInizio', blank=True, null=True)  # Field name made lowercase.
-    datafine = models.DateField(db_column='DataFine', blank=True, null=True)  # Field name made lowercase.
+    percentuale = models.ForeignKey('PercentualiContratto', models.DO_NOTHING, db_column='Percentuale')  # Field name made lowercase.
+    trasferte_fisse = models.IntegerField(blank=True, null=True)
+    trasferte_fisse_tipo = models.CharField(max_length=2, blank=True, null=True)
+    datainizio = models.DateField(db_column='DataInizio',blank=True,null=True)  # Field name made lowercase.
+    datafine = models.DateField(db_column='DataFine')  # Field name made lowercase.
     note = models.TextField(db_column='Note', blank=True, null=True)  # Field name made lowercase.
-    
+
     class Meta:
         managed = False
         db_table = 'Contratti'
-        ordering = ["codicecontratto"]
+    
+    @property
+    def getdipendente(self):
+        if self.id_dip:
+            return self.id_dip.nominativo
+        else:
+            return "N/A"
+    
+    @property
+    def getsocieta(self):
+        if self.id_societa:
+            return str(self.id_societa.nomesocieta).title()
+        else:
+            return "N/A"
+        
+    @property
+    def gettipologia(self):
+        if self.tipologia:
+            return self.tipologia.nome_contratto
+        else:
+            return "N/A"
+    
+    @property
+    def getccnl(self):
+        if self.ccnl:
+            return self.ccnl.tipo_contratto
+        else:
+            return "N/A"
+    
+    @property
+    def getpercentuale(self):
+        if self.percentuale:
+            return self.percentuale.dicitura_percentuale
+        else:
+            return "N/A"
+
+
+@receiver(post_save, sender=Contratti)
+def cedolini_post_save_receiver(sender, instance, created, *args, **kwargs):
+    if created:
+        print(instance.pk)
+    
+@receiver(pre_save, sender=Contratti)
+def cedolini_pre_save_receiver(sender, instance, *args, **kwargs):
+    starting_date = instance.datainizio
+    end_date = instance.datafine
+    trasferta = instance.trasferte_fisse
+    trasferteValore = str(instance.trasferte_fisse_tipo).replace(".","")
+    dipen = AnaDipendenti.objects.get(id_dip=instance.id_dip.id_dip)    
+
+    try:
+        cal = Italy()
+        while starting_date <= end_date:
+            year = starting_date.year
+            month = starting_date.month  
+            listaTrenta = [4,6,9,11]      
+            if not(Cedolini.objects.filter(dipendente=AnaDipendenti.objects.get(id_dip=instance.id_dip.id_dip),mese=month,anno=year).exists()):
+                Cedolini.objects.create(dipendente=AnaDipendenti.objects.get(id_dip=instance.id_dip.id_dip),mese=month,anno=year,timestamp_creazione=timezone.now())                
+                starting_date = starting_date.replace(day=1)
+            if month == 12:
+                starting_date = starting_date.replace(year=year+1, month=1)
+            else:
+                starting_date = starting_date.replace(month=month+1)
+    except Exception as err:
+        print(err)
+    
+    if str(trasferta) != '0' and trasferta != None and str(trasferta) != "":        
+        starting_date = instance.datainizio
+        end_date = instance.datafine
+        trasferta = instance.trasferte_fisse
+        trasferteValore = str(instance.trasferte_fisse_tipo).replace(".","")
+        try:
+            while starting_date <= end_date:
+                year = starting_date.year
+                month = starting_date.month  
+                listaTrenta = [4,6,9,11]
+                trasferter = str(trasferteValore).replace(".","")
+                counter = int(trasferta)
+                index = 0
+                while index < counter:
+                    if month == 2:
+                        giorno = random.randint(1,28)
+                    elif month in listaTrenta:
+                        giorno = random.randint(1,30)
+                    else:
+                        giorno = random.randint(1,31)
+                    day = datetime(year,month,giorno)
+                    if cal.is_working_day(day) and index < 19:
+                        if not(AddTrasferte.objects.filter(id_dip=AnaDipendenti.objects.get(id_dip=instance.id_dip.id_dip),rel_giorno=day).exists()):
+                            AddTrasferte.objects.create(id_dip=AnaDipendenti.objects.get(id_dip=instance.id_dip.id_dip),id_ced=Cedolini.objects.get(dipendente=dipen.id_dip,anno=year,mese=month),rel_giorno=day,stato=1,valore=float(trasferter))
+                            index += 1
+                    starting_date = starting_date.replace(day=1)
+                if month == 12:
+                    starting_date = starting_date.replace(year=year+1, month=1)
+                else:
+                    starting_date = starting_date.replace(month=month+1)
+        except Exception as err:
+            print(err)
 
 
 class Dirigenti(models.Model):
@@ -762,7 +653,8 @@ class Istruzione(models.Model):
     
 @receiver(pre_save, sender=Istruzione)
 def tipo_istruzione_pre_save_receiver(sender, instance, *args, **kwargs):
-    instance.tipo_istruzione = (instance.tipo_istruzione.upper())
+    instance.tipo_istruzione = (instance.tipo_istruzione.title())
+
 
 class Ingressidip(models.Model):
     id_ingresso = models.AutoField(primary_key=True)
@@ -931,7 +823,7 @@ class Mansione(models.Model):
     
 @receiver(pre_save, sender=Mansione)
 def mansione_pre_save_receiver(sender, instance, *args, **kwargs):
-    instance.tipo_mansione = (instance.tipo_mansione.upper())
+    instance.tipo_mansione = (instance.tipo_mansione.title())
 
         
 class Mese(models.Model):
@@ -1096,7 +988,7 @@ class Sede(models.Model):
     
 @receiver(pre_save, sender=Sede)
 def sede_pre_save_receiver(sender, instance, *args, **kwargs):
-    instance.nome_sede = (instance.nome_sede.upper())
+    instance.nome_sede = (instance.nome_sede.title())
 
 
 class Sesso(models.Model):
@@ -1128,13 +1020,27 @@ class Societa(models.Model):
 
 @receiver(pre_save, sender=Societa)
 def societa_pre_save_receiver(sender, instance, *args, **kwargs):
-    instance.nome_societa = (instance.nome_societa.upper())
+    instance.nome_societa = (instance.nome_societa.title())
+
+
+class TabellaCcnl(models.Model):
+    id_ccnl = models.AutoField(primary_key=True)
+    tipo_contratto = models.CharField(max_length=250, blank=True, null=True)
+    codice_ccnl = models.CharField(max_length=10, blank=True, null=True)
+    note = models.CharField(max_length=50, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'tabella_ccnl'
+    
+    def __str__(self):
+        return str(self.tipo_contratto).title()
 
 
 class TipoContratto(models.Model):
     id_contratto = models.AutoField(primary_key=True)
     nome_contratto = models.CharField(unique=True, max_length=100, blank=True, null=True)
-    codice_contratto = models.CharField(max_length=2, blank=True, null=True)
+    codice_contratto = models.CharField(max_length=10, blank=True, null=True)
     data_creazione = models.DateTimeField(blank=True, null=True)
     data_modifica = models.DateTimeField(blank=True, null=True)
     note = models.TextField(db_column='Note', blank=True, null=True)  # Field name made lowercase.
@@ -1150,7 +1056,7 @@ class TipoContratto(models.Model):
 
 @receiver(pre_save, sender=TipoContratto)
 def sede_pre_save_receiver(sender, instance, *args, **kwargs):
-    instance.nome_contratto = (instance.nome_contratto.upper())
+    instance.nome_contratto = (instance.nome_contratto.title())
 
 class AuthGroup(models.Model):
     name = models.CharField(unique=True, max_length=150)

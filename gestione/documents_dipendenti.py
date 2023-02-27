@@ -121,7 +121,7 @@ def generaExcelDipendenti(request):
             output.seek(0)
             
             response = HttpResponse(output.read(), content_type='application/vnd.ms-excel')
-            response['Content-Disposition'] = f'attachment; filename="Lista Dipendenti-{data}-date.xlsx' 
+            response['Content-Disposition'] = f'attachment; filename="Lista Dipendenti-{str(data)}-date.xlsx' 
             
             return response
         except:
@@ -168,7 +168,7 @@ def generaExcelMansioni(request):
             wb.save(output)
             output.seek(0)
             response = HttpResponse(output.read(), content_type='application/vnd.ms-excel')
-            response['Content-Disposition'] = f'attachment; filename="Lista Mansioni al {date}.xlsx' 
+            response['Content-Disposition'] = f'attachment; filename="Lista Mansioni al {str(date)}.xlsx' 
             
             return response
         except:
@@ -215,7 +215,7 @@ def generaExcelContratti(request):
             wb.save(output)
             output.seek(0)
             response = HttpResponse(output.read(), content_type='application/vnd.ms-excel')
-            response['Content-Disposition'] = f'attachment; filename="Tipologie Contratti al {date}.xlsx' 
+            response['Content-Disposition'] = f'attachment; filename="Tipologie Contratti al {str(date)}.xlsx' 
             
             return response
         except:
@@ -262,7 +262,7 @@ def generaExcelIstruzione(request):
             wb.save(output)
             output.seek(0)
             response = HttpResponse(output.read(), content_type='application/vnd.ms-excel')
-            response['Content-Disposition'] = f'attachment; filename="Tipo Istruzione al {date}.xlsx' 
+            response['Content-Disposition'] = f'attachment; filename="Tipo Istruzione al {str(date)}.xlsx' 
             
             return response
         except:
@@ -309,7 +309,7 @@ def generaExcelSocieta(request):
             wb.save(output)
             output.seek(0)
             response = HttpResponse(output.read(), content_type='application/vnd.ms-excel')
-            response['Content-Disposition'] = f'attachment; filename="Società al {date}.xlsx' 
+            response['Content-Disposition'] = f'attachment; filename="Società al {str(date)}.xlsx' 
             
             return response
         except:
@@ -356,7 +356,7 @@ def generaExcelSedi(request):
             wb.save(output)
             output.seek(0)
             response = HttpResponse(output.read(), content_type='application/vnd.ms-excel')
-            response['Content-Disposition'] = f'attachment; filename="Sedi al {date}.xlsx' 
+            response['Content-Disposition'] = f'attachment; filename="Sedi al {str(date)}.xlsx' 
             
             return response
         except:
@@ -402,7 +402,7 @@ def generaExcelArea(request):
             wb.save(output)
             output.seek(0)
             response = HttpResponse(output.read(), content_type='application/vnd.ms-excel')
-            response['Content-Disposition'] = f'attachment; filename="Aree al {date}.xlsx' 
+            response['Content-Disposition'] = f'attachment; filename="Aree al {str(date)}.xlsx' 
             
             return response
         except:
@@ -417,177 +417,19 @@ def generaExcelCapiArea(request):
     date = datetime.now().date()
     query = ""
     try:
-        print(request.GET)
-        if request.GET.get('capiarea') != 'undefined' and request.GET.get('capiarea') != '' and request.GET.get('capiarea') != None:
-            query = request.GET.get('capiarea')
-            if "=" in str(query):
-                queryDue = query.split('=')
-                query = str(queryDue[-1])
-                lista = CapoArea.objects.filter(Q(nomecompleto__icontains=query)).order_by('nomecompleto')
-                 
-                wb = Workbook()
-        
-                try:
-                    print("here")
-                    sheet = wb.create_sheet(f'SheetOne')
-                    del wb['Sheet']
-                    cursor = sheet.cell(row=1,column=1)
-                    cursor.font = Font(bold=True)
-                    sheet.column_dimensions['A'].width = 25
-                    cursor.value = "Capo Area"
-                    
-                    cursor = sheet.cell(row=1,column=2)
-                    cursor.font = Font(bold=True)
-                    sheet.column_dimensions['B'].width = 30
-                    cursor.value = "Sede"
-                    
-                    cursor = sheet.cell(row=1,column=3)
-                    cursor.font = Font(bold=True)
-                    sheet.column_dimensions['C'].width = 30
-                    cursor.value = "Area"
-                    
-                    cursor = sheet.cell(row=1,column=4)
-                    cursor.font = Font(bold=True)
-                    sheet.column_dimensions['D'].width = 30
-                    cursor.value = "Societa"
-
-
-                    for index,values in enumerate(lista, start=1):
-                        try:                    
-                            cursor = sheet.cell(row=1+index,column=1)
-                            cursor.value = values.nomecompleto
-                        except Exception as err:
-                            print(err)
-                        try:
-                            cursor = sheet.cell(row=1+index,column=2)
-                            cursor.value = str(values.id_dipendente.sede).title()
-                        except Exception as err:
-                            print(err)
-                        try:
-                            cursor = sheet.cell(row=1+index,column=3)
-                            cursor.value = str(values.id_dipendente.area).title()
-                        except Exception as err:
-                            print(err)
-                        try:
-                            cursor = sheet.cell(row=1+index,column=4)
-                            cursor.value = str(values.id_dipendente.societa).title()
-                        except Exception as err:
-                            print(err)
-
-                    
-                        output = BytesIO()
-                        wb.save(output)
-                        output.seek(0)
-                        response = HttpResponse(output.read(), content_type='application/vnd.ms-excel')
-                        response['Content-Disposition'] = f'attachment; filename="Capi Area - etc al {date}.xlsx' 
-                        
-                    return response
-                except:
-                    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))  
-        elif request.GET.get('capiarea') == 'undefined' or "":
-            lista = CapoArea.objects.all().select_related('id_dipendente').order_by('nomecompleto')
-            
-               
-        if request.GET.get('dirigenti') != 'undefined' and request.GET.get('dirigenti') != '' and request.GET.get('dirigenti') != None:
-            query = request.GET.get('dirigenti') or ""
-            lista = Dirigenti.objects.filter(Q(nomecompleto__icontains=query)).order_by('nomecompleto')
-            exName = 'Dirigenti'
-        elif request.method == "GET" and request.GET.get('dirigenti')  == 'undefined' or "":
-            lista = Dirigenti.objects.all().order_by('nomecompleto')
-            exName = 'Dirigenti'
-        
-        if request.GET.get('responsabili') != 'undefined' and request.GET.get('responsabili') != '' and request.GET.get('responsabili') != None:
-            query = request.GET.get('responsabili') or ""
-            lista = Responsabili.objects.filter(Q(nomecompleto__icontains=query)).order_by('nomecompleto')
-            exName = 'Responsabili'
-        elif request.method == "GET" and request.GET.get('responsabili')  == 'undefined' or "":
-            lista = Responsabili.objects.all().order_by('nomecompleto')
-            exName = 'Responsabili'
-        
-        if request.GET.get('responsabilisede') != 'undefined' and request.GET.get('responsabilisede') != '' and request.GET.get('responsabilisede') != None:
-            query = request.GET.get('responsabilisede') or ""
-            lista = ResponsabiliSede.objects.filter(Q(nomecompleto__icontains=query)).order_by('nomecompleto')
-            exName = 'Responsabili Sede'
-        elif request.method == "GET" and request.GET.get('responsabilisede')  == 'undefined' or "":
-            lista = ResponsabiliSede.objects.all().order_by('nomecompleto')
-            exName = 'Responsabili Sede'
-        
-            wb = Workbook()
-    
-            try:
-                print("here")
-                sheet = wb.create_sheet(f'SheetOne')
-                del wb['Sheet']
-                cursor = sheet.cell(row=1,column=1)
-                cursor.font = Font(bold=True)
-                sheet.column_dimensions['A'].width = 25
-                cursor.value = "Capo Area"
-                
-                cursor = sheet.cell(row=1,column=2)
-                cursor.font = Font(bold=True)
-                sheet.column_dimensions['B'].width = 30
-                cursor.value = "Sede"
-                
-                cursor = sheet.cell(row=1,column=3)
-                cursor.font = Font(bold=True)
-                sheet.column_dimensions['C'].width = 30
-                cursor.value = "Area"
-                
-                cursor = sheet.cell(row=1,column=4)
-                cursor.font = Font(bold=True)
-                sheet.column_dimensions['D'].width = 30
-                cursor.value = "Societa"
-
-
-                for index,values in enumerate(lista, start=1):
-                    try:                    
-                        cursor = sheet.cell(row=1+index,column=1)
-                        cursor.value = values.nomecompleto
-                    except Exception as err:
-                        print(err)
-                    try:
-                        cursor = sheet.cell(row=1+index,column=2)
-                        cursor.value = str(values.id_dipendente.sede).title()
-                    except Exception as err:
-                        print(err)
-                    try:
-                        cursor = sheet.cell(row=1+index,column=3)
-                        cursor.value = str(values.id_dipendente.area).title()
-                    except Exception as err:
-                        print(err)
-                    try:
-                        cursor = sheet.cell(row=1+index,column=4)
-                        cursor.value = str(values.id_dipendente.societa).title()
-                    except Exception as err:
-                        print(err)
-
-                
-                    output = BytesIO()
-                    wb.save(output)
-                    output.seek(0)
-                    response = HttpResponse(output.read(), content_type='application/vnd.ms-excel')
-                    response['Content-Disposition'] = f'attachment; filename="Capi Area - etc al {date}.xlsx' 
-                    
-                return response
-            except:
-                return HttpResponseRedirect(request.META.get('HTTP_REFERER'))  
-
-        if request.GET.get('referenti') != 'undefined' and request.GET.get('referenti') != '' and request.GET.get('referenti') != None:
-            query = request.GET.get('referenti') or ""
-            lista = AnaDipendenti.objects.filter(Q(area=46,nome__icontains=query)|Q(area=46,cognome__icontains=query)).order_by('cognome')
-            exName = 'Referente'
-        elif request.method == "GET" and request.GET.get('referenti')  == 'undefined' or "":
-            lista = AnaDipendenti.objects.filter(area=46).order_by('cognome')
-            exName = 'Referente'
+        if request.method == "GET" and request.GET.get('capiarea'):
+            query = request.GET.get('area') or ""
+            query = CapoArea.objects.filter(Q(nomecompleto__icontains=query)).order_by('nomecompleto')
+        elif request.method == "GET":
+            query = CapoArea.objects.all().order_by('nomecompleto')
         wb = Workbook()
-    
         try:
             sheet = wb.create_sheet(f'SheetOne')
             del wb['Sheet']
             cursor = sheet.cell(row=1,column=1)
             cursor.font = Font(bold=True)
             sheet.column_dimensions['A'].width = 25
-            cursor.value = f'{exName}'
+            cursor.value = "Capo Area"
             
             cursor = sheet.cell(row=1,column=2)
             cursor.font = Font(bold=True)
@@ -605,35 +447,106 @@ def generaExcelCapiArea(request):
             cursor.value = "Societa"
 
 
-            for index,values in enumerate(lista, start=1):
+            for index,values in enumerate(query, start=1):
                 try:                    
                     cursor = sheet.cell(row=1+index,column=1)
-                    cursor.value = f'{values.cognome} {values.nome}'
+                    cursor.value = values.nomecompleto
                 except Exception as err:
                     print(err)
                 try:
                     cursor = sheet.cell(row=1+index,column=2)
-                    cursor.value = str(values.sede).title()
+                    cursor.value = str(values.id_dipendente.sede).title()
                 except Exception as err:
                     print(err)
                 try:
                     cursor = sheet.cell(row=1+index,column=3)
-                    cursor.value = str(values.area).title()
+                    cursor.value = str(values.id_dipendente.area).title()
                 except Exception as err:
                     print(err)
                 try:
                     cursor = sheet.cell(row=1+index,column=4)
-                    cursor.value = str(values.societa).title()
+                    cursor.value = str(values.id_dipendente.societa).title()
                 except Exception as err:
                     print(err)
 
-
-            output = BytesIO()
-            wb.save(output)
-            output.seek(0)
-            response = HttpResponse(output.read(), content_type='application/vnd.ms-excel')
-            response['Content-Disposition'] = f'attachment; filename="{exName} - al {str(date)}.xlsx' 
             
+                output = BytesIO()
+                wb.save(output)
+                output.seek(0)
+                response = HttpResponse(output.read(), content_type='application/vnd.ms-excel')
+                response['Content-Disposition'] = f'attachment; filename="Capi Area - etc al {str(date)}.xlsx' 
+           
+            return response
+        except:
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))  
+    except: 
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))    
+
+@csrf_exempt
+@login_required
+def generaExcelResponsabili(request):
+    date = datetime.now().date()
+    query = ""
+    try:
+        if request.method == "GET" and request.GET.get('responsabili'):
+            query = request.GET.get('area') or ""
+            query = Responsabili.objects.filter(Q(nomecompleto__icontains=query)).order_by('nomecompleto')
+        elif request.method == "GET":
+            query = Responsabili.objects.all().order_by('nomecompleto')
+        wb = Workbook()
+        try:
+            sheet = wb.create_sheet(f'SheetOne')
+            del wb['Sheet']
+            cursor = sheet.cell(row=1,column=1)
+            cursor.font = Font(bold=True)
+            sheet.column_dimensions['A'].width = 25
+            cursor.value = "Responsabile"
+            
+            cursor = sheet.cell(row=1,column=2)
+            cursor.font = Font(bold=True)
+            sheet.column_dimensions['B'].width = 30
+            cursor.value = "Sede"
+            
+            cursor = sheet.cell(row=1,column=3)
+            cursor.font = Font(bold=True)
+            sheet.column_dimensions['C'].width = 30
+            cursor.value = "Area"
+            
+            cursor = sheet.cell(row=1,column=4)
+            cursor.font = Font(bold=True)
+            sheet.column_dimensions['D'].width = 30
+            cursor.value = "Societa"
+
+
+            for index,values in enumerate(query, start=1):
+                try:                    
+                    cursor = sheet.cell(row=1+index,column=1)
+                    cursor.value = values.nomecompleto
+                except Exception as err:
+                    print(err)
+                try:
+                    cursor = sheet.cell(row=1+index,column=2)
+                    cursor.value = str(values.id_dipendente.sede).title()
+                except Exception as err:
+                    print(err)
+                try:
+                    cursor = sheet.cell(row=1+index,column=3)
+                    cursor.value = str(values.id_dipendente.area).title()
+                except Exception as err:
+                    print(err)
+                try:
+                    cursor = sheet.cell(row=1+index,column=4)
+                    cursor.value = str(values.id_dipendente.societa).title()
+                except Exception as err:
+                    print(err)
+
+            
+                output = BytesIO()
+                wb.save(output)
+                output.seek(0)
+                response = HttpResponse(output.read(), content_type='application/vnd.ms-excel')
+                response['Content-Disposition'] = f'attachment; filename="Responsabili - etc al {str(date)}.xlsx' 
+           
             return response
         except:
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))  
@@ -641,6 +554,147 @@ def generaExcelCapiArea(request):
         return HttpResponseRedirect(request.META.get('HTTP_REFERER'))    
 
 
+@csrf_exempt
+@login_required
+def generaExcelResponsabiliSede(request):
+    date = datetime.now().date()
+    query = ""
+    try:
+        if request.method == "GET" and request.GET.get('responsabili-sede'):
+            query = request.GET.get('area') or ""
+            query = ResponsabiliSede.objects.filter(Q(nomecompleto__icontains=query)).order_by('nomecompleto')
+        elif request.method == "GET":
+            query = ResponsabiliSede.objects.all().order_by('nomecompleto')
+        wb = Workbook()
+        try:
+            sheet = wb.create_sheet(f'SheetOne')
+            del wb['Sheet']
+            cursor = sheet.cell(row=1,column=1)
+            cursor.font = Font(bold=True)
+            sheet.column_dimensions['A'].width = 25
+            cursor.value = "Responsabile"
+            
+            cursor = sheet.cell(row=1,column=2)
+            cursor.font = Font(bold=True)
+            sheet.column_dimensions['B'].width = 30
+            cursor.value = "Sede"
+            
+            cursor = sheet.cell(row=1,column=3)
+            cursor.font = Font(bold=True)
+            sheet.column_dimensions['C'].width = 30
+            cursor.value = "Area"
+            
+            cursor = sheet.cell(row=1,column=4)
+            cursor.font = Font(bold=True)
+            sheet.column_dimensions['D'].width = 30
+            cursor.value = "Societa"
+
+
+            for index,values in enumerate(query, start=1):
+                try:                    
+                    cursor = sheet.cell(row=1+index,column=1)
+                    cursor.value = values.nomecompleto
+                except Exception as err:
+                    print(err)
+                try:
+                    cursor = sheet.cell(row=1+index,column=2)
+                    cursor.value = str(values.id_dipendente.sede).title()
+                except Exception as err:
+                    print(err)
+                try:
+                    cursor = sheet.cell(row=1+index,column=3)
+                    cursor.value = str(values.id_dipendente.area).title()
+                except Exception as err:
+                    print(err)
+                try:
+                    cursor = sheet.cell(row=1+index,column=4)
+                    cursor.value = str(values.id_dipendente.societa).title()
+                except Exception as err:
+                    print(err)
+
+            
+                output = BytesIO()
+                wb.save(output)
+                output.seek(0)
+                response = HttpResponse(output.read(), content_type='application/vnd.ms-excel')
+                response['Content-Disposition'] = f'attachment; filename="Responsabili - etc al {str(date)}.xlsx' 
+           
+            return response
+        except:
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))  
+    except: 
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))    
+
+@csrf_exempt
+@login_required
+def generaExcelDirigenti(request):
+    date = datetime.now().date()
+    query = ""
+    try:
+        if request.method == "GET" and request.GET.get('dirigenti'):
+            query = request.GET.get('area') or ""
+            query = Dirigenti.objects.filter(Q(nomecompleto__icontains=query)).order_by('nomecompleto')
+        elif request.method == "GET":
+            query = Dirigenti.objects.all().order_by('nomecompleto')
+        wb = Workbook()
+        try:
+            sheet = wb.create_sheet(f'SheetOne')
+            del wb['Sheet']
+            cursor = sheet.cell(row=1,column=1)
+            cursor.font = Font(bold=True)
+            sheet.column_dimensions['A'].width = 25
+            cursor.value = "Responsabile Sede"
+            
+            cursor = sheet.cell(row=1,column=2)
+            cursor.font = Font(bold=True)
+            sheet.column_dimensions['B'].width = 30
+            cursor.value = "Sede"
+            
+            cursor = sheet.cell(row=1,column=3)
+            cursor.font = Font(bold=True)
+            sheet.column_dimensions['C'].width = 30
+            cursor.value = "Area"
+            
+            cursor = sheet.cell(row=1,column=4)
+            cursor.font = Font(bold=True)
+            sheet.column_dimensions['D'].width = 30
+            cursor.value = "Societa"
+
+
+            for index,values in enumerate(query, start=1):
+                try:                    
+                    cursor = sheet.cell(row=1+index,column=1)
+                    cursor.value = values.nomecompleto
+                except Exception as err:
+                    print(err)
+                try:
+                    cursor = sheet.cell(row=1+index,column=2)
+                    cursor.value = str(values.id_dipendente.sede).title()
+                except Exception as err:
+                    print(err)
+                try:
+                    cursor = sheet.cell(row=1+index,column=3)
+                    cursor.value = str(values.id_dipendente.area).title()
+                except Exception as err:
+                    print(err)
+                try:
+                    cursor = sheet.cell(row=1+index,column=4)
+                    cursor.value = str(values.id_dipendente.societa).title()
+                except Exception as err:
+                    print(err)
+
+            
+                output = BytesIO()
+                wb.save(output)
+                output.seek(0)
+                response = HttpResponse(output.read(), content_type='application/vnd.ms-excel')
+                response['Content-Disposition'] = f'attachment; filename="Dirigenti - etc al {str(date)}.xlsx' 
+           
+            return response
+        except:
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))  
+    except: 
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))    
 
 
 @login_required
@@ -873,4 +927,114 @@ def scaricaRichiestePersonale(request,data,dipendente=None):
             return response
     except:
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))  
-       
+
+@csrf_exempt
+@login_required
+@permission_required("gestione.change_anadipendenti")
+def generaContratti(request,dipendente):
+    for el in request:
+        print(el)
+    element=request.GET.get('dipendente')
+    query = ""
+    try:
+        if request.method == "GET" and request.GET.get('dipendente'):
+            query = request.GET.get('dipendente') or ""
+            query = Contratti.objects.filter(Q(id_dip__cognome__icontains=query)|Q(id_dip__nome__icontains=query)).order_by('id_dip__cognome')
+        elif request.method == "GET":
+            query = Contratti.objects.all().order_by('id_dip__cognome')
+        wb = Workbook()
+        del wb['Sheet']
+        cell_range = 'A1:G1'
+        sheet.merge_cells(cell_range) 
+        cursor = sheet.cell(row=1,column=1)           
+        cursor.alignment = Alignment(horizontal='center')
+        cursor.value = f"Contratti"
+        
+        try:
+            sheet = wb.create_sheet(f'SheetOne')
+            del wb['Sheet']
+            cursor = sheet.cell(row=1,column=1)
+            cursor.font = Font(bold=True)
+            sheet.column_dimensions['A'].width = 25
+            cursor.value = "Dipendente"
+            
+            cursor = sheet.cell(row=1,column=2)
+            cursor.font = Font(bold=True)
+            sheet.column_dimensions['B'].width = 30
+            cursor.value = "Società"
+            
+            cursor = sheet.cell(row=1,column=3)
+            cursor.font = Font(bold=True)
+            sheet.column_dimensions['C'].width = 30
+            cursor.value = "Tipologia"
+            
+            cursor = sheet.cell(row=1,column=4)
+            cursor.font = Font(bold=True)
+            sheet.column_dimensions['D'].width = 30
+            cursor.value = "CCNL"
+            
+            cursor = sheet.cell(row=1,column=4)
+            cursor.font = Font(bold=True)
+            sheet.column_dimensions['E'].width = 15
+            cursor.value = "Percentuale"
+
+            cursor = sheet.cell(row=1,column=4)
+            cursor.font = Font(bold=True)
+            sheet.column_dimensions['F'].width = 15
+            cursor.value = "Data Inizio"
+
+            cursor = sheet.cell(row=1,column=4)
+            cursor.font = Font(bold=True)
+            sheet.column_dimensions['G'].width = 15
+            cursor.value = "Data Fine"
+
+
+            for index,values in enumerate(query, start=1):
+                try:                    
+                    cursor = sheet.cell(row=1+index,column=1)
+                    cursor.value = values.id_dip.nominativo
+                except Exception as err:
+                    print(err)
+                try:
+                    cursor = sheet.cell(row=1+index,column=2)
+                    cursor.value = str(values.id_societa.nome_societa).title()
+                except Exception as err:
+                    print(err)
+                try:
+                    cursor = sheet.cell(row=1+index,column=3)
+                    cursor.value = str(values.tipologia.nome_contratto).title()
+                except Exception as err:
+                    print(err)
+                try:
+                    cursor = sheet.cell(row=1+index,column=4)
+                    cursor.value = str(values.ccnl).title()
+                except Exception as err:
+                    print(err)
+                try:
+                    cursor = sheet.cell(row=1+index,column=5)
+                    cursor.value = str(values.percentuale).title()
+                except Exception as err:
+                    print(err)
+                try:
+                    cursor = sheet.cell(row=1+index,column=6)
+                    cursor.value = str(values.datainizio).title()
+                except Exception as err:
+                    print(err)
+                try:
+                    cursor = sheet.cell(row=1+index,column=7)
+                    cursor.value = str(values.datafine).title()
+                except Exception as err:
+                    print(err)
+
+            
+                output = BytesIO()
+                wb.save(output)
+                output.seek(0)
+                response = HttpResponse(output.read(), content_type='application/vnd.ms-excel')
+                response['Content-Disposition'] = f'attachment; filename="Contratti - al {str(date)}.xlsx' 
+           
+            return response
+        except:
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))  
+    except: 
+        return HttpResponseRedirect(request.META.get('HTTP_REFERER'))    

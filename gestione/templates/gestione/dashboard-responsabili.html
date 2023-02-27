@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="{% static 'gestione/css/style.css' %}">
 <script src="{% static 'gestione/js/script.js' %}"></script>
 
-<section style="box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); margin-left:268px;">
+<section id="styler-navbar" style="box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); margin-left:210px;">
     <header class="p-3 bg-light text-black">
         <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
             <li class="nav-link px-2 text-dark"><strong>{{capicount}}</strong> Capi Area</li>
@@ -51,7 +51,7 @@
 
         <div class="carta">
             <div>
-            <a href="{% url 'gestione:dipendenti' %}">
+            <a href="{% url 'gestione:responsabili' %}">
             <div class="numbers">{{responsabilicount}}</div>
                 <div class="cartaName">Vai ai Responsabili</div>
         </div>
@@ -73,7 +73,7 @@
 
         <div class="carta">
             <div>
-            <a href="{% url 'gestione:dipendenti' %}">
+            <a href="{% url 'gestione:responsabili_sede' %}">
             <div class="numbers">{{ressedecount}}</div>
                 <div class="cartaName">Vai ai Res. di Sede</div>
         </div>

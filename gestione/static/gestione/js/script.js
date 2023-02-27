@@ -121,6 +121,7 @@ var getUrlParameter = function getUrlParameter(sParam) {
     }
 };
 
+
 $(document).ready(function() {
     $('.nav-link').on('click', function(e) {
         var tab_id = $(this).attr('id');
@@ -278,84 +279,61 @@ function scaricaForm() {
     form.submit();
 }
 
-$(document).ready(function() {
-    var editor;
-    $('#dipendenti-datas-head').clone(true).addClass('filters').appendTo('#reception-datas-head');
-    // Clone the original table headers and add a class for styling purposes
-    var tableIngressi = $("#dipendenti-datas").DataTable({
-        // Specify the source of data for the table using the AJAX option
-        ajax: {
-            url: "../../../gestione/datatables/dipendenti_json/",
-            type: "GET",
-            data: {
-                csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val()
-            },
-            dataSrc: "",
-        },
-        'columns': [
-        { data: 'nominativo', title: "Nominativo" },
-        { data: 'getsocieta', title: "Società" },
-        { data: 'getsede', title: "Sede" },
-        { data: 'getarea', title: "Area" },
-        { data: 'capoareadi', title: "Capo Area?" },
-        { data: 'getmansione', title: "Mansione" },
-        { data: 'contratto', title: "Contratto" },
-        { data: 'getinizio', title: "Inizio Rapporto" },
-        { data: 'getscadenza', title: "Fine Contratto" },
-        { data: 'getsesso', title: "Sesso" },
-        { data: 'codice_fiscale', title: "Codice Fiscale" },
-        { data: 'getcitta', title: "Indirizzo" },
-        { data: 'getprovincia', title: "Provincia" },
-        { data: 'iban', title: "IBAN" },
-        { data: 'p_iva', title: "P. Iva" },
-        ],
-        paging:true,
-        dom: 'Bfrtip',
-        buttons: [
-            {
-                extend: 'copy',
-                className: 'btn btn-secondary',
-                text: 'Copia'
-            },
-            {
-                extend: 'excel',
-                className: 'btn btn-success',
-                text: 'Excel'
-            },
-            {
-                extend: 'pdfHtml5',
-                className: 'btn btn-danger',
-                text: 'PDF',
-                orientation: 'landscape',
-                pageSize: 'A2',
-                exportOptions: {
-                columns: ':visible'
-                },
-                customize: function(doc) {
-                    doc.content.forEach(function(item) {
-                    if (item.text) {
-                    item.text[0].fontSize = 8 // Set the font size to 8pt
-                    }
-                });
-                }
-            },
-        ],
-        pageLength: 10,
-        datetime:true,
-        responsive: true,
-        lengthChange:true,
-        autoFill:true,
-        keys: {
-            columns: ':not(:first-child)',
-            editor:  editor
-        },        searching:true,
-        scrollX:true,
-        scrollY:true,
-        bInfo:true,
-        bSort:true,
-        language: {
-            "url": "//cdn.datatables.net/plug-ins/1.13.1/i18n/it-IT.json"},
-        // Set the processing option to true to show a loading indicator
-        processing: true,
-    });
-});
+function scaricaContratti() {
+    // Get the value of the input field
+    var inputValue = document.getElementById("contratti-input").value;
+    // Get the form element
+    var form = document.createElement("form");
+
+    form.action = "../../gestione/lista_contratti/scarica/" + inputValue + "/";
+
+    // Set the method attribute of the form to GET
+    form.method = "post";
+
+    // Add the form to the HTML document
+    document.body.appendChild(form);
+
+    // Submit the form
+    form.submit();
+    console.log(inputValue)
+}
+document.getElementById("contratti-button-scarica");
+
+
+function submitFormDipendente() {
+    var form = document.getElementById("reception-form-cerca");
+    var input = document.createElement("dipendente");
+    input.setAttribute("type", "hidden");
+    input.setAttribute("name", "giorno");
+    input.setAttribute("value", document.getElementById("dipendente").value);
+    form.appendChild(input);
+    form.submit();
+}
+
+document.getElementById("button-cerca-dipendente");
+
+
+// function submitFormAccettate() {
+//     var form = document.getElementById("reception-form-accettate");
+//     var input = document.createElement("accettate");
+//     input.setAttribute("type", "hidden");
+//     input.setAttribute("name", "accettate");
+//     input.setAttribute("value", "accettate");
+//     form.appendChild(input);
+//     form.submit();
+// }
+
+// document.getElementById("button-cerca-accettate");
+
+
+// function submitFormRifiutate() {
+//     var form = document.getElementById("reception-form-rifiutate");
+//     var input = document.createElement("rifiutate");
+//     input.setAttribute("type", "hidden");
+//     input.setAttribute("name", "rifiutate");
+//     input.setAttribute("value", "rifiutate");
+//     form.appendChild(input);
+//     form.submit();
+// }
+
+// document.getElementById("button-cerca-rifiutate");

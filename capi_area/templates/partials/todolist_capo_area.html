@@ -1,0 +1,76 @@
+<div class="container" id="todolist">
+    <div class="cartaBox-table-reception-datatables">
+
+            <div class="carta-table-reception-datatables text-nowrap">
+                <div>
+                    <div class="numbers">{{todos|length}}</div>
+                    <div class="no-hover">
+                    <table class="table table-striped table-hover caption-top">
+                        <caption>Todos</caption>
+                        <thead>
+                        <tr>
+                            <th scope="col"></th>
+                            <td> Appunto</td>
+                            <td> Assegnato a:</td>
+                            <td> Assegnata il:</td>
+                            <td> Priorità</td>
+                            <td> Fatta?</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% if todos %}
+                            {% for todo in todos %}
+                            <tr>
+                                <th scope="col">
+                                    <div class="dropdown">
+                                        <a class="d-flex align-items-center link-dark text-decoration-none dropdown-toggle" id="dropdownUser2" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#14A44D" class="bi bi-check2" viewBox="0 0 16 16">
+                                                <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z"/>
+                                            </svg>
+                                        </a>
+                                            <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser2">
+                                            <li><a class="dropdown-item" onclick="open_modal_modifica_todo('{% url 'capi_area:update_todo_capo_area' todo.pk %}')">Modifica</a></li>
+                                        </ul>
+                                    </div>
+                                </th>
+                                <td>{% if todo.todo != none %}{{todo.todo}}{% endif %}</td>
+                                <td> <div {% if not todo.setter %} class="stato attesa text-center" {% else %} class="stato maternita text-center" {% endif %}>{% if not todo.setter %} Me {% else %} {{todo.user.last_name}} {{todo.user.first_name}} {% endif %}</div></td>
+                                <td>{% if todo.data != none %}{{todo.data|date:"Y-m-d"}}{% endif %}</td>
+                                <td><div {% if todo.priority == 0 %} class="stato attivo text-center" {% elif todo.priority == 1 %} class="stato tirocinante text-center" {% elif todo.priority == 2 %} class="stato permesso text-center" {% elif todo.priority == 3 %} class="stato assente text-center" {% else %} class="stato attivo text-center" {% endif %}>{% if todo.priority == 0 %} Bassa {% elif todo.priority == 1 %} Media {% elif todo.priority == 2 %} Alta{% elif todo.priority == 3 %} Urgente {% else %} Bassa{% endif %}</div></td>
+                                <td><div class="container">{% if todo %}<a href="{% url 'capi_area:delete_todo_capo_area' todo.pk %}" hx-put="{% url 'capi_area:delete_todo_capo_area' todo.pk %}" hx-target="#todolist"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="red" class="bi bi-check2-all" viewBox="0 0 16 16">
+                                    <path d="M12.354 4.354a.5.5 0 0 0-.708-.708L5 10.293 1.854 7.146a.5.5 0 1 0-.708.708l3.5 3.5a.5.5 0 0 0 .708 0l7-7zm-4.208 7-.896-.897.707-.707.543.543 6.646-6.647a.5.5 0 0 1 .708.708l-7 7a.5.5 0 0 1-.708 0z"/>
+                                    <path d="m5.354 7.146.896.897-.707.707-.897-.896a.5.5 0 1 1 .708-.708z"/>
+                                  </svg><a/>{% endif %}</div></td>
+                                </tr>
+                            {% endfor %}
+                        {% else %}
+                        <tr>
+                            <th scope="col">
+                            </th>
+                            <td>Non ci sono note ne assegni.</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        {% endif %}
+                        </tbody> 
+                    </table>
+                </div>
+                </div>
+                <div class="iconBox">
+                    <form class="d-flex align-items-center">
+                    {% csrf_token %}
+                    <select class="form-select form-select-sm" aria-label="Default select example" name="dipendente" style="margin-right:1em;">
+                        <option selected>Me</option>
+                        {% for dip in dipendenti %}
+                        <option id="dipendente" name="dipendente" value="{{dip.0}}">{{dip.1|title}} {{dip.2|title}}</option>
+                        {% endfor %}
+                  </select>    
+                    <input input="text" name="aggiungi" id="aggiungi" class="form-control-sm mr-2" placeholder="Aggiungi un todo" style="margin-right:1em;">
+                    <button hx-post="{% url 'capi_area:todolist_capo_area' %}" hx-target="#todolist" type="submit" class="btn btn-success btn-sm">Crea</button>
+                    </form>
+                </div>
+                </a>
+            </div>
+    </div>  
+</div> 

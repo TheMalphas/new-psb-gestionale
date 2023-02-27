@@ -1,12 +1,24 @@
 {% extends 'base/main.html' %}
+
 {% load static %}
+
 {% block content %}
 
-<title>{% block title%}Permessi in corso{% endblock %}</title>
+<title>{% block title%}Presenze{% endblock %}</title>
 <link rel="stylesheet" href="{% static 'gestione/css/style.css' %}">
+<link rel="stylesheet" href="{% static 'base/css/datatables.css' %}">
 <script src="{% static 'gestione/js/script.js' %}"></script>
 
-<section style="box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); margin-left:268px;">
+<!-- Datatables -->
+
+<link href="https://cdn.datatables.net/1.13.2/css/jquery.dataTables.min.css" rel="stylesheet" crossorigin="anonymous">
+<script src="https://cdn.datatables.net/1.13.2/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/v/bs5/jszip-2.5.0/dt-1.13.2/af-2.5.2/b-2.3.4/b-colvis-2.3.4/b-html5-2.3.4/b-print-2.3.4/cr-1.6.1/date-1.3.0/fc-4.2.1/fh-3.3.1/kt-2.8.1/r-2.4.0/rg-1.3.0/rr-1.3.2/sc-2.1.0/sb-1.4.0/sp-2.1.1/sr-1.2.1/datatables.min.js"></script>
+    
+
+<section id="styler-navbar" style="box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2); margin-left:210px;">
   <header class="p-3 bg-light text-black">
       <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
   
@@ -37,67 +49,84 @@
       </div>
 </header>
 </section>
-
+  
 <section style="margin-left:300px; margin-top:25px;">
   <div class="cartaBox-table-reception-datatables">
 
-          <div class="carta-table-reception-datatables">
-              <div>
-                  <div class="numbers">{{richieste|length}}</div>
-                  <div class="no-hover">
-                  <table class="table table-striped table-hover caption-top">
-                    <caption>Lista Richieste Accettate, {{data}}</caption>
-                      <thead>
-                      <tr>
-                        <th scope="col"></th>
-                        <th scope="col">Dipendente</th>
-                        <th scope="col">Area</th>
-                        <th scope="col">Responsabile</th>
-                        <th scope="col">Permesso</th>
-                        <th scope="col">Inizio</th>
-                        <th scope="col">Ritorno</th>
-                        <th scope="col">Orario</th>
-                        <th scope="col">Urgente</th>
+    <div class="carta-table-reception-datatables">
+      <div>
+            <div class="numbers">{{richieste|length}}</div>
+            <div class="no-hover">
+                <table class="table table-striped table-hover caption-top" id="table-presenze">
+                  <caption>Lista Richieste Accettate, {{data}}</caption>
+                  <thead>
+                  <tr>
+                    <th>Dipendente</th>
+                    <th>Area</th>
+                    <th>Responsabile</th>
+                    <th>Permesso</th>
+                    <th>Inizio</th>
+                    <th>Ritorno</th>
+                    <th>Orario</th>
+                    <th>Urgente</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                    {% for richiesta in richieste %}
+                    <tr>
+                        <td>
+                          <div class="d-flex align-items-center">
+                            <span>{{richiesta.id_richieste.nominativo}}</span>
+                            <span>  
+                              <div class="dropdown">
+                                <a href="#" class="d-flex align-items-center link-dark text-decoration-none dropdown-toggle" id="dropdownUser2" data-bs-toggle="dropdown" aria-expanded="false">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-mouse-fill" viewBox="0 0 16 16">
+                                    <path d="M3 5a5 5 0 0 1 10 0v6a5 5 0 0 1-10 0V5zm5.5-1.5a.5.5 0 0 0-1 0v2a.5.5 0 0 0 1 0v-2z"/>
+                                </svg>
+                                </a>
+                                <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser2">
+                                  <li><a class="dropdown-item"  onclick="open_modal_conferma_richieste_accettate('{% url 'gestione:conferma-richieste-accettate' richiesta.pk %}')">Conferma Richiesta</a></li>
+                                  <li><hr class="dropdown-divider"></li>
+                                  <li><a class="dropdown-item" onclick="open_modal_modifica_richieste_accettate('{% url 'gestione:modifica-richieste-accettate' richiesta.pk %}')">Modifica</a></li>
+                                </ul>
+                                </div>
+                            </div>
+                          </span>
+                        </td>
+                        <td>{{richiesta.id_richieste.id_dipendente_richiesta.area}}</td>
+                        <td>{{richiesta.id_capoarea_richieste.nomecompleto}}</td>
+                        <td> <div {% if richiesta.id_richieste.id_permessi_richieste.id_permesso == 2 %} class="stato maternita text-center" style="color:white;" {% elif richiesta.id_richieste.id_permessi_richieste.id_permesso == 13 %} class="stato malattia text-center" style="color:white;"{% elif richiesta.id_richieste.id_permessi_richieste.id_permesso == 6 %} class="stato ferie text-center" style="color:white;" {% elif richiesta.id_richieste.id_permessi_richieste.id_permesso != 6 %} class="stato permesso text-center" style="color:white;" {% endif %}> {% if richiesta.id_richieste.id_permessi_richieste %} {{richiesta.id_richieste.id_permessi_richieste.codicepermesso|title}} {% else %} Permesso Orario {% endif %}</div></td>
+                        <td>{{richiesta.data_inizio_permesso|date:"j N Y"}}</td>
+                        <td>{% if richiesta.data_fine_permesso %}{{richiesta.data_fine_permesso|date:"j N Y"}} {% else %} -- {% endif %}</td>
+                        <td>{% if richiesta.ora_inizio_permesso %}da {{richiesta.ora_inizio_permesso|time:"H:i"}} a {{richiesta.ora_fine_permesso|time:"H:i"}} {% else %} -- {% endif %}</td>
+                        <td>{% if richiesta.id_richieste.urgente %} Si {% else %} No {% endif %}</td>
                       </tr>
-                      </thead>
-                      <tbody>
-                      {% for richiesta in richieste %}
-                          <tr>
-                              <th scope="col">
-                                  <div class="dropdown">
-                                      <a href="#" class="d-flex align-items-center link-dark text-decoration-none dropdown-toggle" id="dropdownUser2" data-bs-toggle="dropdown" aria-expanded="false">
-                                          <i class="bi bi-plus-square-fill"></i>
-                                      </a>
-                                          <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser2">
-                                    <li><a class="dropdown-item"  onclick="open_modal_conferma_richieste_accettate('{% url 'gestione:conferma-richieste-accettate' richiesta.pk %}')">Conferma Richiesta</a></li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" onclick="open_modal_modifica_richieste_accettate('{% url 'gestione:modifica-richieste-accettate' richiesta.pk %}')">Modifica</a></li>
-                                      </ul>
-                                  </div>
-                              </th>
-                            <td>{{richiesta.id_richieste.nominativo}}</td>
-                            <td>{{richiesta.id_richieste.id_dipendente_richiesta.area}}</td>
-                            <td>{{richiesta.id_capoarea_richieste.nomecompleto}}</td>
-                            <td> <div {% if richiesta.id_richieste.id_permessi_richieste.id_permesso == 2 %} class="stato maternita text-center" style="color:white;" {% elif richiesta.id_richieste.id_permessi_richieste.id_permesso == 13 %} class="stato malattia text-center" style="color:white;"{% elif richiesta.id_richieste.id_permessi_richieste.id_permesso == 6 %} class="stato ferie text-center" style="color:white;" {% elif richiesta.id_richieste.id_permessi_richieste.id_permesso != 6 %} class="stato permesso text-center" style="color:white;" {% endif %}> {% if richiesta.id_richieste.id_permessi_richieste %} {{richiesta.id_richieste.id_permessi_richieste.codicepermesso|title}} {% else %} Permesso Orario {% endif %}</div></td>
-                            <td>{{richiesta.data_inizio_permesso|date:"j N Y"}}</td>
-                            <td>{% if richiesta.data_fine_permesso %}{{richiesta.data_fine_permesso|date:"j N Y"}} {% else %} -- {% endif %}</td>
-                            <td>{% if richiesta.ora_inizio_permesso %}da {{richiesta.ora_inizio_permesso|time:"H:i"}} a {{richiesta.ora_fine_permesso|time:"H:i"}} {% else %} -- {% endif %}</td>
-                            <td>{% if richiesta.id_richieste.urgente %} Si {% else %} No {% endif %}</td>
-                            {% endfor %}
-                      </tbody>
-                  </table>
-              </div>
-              </div>
-              <div class="iconBox">
-                <svg xmlns="http://www.w3.org/2000/svg" width="55" height="55" fill="currentColor" class="bi bi-pc-display-horizontal" viewBox="0 0 16 16">
-                  <path d="M1.5 0A1.5 1.5 0 0 0 0 1.5v7A1.5 1.5 0 0 0 1.5 10H6v1H1a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1h-5v-1h4.5A1.5 1.5 0 0 0 16 8.5v-7A1.5 1.5 0 0 0 14.5 0h-13Zm0 1h13a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-7a.5.5 0 0 1 .5-.5ZM12 12.5a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0Zm2 0a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0ZM1.5 12h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1ZM1 14.25a.25.25 0 0 1 .25-.25h5.5a.25.25 0 1 1 0 .5h-5.5a.25.25 0 0 1-.25-.25Z"/>
-              </svg>
-              </div>
-              </a>
+                        {% endfor %}
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <th>Dipendente</th>
+                      <th>Area</th>
+                      <th>Responsabile</th>
+                      <th>Permesso</th>
+                      <th>Inizio</th>
+                      <th>Ritorno</th>
+                      <th>Orario</th>
+                      <th>Urgente</th>
+                    </tr>
+                </tfoot>
+              </table>
           </div>
-  </div>    
-
-
+          </div>
+          <div class="iconBox">
+            <a href="{% url 'gestione:anagrafica-dipendente' %}">
+              <svg xmlns="http://www.w3.org/2000/svg" width="55" height="55" fill="currentColor" class="bi bi-pc-display-horizontal" viewBox="0 0 16 16">
+                <path d="M1.5 0A1.5 1.5 0 0 0 0 1.5v7A1.5 1.5 0 0 0 1.5 10H6v1H1a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1h-5v-1h4.5A1.5 1.5 0 0 0 16 8.5v-7A1.5 1.5 0 0 0 14.5 0h-13Zm0 1h13a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-7a.5.5 0 0 1 .5-.5ZM12 12.5a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0Zm2 0a.5.5 0 1 1 1 0 .5.5 0 0 1-1 0ZM1.5 12h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1 0-1ZM1 14.25a.25.25 0 0 1 .25-.25h5.5a.25.25 0 1 1 0 .5h-5.5a.25.25 0 0 1-.25-.25Z"/>
+            </svg>
+            </a>
+          </div>
+      </div>
+    </div>    
 </section>
 
 <div class="modal fade" id="confermaRichiesteAccettateModal" role="dialog" tabindex="-1">
@@ -122,7 +151,98 @@ function open_modal_modifica_richieste_accettate(url){
       $(this).modal('show'); 
     });
 };
-</script>
 
-{% endblock %}
-
+  $(document).ready(function () {
+      // Setup - add a text input to each footer cell
+      $('#table-presenze thead tr')
+          .clone(true)
+          .addClass('filters')
+          .appendTo('#table-presenze thead');
+      
+      var table = $('#table-presenze').DataTable({
+          orderCellsTop: true,
+          fixedHeader: true,
+          dom: 'Bfrtip',
+          buttons: [
+            {
+                extend: 'copy',
+                className: 'btn btn-secondary',
+                text: 'Copia'
+            },
+            {
+                extend: 'excel',
+                className: 'btn btn-success',
+                text: 'Excel'
+            },
+            {
+                extend: 'pdfHtml5',
+                className: 'btn btn-danger',
+                text: 'PDF',
+                orientation: 'landscape',
+                pageSize: 'A3',
+                exportOptions: {
+                columns: ':visible'
+                },
+                customize: function(doc) {
+                    doc.content.forEach(function(item) {
+                    if (item.text) {
+                    item.text[0].fontSize = 8 // Set the font size to 8pt
+                    }
+                });
+                }
+            },
+        ],
+          initComplete: function () {
+              var api = this.api();
+      
+              // For each column
+              api
+                  .columns()
+                  .eq(0)
+                  .each(function (colIdx) {
+                      // Set the header cell to contain the input element
+                      var cell = $('.filters th').eq(
+                          $(api.column(colIdx).header()).index()
+                      );
+                      var title = $(cell).text();
+                      $(cell).html('<input type="text" placeholder="' + title + '" />');
+      
+                      // On every keypress in this input
+                      $(
+                          'input',
+                          $('.filters th').eq($(api.column(colIdx).header()).index())
+                      )
+                          .off('keyup change')
+                          .on('change', function (e) {
+                              // Get the search value
+                              $(this).attr('title', $(this).val());
+                              var regexr = '({search})'; //$(this).parents('th').find('select').val();
+      
+                              var cursorPosition = this.selectionStart;
+                              // Search the column for that value
+                              api
+                                  .column(colIdx)
+                                  .search(
+                                      this.value != ''
+                                          ? regexr.replace('{search}', '(((' + this.value + ')))')
+                                          : '',
+                                      this.value != '',
+                                      this.value == ''
+                                  )
+                                  .draw();
+                          })
+                          .on('keyup', function (e) {
+                              e.stopPropagation();
+      
+                              $(this).trigger('change');
+                              $(this)
+                                  .focus()[0]
+                                  .setSelectionRange(cursorPosition, cursorPosition);
+                          });
+                  });
+          },
+      });
+  });
+  
+  </script>
+{% endblock content %}
